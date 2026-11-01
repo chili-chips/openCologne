@@ -531,6 +531,8 @@ module tb_rules #(
     #2000;
     rule("TX/RX_POWER_DOWN_N_I: done stays", (txdone === 1'b1) && (rxdone === 1'b1), $sformatf(
          "%b%b", txdone, rxdone));
+    rule("TX_POWERDOWN_N_I low: 1/1 on the TX pins, no Z", (txp === 1'b1) && (txn === 1'b1), $sformatf(
+         "%b%b", txp, txn));
     txpd = 1'b1;
     rxpd = 1'b1;
     // near-end PCS loopback: no CDR lock wait; the line cut
@@ -753,6 +755,8 @@ module tb_rules #(
     #3000;
     rule("DS: TX_ELEC_IDLE_I: RX_EI_EN_O at the default RX_EI_BW_SEL", ei_o === 1'b1, $sformatf(
          "%b", ei_o));
+    rule("TX_ELEC_IDLE_I: 0/0 on the TX pins, no X", (txp === 1'b0) && (txn === 1'b0), $sformatf(
+         "%b%b", txp, txn));
     tx_ei = 1'b0;
     #3000;
     rule("RX_EI_EN_O low again with data", ei_o === 1'b0, $sformatf("%b", ei_o));
