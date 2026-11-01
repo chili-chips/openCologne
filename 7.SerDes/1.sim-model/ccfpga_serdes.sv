@@ -63,7 +63,7 @@
 //   tb_rules checks them.
 //
 //   The line: idle (electrical idle) is P = N for 20 UI; TX_ELEC_IDLE_I
-//   drives X on both pins, power down Z (both 0 in Verilator). Idle stops
+//   drives 0 on both pins, power down 1, on every simulator. Idle stops
 //   the receiver, as a lost signal would; RX_EN_EI_DETECTOR_I gates
 //   RX_EI_EN_O only. CDR_MODEL = NONE carries no bits on the pins
 //   (ccfpga_serdes_pkg), so its latency leaves out any wire delay the
@@ -1131,8 +1131,8 @@ module ccfpga_serdes
   bit rx_pad_p;
   bit rx_pad_n;
 
-  // the TX pins, N first: in CDR_MODEL = NONE, P clocks N. X (electrical
-  // idle) and Z (power down) are 0 on the pads.
+  // the TX pins, N first: in CDR_MODEL = NONE, P clocks N. Electrical idle
+  // is 0/0 and power down 1/1 on the pins: P = N, no X or Z.
   task automatic tx_line(logic p, logic n);
     TX_SERIO_N_B = n;
     TX_SERIO_P_B = p;
@@ -1176,13 +1176,14 @@ module ccfpga_serdes
     end
   endtask
 
-  // the line: power down Z, electrical idle X, else the bit
+  // the line: power down 1/1, electrical idle 0/0 (P = N, the same on every
+  // simulator), else the bit
   task automatic tx_drive(bit b);
     if (!tx_powerdown_n_i) begin
-      tx_line(1'bz, 1'bz);
+      tx_line(1'b1, 1'b1);
     end
     else if (tx_elec_idle_i) begin
-      tx_line(1'bx, 1'bx);
+      tx_line(1'b0, 1'b0);
     end
     else begin
       tx_line(b ^ tx_polarity_i, ~(b ^ tx_polarity_i));
@@ -1297,9 +1298,10 @@ module ccfpga_serdes
     end
   end
 
-  // Idle: P = N for EI_WINDOW_UI, so also X or Z on both pins, as a TX in
-  // electrical idle or power down drives them (DS1001 2.5.6.2 gives no
-  // criterion). Data keeps P and N apart, so no run length looks idle.
+  // Idle: P = N for EI_WINDOW_UI, as a TX in electrical idle (0/0) or power
+  // down (1/1) drives them; X or Z from other drivers read 0 on the pads
+  // (DS1001 2.5.6.2 gives no criterion). Data keeps P and N apart, so no run
+  // length looks idle.
   // NONE has no bits on the pins: there, idle is no word for EI_WINDOW_UI
   // (rx_none_words).
   localparam real EI_WINDOW_UI = (CDR_MODEL == NONE) ? 200.0 : 20.0;

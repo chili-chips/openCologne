@@ -130,7 +130,22 @@ The model takes all 115 SerDes parameters, with their names and defaults, so any
 - **TX:** 8b/10b with running disparity, `tx_char_dispmode` / `dispval` forcing, per-byte bypass, the TX buffer (32 words; `TX_BUFFER_ADDR_WIDTH` must stay 5) with its errors, serializer, electrical idle, polarity, PRBS7/15/23/31 with error injection (each rising edge of `TX_PRBS_FORCE_ERR_I` makes one bit wrong, which the checker counts as 3). PRBS23 and 31 are extensions: DS1001 lists PRBS7 and 15.
 - **RX:** the receiver by [`CDR_MODEL`](#three-levels-of-line-and-receiver-cdr_model), deserializer, comma detection, byte and word alignment by `ALIGN_MCOMMA_VALUE`, `ALIGN_PCOMMA_VALUE`, `ALIGN_COMMA_ENABLE` and `ALIGN_COMMA_WORD` (= `RX_ALIGN_COMMA_WORD` of `CC_SERDES`), bit slide, polarity, 8b/10b decode with `not_in_table` and `disp_err`, the RX buffer with clock correction (below), PRBS checker. While comma alignment is on, a comma off the word boundary realigns (DS1001 Table 2.50).
 - **Reset sequencers,** TX and RX, with the PMA/PCS/CDR/EQA/BUF reset timers.
-- **Receiver detection, electrical-idle detection, PCS and PMA loopback.** Electrical idle is P = N for 20 UI, like an envelope detector; 8b/10b has an edge at least every 5 UI, so live traffic never looks idle. In `NONE` one TX can feed any number of receivers.
+- **Receiver detection, electrical-idle detection, PCS and PMA loopback.** Electrical idle is P = N for 20 UI ([line values](#line-values)), like an envelope detector; 8b/10b has an edge at least every 5 UI, so live traffic never looks idle. In `NONE` one TX can feed any number of receivers.
+
+### Line values
+
+The receiver looks only at whether P and N differ, so the line is the same on Verilator and Icarus: no X or Z.
+
+| Pins | Value | Means | Port or parameter |
+|---|---|---|---|
+| P ≠ N | P = the bit, N = its inverse (each XOR the polarity) | a data bit | `TX_POLARITY_I`, `RX_POLARITY_I` |
+| P = N | 0 and 0 | TX electrical idle | `TX_ELEC_IDLE_I` |
+| | 1 and 1 | TX power down | `TX_POWERDOWN_N_I` low |
+| P = N for 20 UI | either of the above | RX electrical idle seen: the receiver stops, as on a lost signal; `RX_EI_EN_O` after `RX_EI_BW_SEL` reference clocks | `RX_EI_BIAS`, `RX_EN_EI_DETECTOR_I` |
+| | `CDR_MODEL = NONE`: no word for 200 UI | the same, with no bits on the pins | |
+| comma | `ALIGN_PCOMMA_VALUE`, `ALIGN_MCOMMA_VALUE` (K28.5 by default) | byte alignment: locks after 16 commas | `ALIGN_COMMA_ENABLE`, `ALIGN_COMMA_WORD` |
+
+An X or Z another model drives reads as 0 on the RX pads.
 
 ### Not modelled
 
