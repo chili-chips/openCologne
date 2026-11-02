@@ -6,21 +6,36 @@ SPDX-License-Identifier: BSD-3-Clause
 
 # SerDes BFM: an open-source model of the GateMate SerDes
 
-`ccfpga_serdes.sv` is an open-source behavioural model of the GateMate SerDes hard macro (`CC_SERDES`), for simulation. It has the SerDes ports and parameters, with their names and defaults, so a design's SerDes instance simulates unchanged: point the file list here. It runs in Verilator and Icarus Verilog, with open tools only.
+`ccfpga_serdes.BFM.sv` is an open-source behavioural model of the GateMate SerDes, for simulation. It runs in Verilator and Icarus Verilog, with open tools only.
 
-For hardware, the design instantiates the `CC_SERDES` primitive. This model stands in for it in simulation only.
+**Level: `ccfpga_serdes`, not `CC_SERDES`.** The model replaces Cologne Chip's simulation model `ccfpga_serdes` (NDA), with its module name, ports and parameters, not the `CC_SERDES` primitive ([the two levels](#ccfpga_serdes-vs-cc_serdes)).
+
+**One instance, chip and simulation.** [`ccfpga_serdes.SYNTH.sv`](ccfpga_serdes.SYNTH.sv) is `ccfpga_serdes` for the chip: `CC_SERDES` behind the same ports and parameters, with `CC_SERDES`'s defaults, names only, no logic. A design instantiates `ccfpga_serdes` once, with no `` `ifdef SYNTHESIS ``: the file list takes `.SYNTH.sv` for synthesis and `.BFM.sv` for simulation.
 
 It was developed in [openCologne](https://github.com/chili-chips-ba/openCologne) (7.SerDes) and is used by [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE). This folder is the master copy.
 
 | File | Content |
 |---|---|
-| [`ccfpga_serdes.sv`](ccfpga_serdes.sv) | the model |
+| [`ccfpga_serdes.BFM.sv`](ccfpga_serdes.BFM.sv) | the model, for simulation |
+| [`ccfpga_serdes.SYNTH.sv`](ccfpga_serdes.SYNTH.sv) | for synthesis: `CC_SERDES` behind the model's ports and parameters |
 | [`ccfpga_serdes_pkg.sv`](ccfpga_serdes_pkg.sv) | 8b/10b codec and PRBS as functions, the model settings (`CDR_MODEL`, `BHV_*`) |
 | [`Makefile`](Makefile) | its own tests: `make -C 7.SerDes/1.sim-model` runs `sim_modes`, `sim_icarus` and `formal` |
 | [`tb_modes.sv`](tb_modes.sv) | one model looped back: the three `CDR_MODEL`s against each other, PRBS, decode table, registers |
 | [`tb_rules.sv`](tb_rules.sv) | the model's behaviour at its ports, rule by rule, where DS1001 is silent |
 | [`ccfpga_serdes.vlt`](ccfpga_serdes.vlt) | Verilator: no lint on the model |
 | [`formal_8b10b/`](formal_8b10b) | formal proofs of the 8b/10b codec (`run-formal.sh`) |
+
+## `ccfpga_serdes` vs `CC_SERDES`
+
+| | `CC_SERDES` (chip) | `ccfpga_serdes` (vendor sim model, this BFM) |
+|---|---|---|
+| What | the hard-macro primitive, a Yosys black box | a behavioural model of the same macro |
+| Parameters | 208 | 115 (+ `SERDES_ENABLE`, `SERDES_AUTO_INIT` in this BFM); 105 shared by name |
+| Only here | the TX sets for electrical idle (`*_EI`) and receiver detection (`*_RXDET`); static values and overrides of control ports (`*_OVR`, e.g. `TX_POLARITY`, `RX_PCS_RESET`) | `ALIGN_*` (`RX_ALIGN_*` on `CC_SERDES`), `RX_RESETDONE_GATE`, `TX_BUFFER_ADDR_WIDTH`, the DFE overrides `RX_*_OVR` |
+| Ports | 61, upper case | 83, lower case; 49 shared (case aside) |
+| Clocks | `PLL_CLK_O`, `TX_CLK_I`, `RX_CLK_I`, `RX_CLK_O`, `REGFILE_CLK_I` | `clk_core_pll_o`, `clk_core_tx_i`, `clk_core_rx_i`, `clk_core_rx_o`, `clk_reg_i`, plus `clk_ref_i`, `clk_cfg_i` and their resets |
+| Only here | `*_POWER_DOWN_N_I`, `*_RESET_DONE_O`, `TX_DETECT_RX_*_O`, `RX_EI_EN_O` (other names on the model) | the config port (`cfg_en_i`, `cfgfile_*`), serial pins (`*_serio_*`), `refclk_sel_o`, `refclk_rterm_o`, scan and test |
+| Bring-up | parameters set the register reset values: `SERDES_ENABLE = 1` and `PLL_EN_ADPLL_CTRL = 1` start it | the vendor model starts disabled: `0x5C` (SerDes Enable) on the config port, then the PLL on in `PLL_CFG0` (`0x50`). This BFM also takes the parameters, and `0x5C` on the regfile, as the chip does |
 
 ## Why
 
@@ -33,18 +48,20 @@ Compile the package first, then the model, then your design and testbench.
 ```sh
 # Verilator
 verilator --binary --timing --timescale 1ns/1ps \
-  ccfpga_serdes_pkg.sv ccfpga_serdes.sv <design and testbench>
+  ccfpga_serdes_pkg.sv ccfpga_serdes.BFM.sv <design and testbench>
 
 # Icarus Verilog
-iverilog -g2012 ccfpga_serdes_pkg.sv ccfpga_serdes.sv <design and testbench>
+iverilog -g2012 ccfpga_serdes_pkg.sv ccfpga_serdes.BFM.sv <design and testbench>
+
+# Yosys, for the chip
+read_slang -D SYNTHESIS <cells_bb.v> ccfpga_serdes.SYNTH.sv <design>
 ```
 
 The model is not lint-clean by our RTL rules, on purpose (see [Implementation](#implementation)). Verilator users can turn lint off for it, as [`ccfpga_serdes.vlt`](ccfpga_serdes.vlt) does.
 
-**Bring-up** is the silicon's: enable the SerDes in the config file (`0x5C = 0x0001`), set the PLL in the regfile, then release the TX and RX resets. Two working examples:
-
-- openCologne: [`iclink_serdes_gm.sv`](../3.iclink-sv/1.hw/iclink_serdes_gm.sv), a bring-up FSM of 3 writes (`iclink_phy_pkg::cfg_seq()`): the PLL for the line rate (`0x51`), SerDes enable, PLL on (`0x50`).
-- openCologne-PCIE: `2.rtl/4.dll/sim/phy_model.sv`, and `writeCfg` / `writeRegfile` tasks in `2.rtl/1.phy/3.sim/tb_phy.sv`.
+**Bring-up** is the silicon's, two ways:
+- **Parameters:** `SERDES_ENABLE = 1`, `PLL_EN_ADPLL_CTRL = 1`, `PLL_CONFIG_SEL = 1` and the PLL rate: the SerDes and PLL start from reset. openCologne-PCIE's `phy_top.sv` does this.
+- **Register writes:** enable the SerDes (`0x5C = 0x0001`, regfile or config file), set the PLL in the regfile, then release the TX and RX resets. openCologne's [`iclink_serdes_gm.sv`](../3.iclink-sv/1.hw/iclink_serdes_gm.sv) does this (`iclink_phy_pkg::cfg_seq()`); so do `2.rtl/4.dll/sim/phy_model.sv` and the `writeCfg` / `writeRegfile` tasks of `2.rtl/1.phy/3.sim/tb_phy.sv` in openCologne-PCIE.
 
 ## Settings
 
@@ -85,7 +102,7 @@ The three agree word for word, with latencies within 4 UI of each other (`sim_mo
 
 ## Parameters
 
-The model takes all 115 SerDes parameters, with their names and defaults, so any instantiation works unchanged. It acts on 38. 7 more only set a register value to read back. The other 70 tune what a digital model doesn't have; it accepts them for drop-in compatibility. A value the datasheet doesn't allow (UG1001 Tables 7.12 to 7.14, DS1001 Tables 2.15 to 2.17), or one the model doesn't model, stops the simulation (`$error`, then `$fatal`). So do a bad `PLL_CFG1` or `RX_BUF_CFG` written at run time, when it takes effect. Example: `PLL_OUT_DIVSEL = 2`, n.a. in DS1001 Table 2.15.
+The model takes all 115 `ccfpga_serdes` parameters, with their names and defaults, so any instantiation of the vendor model works unchanged, plus `SERDES_ENABLE` and `SERDES_AUTO_INIT` of `CC_SERDES`. It acts on 38. 7 more only set a register value to read back. The other 70 tune what a digital model doesn't have; it accepts them for drop-in compatibility. A value the datasheet doesn't allow (UG1001 Tables 7.12 to 7.14, DS1001 Tables 2.15 to 2.17), or one the model doesn't model, stops the simulation (`$error`, then `$fatal`). So do a bad `PLL_CFG1` or `RX_BUF_CFG` written at run time, when it takes effect. Example: `PLL_OUT_DIVSEL = 2`, n.a. in DS1001 Table 2.15.
 
 **Modelled (34):**
 

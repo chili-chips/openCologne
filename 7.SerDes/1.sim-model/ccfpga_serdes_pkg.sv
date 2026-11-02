@@ -37,7 +37,7 @@
 //              https://opensource.org/license/bsd-3-clause
 //--------------------------------------------------------------------------
 // Description:
-//   Shared by every SerDes BFM (ccfpga_serdes.sv): its settings, the NONE
+//   Shared by every SerDes BFM (ccfpga_serdes.BFM.sv): its settings, the NONE
 //   word channel, and pure functions: the 8b/10b codec, PRBS, PLL divider.
 //   formal_8b10b/ proves enc8b10b() and dec8b10b() from this package.
 //

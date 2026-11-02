@@ -41,7 +41,7 @@ OFL      ?= openFPGALoader
 
 BLD      := build
 HW       := $(abspath ../1.hw)
-SV       := $(shell bash -c '. ./sources.sh && design_rtl $(HW)')
+SV       := $(shell bash -c '. ./sources.sh && design_rtl $(HW) && serdes_synth')
 # the GateMate primitives (CC_SERDES, ...) as blackboxes for read_slang
 CELLS    := $(shell $(YOSYS)-config --datdir)/gatemate/cells_bb.v
 

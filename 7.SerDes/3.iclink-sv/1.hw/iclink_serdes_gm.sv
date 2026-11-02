@@ -57,10 +57,10 @@
 //   bring-up: four regfile writes
 //   (iclink_phy_pkg::cfg_seq()), then TX and RX out of reset.
 //
-//   On the chip CC_SERDES connects to its own serial pins and reference
-//   clock. In simulation the SerDes BFM (ccfpga_serdes, the SerDes ports and
-//   parameters) takes its place: serial pins and the reference
-//   are ports, and the SerDes enable goes through its config port.
+//   The SerDes is one ccfpga_serdes instance: CC_SERDES behind the BFM's
+//   ports on the chip (ccfpga_serdes.SYNTH.sv), the BFM in simulation
+//   (ccfpga_serdes.BFM.sv). On the chip CC_SERDES has its own serial pins
+//   and reference clock, so clk_ref and ser_* go unused there.
 //==========================================================================
 
 module iclink_serdes_gm
@@ -69,13 +69,13 @@ module iclink_serdes_gm
 #(
     parameter int LINE_RATE = 2500
 ) (
-`ifndef SYNTHESIS
+    // the BFM's reference and serial pins; ccfpga_serdes.SYNTH.sv does not
+    // use them: CC_SERDES has its own
     input  logic clk_ref,  // SerDes reference, 100 MHz
     input  logic ser_rxp,
     input  logic ser_rxn,
     output logic ser_txp,
     output logic ser_txn,
-`endif
 
     input logic      clk_reg,  // bring-up clock, the board clock
     input logic      arst_n,   // reset, released on clk_reg
@@ -117,9 +117,6 @@ module iclink_serdes_gm
   cfg_write_t                  reg_wr;
   logic                        pll_reset;  // PLL in reset until the board clock runs
   logic                        serdes_reset;  // TX and RX in reset until the bring-up is done
-`ifndef SYNTHESIS
-  logic cfg_en;  // the BFM: the SerDes enable goes to its config port
-`endif
 
   always_ff @(posedge clk_reg or negedge arst_n) begin
     if (!arst_n) begin
@@ -130,16 +127,10 @@ module iclink_serdes_gm
       reg_wr       <= '0;
       pll_reset    <= 1'b1;
       serdes_reset <= 1'b1;
-`ifndef SYNTHESIS
-      cfg_en <= 1'b0;
-`endif
     end
     else begin
       reg_en    <= 1'b0;
       pll_reset <= 1'b0;
-`ifndef SYNTHESIS
-      cfg_en <= 1'b0;
-`endif
 
       unique case (cfg_state)
         CFG_IDLE: begin
@@ -150,12 +141,7 @@ module iclink_serdes_gm
         end
 
         CFG_WRITE: begin
-`ifdef SYNTHESIS
-          reg_en <= 1'b1;
-`else
-          reg_en <= CFG_SEQ[cfg_idx].addr != SERDES_CFG_ADDR;
-          cfg_en <= CFG_SEQ[cfg_idx].addr == SERDES_CFG_ADDR;
-`endif
+          reg_en    <= 1'b1;
           reg_wr    <= CFG_SEQ[cfg_idx];
           cfg_state <= CFG_WAIT;
         end
@@ -343,89 +329,9 @@ module iclink_serdes_gm
   //-----------------------------------------------------------------------
   // The SerDes
   //-----------------------------------------------------------------------
-`ifdef SYNTHESIS
-
-  CC_SERDES #(
-      .SERDES_ENABLE      (1'b1),
-      .SERDES_AUTO_INIT   (1'b0),                // the bring-up above sets the PLL up
-      .RX_ALIGN_COMMA_WORD(2'b11),               // the comma in lane 0 or 4: the lane aligner
-      .RX_CLKCOR_USE      (1'b1),                // two boards: the ppm between them
-      .RX_CLKCOR_MIN_LAT  (PHY_CLKCOR_MIN_LAT),
-      .RX_CLKCOR_MAX_LAT  (PHY_CLKCOR_MAX_LAT),
-      .RX_CLKCOR_SEQ_1_0  (PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_1  (PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_2  (PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_3  (PHY_CLKCOR_SEQ)
-  ) u_serdes (
-      .PLL_RESET_I           (pll_reset),
-      .PLL_CLK_O             (clk_core),
-      .REGFILE_CLK_I         (clk_reg),
-      .REGFILE_WE_I          (reg_en),
-      .REGFILE_EN_I          (reg_en),
-      .REGFILE_ADDR_I        (reg_wr.addr),
-      .REGFILE_DI_I          (reg_wr.data),
-      .REGFILE_MASK_I        (16'hFFFF),
-      .REGFILE_RDY_O         (  /*LINT:OK*/),       // the bring-up waits a fixed time instead
-      .REGFILE_DO_O          (  /*LINT:OK*/),       // write-only
-      .LOOPBACK_I            (3'b000),
-      // TX
-      .TX_RESET_I            (serdes_reset),
-      .TX_PCS_RESET_I        (1'b0),
-      .TX_PMA_RESET_I        (1'b0),
-      .TX_CLK_I              (clk_core),
-      .TX_DATA_I             (tx_ser.d),
-      .TX_CHAR_IS_K_I        (tx_ser.k),
-      .TX_CHAR_DISPMODE_I    ('0),                  // CC_SERDES keeps the running disparity
-      .TX_CHAR_DISPVAL_I     ('0),
-      .TX_8B10B_EN_I         (1'b1),
-      .TX_8B10B_BYPASS_I     ('0),
-      .TX_PRBS_SEL_I         (3'b000),              // PRBS is in the fabric
-      .TX_PRBS_FORCE_ERR_I   (1'b0),
-      .TX_POWER_DOWN_N_I     (1'b1),
-      .TX_POLARITY_I         (1'b0),
-      .TX_ELEC_IDLE_I        (1'b0),
-      .TX_DETECT_RX_I        (1'b0),
-      .TX_RESET_DONE_O       (tx_resetdone),
-      .TX_BUF_ERR_O          (  /*LINT:OK*/),       // TX buffer status: not used
-      .TX_DETECT_RX_DONE_O   (  /*LINT:OK*/),       // receiver detection is off
-      .TX_DETECT_RX_PRESENT_O(  /*LINT:OK*/),       // receiver detection is off
-      // RX
-      .RX_RESET_I            (serdes_reset),
-      .RX_PMA_RESET_I        (1'b0),
-      .RX_EQA_RESET_I        (1'b0),
-      .RX_CDR_RESET_I        (1'b0),
-      .RX_PCS_RESET_I        (1'b0),
-      .RX_BUF_RESET_I        (1'b0),
-      .RX_CLK_I              (clk_core),
-      .RX_CLK_O              (  /*LINT:OK*/),       // the RX buffer hands RX over to clk_core
-      .RX_POWER_DOWN_N_I     (1'b1),
-      .RX_POLARITY_I         (1'b0),
-      .RX_8B10B_EN_I         (1'b1),
-      .RX_8B10B_BYPASS_I     ('0),
-      .RX_PRBS_SEL_I         (3'b000),              // PRBS is in the fabric
-      .RX_PRBS_CNT_RESET_I   (1'b0),
-      .RX_PRBS_ERR_O         (  /*LINT:OK*/),       // PRBS is in the fabric
-      .RX_EN_EI_DETECTOR_I   (1'b0),
-      .RX_COMMA_DETECT_EN_I  (1'b1),
-      .RX_SLIDE_I            (1'b0),
-      .RX_MCOMMA_ALIGN_I     (rx_align),
-      .RX_PCOMMA_ALIGN_I     (rx_align),
-      .RX_DATA_O             (rx_hm.d),
-      .RX_CHAR_IS_K_O        (rx_hm.k),
-      .RX_NOT_IN_TABLE_O     (rx_hm.not_in_table),
-      .RX_DISP_ERR_O         (rx_hm.disp_err),
-      .RX_CHAR_IS_COMMA_O    (NC_rx_comma),
-      .RX_BYTE_IS_ALIGNED_O  (rx_hm.aligned),
-      .RX_BYTE_REALIGN_O     (  /*LINT:OK*/),       // alignment is acquired once
-      .RX_RESET_DONE_O       (rx_hm.resetdone),
-      .RX_BUF_ERR_O          (rx_hm.buf_err),
-      .RX_EI_EN_O            (  /*LINT:OK*/)        // electrical-idle detector is off
-  );
-
-`else
-
-  // The BFM: the SerDes enable goes through its config port, the PLL writes
-  // through the regfile, as on the chip
+  // ccfpga_serdes: CC_SERDES on the chip (ccfpga_serdes.SYNTH.sv), the BFM
+  // in simulation (ccfpga_serdes.BFM.sv); the file list picks one. The
+  // bring-up above writes the regfile, the SerDes enable included.
   logic        reset_core_pll_n;
 
   // the BFM's outputs that are not needed
@@ -444,8 +350,10 @@ module iclink_serdes_gm
   logic        NC_rx_ei_en_o;
 
   ccfpga_serdes #(
-      .ALIGN_COMMA_WORD (2'b11),               // as RX_ALIGN_COMMA_WORD above
-      .RX_CLKCOR_USE    (1),
+      .SERDES_ENABLE    (1),
+      .SERDES_AUTO_INIT (0),                   // the bring-up above sets the PLL up
+      .ALIGN_COMMA_WORD (2'b11),               // the comma in lane 0 or 4: the lane aligner
+      .RX_CLKCOR_USE    (1),                   // two boards: the ppm between them
       .RX_CLKCOR_MIN_LAT(PHY_CLKCOR_MIN_LAT),
       .RX_CLKCOR_MAX_LAT(PHY_CLKCOR_MAX_LAT),
       .RX_CLKCOR_SEQ_1_0(PHY_CLKCOR_SEQ),
@@ -484,11 +392,11 @@ module iclink_serdes_gm
       .regfile_di_i        (reg_wr.data),
       .regfile_do_o        (NC_regfile_do_o),
       .regfile_rdy_o       (NC_regfile_rdy_o),
-      .cfg_en_i            (cfg_en),
+      .cfg_en_i            (1'b0),                // the regfile does it all
       .reset_cfg_i         (1'b0),
-      .cfgfile_di_i        (reg_wr.data),
-      .cfgfile_valid_i     (cfg_en),
-      .cfgfile_addr_i      (reg_wr.addr),
+      .cfgfile_di_i        (16'h0),
+      .cfgfile_valid_i     (1'b0),
+      .cfgfile_addr_i      (8'h0),
       .tx_reset_i          (serdes_reset),
       .tx_pcs_reset_i      (1'b0),
       .tx_pma_reset_i      (1'b0),
@@ -538,8 +446,6 @@ module iclink_serdes_gm
       .rx_resetdone_o      (rx_hm.resetdone),
       .rx_ei_en_o          (NC_rx_ei_en_o)
   );
-
-`endif
 
 endmodule : iclink_serdes_gm
 

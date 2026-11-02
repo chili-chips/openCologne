@@ -174,16 +174,22 @@ module top
   // the pump's SerWB words a clock: 4 at 5 Gb/s, on every other clock
   localparam int PUMP_W = (LINE_RATE == 5000) ? 4 : 2;
 
+`ifdef SYNTHESIS
+  // CC_SERDES has its own serial pins and reference clock: no board pins here
+  logic clk_ref, ser_rxp, ser_rxn, ser_txp, ser_txn;
+  assign {clk_ref, ser_rxp, ser_rxn} = '0;
+  logic NC_ser_tx;  // the serial outputs go nowhere on the chip
+  assign NC_ser_tx = ser_txp ^ ser_txn;
+`endif
+
   iclink_serdes_gm #(
       .LINE_RATE(LINE_RATE)
   ) u_phy (
-`ifndef SYNTHESIS
       .clk_ref       (clk_ref),
       .ser_rxp       (ser_rxp),
       .ser_rxn       (ser_rxn),
       .ser_txp       (ser_txp),
       .ser_txn       (ser_txn),
-`endif
       .clk_reg       (clk),
       .arst_n        (rst_n),
       .ctrl          (link_ctrl),

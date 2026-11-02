@@ -55,7 +55,7 @@ W=$(mktemp -d); cd "$W"
 } > bb.v
 
 files() {  # $1 = 1.hw dir
-  echo bb.v $(design_rtl "$1" | tr '\n' ' ')
+  echo bb.v $(design_rtl "$1" | tr '\n' ' ') $(serdes_synth)
 }
 BB="t:CC_SERDES t:CC_PLL t:CC_USR_RSTN t:CC_BUFG"
 PREP="hierarchy -top $TOP; proc; flatten; memory; async2sync"

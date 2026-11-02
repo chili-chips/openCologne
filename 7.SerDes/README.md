@@ -29,7 +29,7 @@ Start with the standalone [SerDes loopback test](2.prbs-loopback/README.md), to 
 | Folder | What | Status |
 |---|---|---|
 | [0.doc](0.doc) | diagrams, and the design notes below | |
-| [1.sim-model](1.sim-model/README.md) | SerDes BFM: open-source simulation model of `CC_SERDES`; shared with openCologne-PCIE | done |
+| [1.sim-model](1.sim-model/README.md) | the SerDes for simulation (BFM) and for the chip (`CC_SERDES` wrapper), one module: [below](#one-serdes-module-chip-and-simulation); shared with openCologne-PCIE | done |
 | [2.prbs-loopback](2.prbs-loopback) | standalone SerDes loopback test | works |
 | [3.iclink-sv](3.iclink-sv/README.md) | the IC Link in SystemVerilog: our reference example, with the full QA flow | WIP |
 | [9.liteiclink-migen](9.liteiclink-migen/README.md) | the earlier LiteICLink port in Python (Migen): GateMate PHY `serdes_gm.py`, LiteX target, demo firmware | archived prototype, does not build |
@@ -42,6 +42,19 @@ Design notes, in `0.doc`:
 | [Clock correction](0.doc/clock-correction.md) | what the `CC_SERDES` RX buffer can and cannot do between two boards, what we did, what it means for PCIe |
 | [Serial Wishbone protocol](0.doc/serwb-protocol.md) | the frame, Etherbone, the interoperability proof, preamble look-alikes, SerWB against PCIe |
 | [Test setups](0.doc/test-setups.md) | the three hardware setups, GateMate to Lattice ECP5 |
+
+### One SerDes module, chip and simulation
+
+A design instantiates `ccfpga_serdes` once, with no `` `ifdef SYNTHESIS ``. The file list picks its body:
+
+| File (in [1.sim-model](1.sim-model/README.md)) | For | What |
+|---|---|---|
+| `ccfpga_serdes.SYNTH.sv` | synthesis | `CC_SERDES`, the hard macro, behind `ccfpga_serdes` ports and parameters; names only, no logic |
+| `ccfpga_serdes.BFM.sv` | simulation | our open-source BFM, a drop-in for Cologne Chip's simulation model `ccfpga_serdes` |
+
+- **Why:** `CC_SERDES` and the vendor simulation model have other port names and parameter sets, so a design used to carry both behind an `` `ifdef ``, and the chip's settings went untested in simulation.
+- **Bring-up:** the same in both: parameters (`SERDES_ENABLE`, `PLL_EN_ADPLL_CTRL`, ...), regfile writes, or both.
+- **Users:** [3.iclink-sv](3.iclink-sv/README.md) here and openCologne-PCIE's `phy_top`.
 
 ## IC Link in SystemVerilog
 

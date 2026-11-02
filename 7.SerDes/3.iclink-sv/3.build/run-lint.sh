@@ -74,7 +74,7 @@ cp -r "$HW" "$W/1.hw"
 rm -rf "$W/2.sim" && mkdir -p "$W/2.sim"
 cp $(ref_rtl "$HERE/../2.sim") "$W/2.sim"
 cd "$W"
-SV=$(design_rtl 1.hw | tr '\n' ' ')
+SV="$(design_rtl 1.hw | tr '\n' ' ') $(serdes_synth)"
 SERWB=$(serwb_rtl 1.hw | tr '\n' ' ')
 REF="1.hw/iclink_pkg.sv $(ref_rtl 2.sim | tr '\n' ' ')"
 OWN="$(own_rtl 1.hw | tr '\n' ' ') $(ref_rtl 2.sim | tr '\n' ' ')"
@@ -189,6 +189,7 @@ run_verilator() {
   cat > waive.vlt <<'VLT'
 `verilator_config
 lint_off -file "*bb.v"
+lint_off -file "*ccfpga_serdes.SYNTH.sv"
 VLT
   : > verilator.log
   local rc=0

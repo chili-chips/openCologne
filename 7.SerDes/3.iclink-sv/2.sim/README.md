@@ -15,7 +15,7 @@ make -C 7.SerDes/3.iclink-sv/2.sim sim_top  # one test
 
 Needs Verilator 5 (`--binary --timing`; we use 5.052) and Icarus Verilog 13. Only for `make vectors`: python3 with LiteX and LiteICLink. Only for the pump plot: matplotlib.
 
-The SerDes in simulation is our open-source SerDes BFM, [`1.sim-model`](../../1.sim-model/README.md): a behavioural model of `CC_SERDES`, with its ports and parameters. Verilator runs our RTL with the BFM in place of the hard macro, so no co-simulation (VProc) is needed. Once the eduBOS5 SoC is in, its RTL will run the test firmware the same way.
+The SerDes in simulation is our open-source SerDes BFM, [`1.sim-model`](../../1.sim-model/README.md): a behavioural model at the `ccfpga_serdes` level (Cologne Chip's sim model), not `CC_SERDES`. `iclink_serdes_gm.sv` instantiates `ccfpga_serdes` once: the build takes `ccfpga_serdes.SYNTH.sv` (`CC_SERDES`), the simulation the BFM. Verilator runs our RTL with the BFM in place of the hard macro, so no co-simulation (VProc) is needed. Once the eduBOS5 SoC is in, its RTL will run the test firmware the same way.
 
 <p align="center">
   <img width="100%" alt="tb_phy_oneway: the test sequence drives the PHY (iclink_serdes_gm); the SerDes BFM stands in for CC_SERDES, its serial TX looped to its RX through an XOR for fault injection" src="../../0.doc/iclink-tb.drawio.png">

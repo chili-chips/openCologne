@@ -36,6 +36,7 @@ SOURCES = [
     "iclink_prbs_rx.sv",
     "iclink_phy_pkg.sv",
     "iclink_serdes_gm.sv",
+    "../../1.sim-model/ccfpga_serdes.SYNTH.sv",  # the SerDes: CC_SERDES behind the BFM's ports
 ]
 
 

@@ -32,7 +32,7 @@ top
  |- iclink_serdes_gm          the PHY
  |   |- iclink_prbs_tx        (iclink_prbs_gen x3)
  |   |- iclink_prbs_rx        (iclink_prbs_chk x3)
- |   '- CC_SERDES             (ccfpga_serdes, the BFM, in simulation)
+ |   '- ccfpga_serdes         (.SYNTH.sv: CC_SERDES; .BFM.sv in simulation)
  |- iclink_prbs_tx / _rx      the fabric self-test, on the board clock
  '- iclink_serwb_pump         (2.5 Gb/s builds)
      |- iclink_serwb_fifo x2

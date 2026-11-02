@@ -20,7 +20,7 @@
 SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -ec
 
-BFM := ccfpga_serdes_pkg.sv ccfpga_serdes.sv
+BFM := ccfpga_serdes_pkg.sv ccfpga_serdes.BFM.sv
 
 .PHONY: all sim_modes sim_icarus formal clean
 

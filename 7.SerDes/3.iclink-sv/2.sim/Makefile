@@ -37,7 +37,7 @@ SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -ec
 
 HW  := ../1.hw
-BFM := ../../1.sim-model/ccfpga_serdes_pkg.sv ../../1.sim-model/ccfpga_serdes.sv
+BFM := ../../1.sim-model/ccfpga_serdes_pkg.sv ../../1.sim-model/ccfpga_serdes.BFM.sv
 CDR_MODEL    ?=
 RANDOM_PHASE ?=
 BFM_DEF := $(if $(CDR_MODEL),+define+CDR_MODEL=$(CDR_MODEL)) \

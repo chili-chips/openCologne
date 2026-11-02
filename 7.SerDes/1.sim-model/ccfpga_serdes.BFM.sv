@@ -38,17 +38,19 @@
 //--------------------------------------------------------------------------
 // Description:
 //   The SerDes BFM: an open-source behavioural model of the GateMate SerDes
-//   hard macro, for simulation only (hardware instantiates CC_SERDES).
-//   Module name, ports, parameters and defaults are those of the Cologne
-//   Chip simulation model, so it is a drop-in replacement. Developed in
+//   hard macro, for simulation. Module name, ports, parameters and defaults
+//   are those of the Cologne Chip simulation model, so it is a drop-in
+//   replacement. For the chip, ccfpga_serdes.SYNTH.sv puts CC_SERDES behind
+//   the same ports and parameters: the file list picks one. Developed in
 //   openCologne, then ported to openCologne-PCIE. What is modelled, and
 //   how: README.md, next to this file.
 //
-//   It takes all 115 SerDes parameters. It acts on 38:
+//   It takes 117 parameters: the vendor model's 115, plus SERDES_ENABLE and
+//   SERDES_AUTO_INIT of CC_SERDES. It acts on 39:
 //   resets, comma alignment and slide, RX buffer and clock correction,
 //   datapath widths, loopback, PLL rates and lock, the TX buffer,
-//   electrical idle. 7 more only set a register value to read back
-//   (PLL_CFG0). The other 70 tune what a digital model doesn't have:
+//   electrical idle, the SerDes enable. 8 more only set a register value to
+//   read back (PLL_CFG0, SERDES_CFG). The other 70 tune what a digital model doesn't have:
 //   analog front end, equaliser, TX driver, CDR and PLL loops and their
 //   calibration, eye monitor, debug. A value the datasheet doesn't allow,
 //   or the BFM doesn't model, stops the simulation (param_check), and so
@@ -163,6 +165,8 @@ module ccfpga_serdes
     parameter logic [ 4:0] TX_PCS_RESET_TIME        = 3,                       // ... PCS
     parameter int          TX_PMA_LOOPBACK          = 0,                       // LOOPBACK_I = 010 loops only with this != 0
     parameter logic [ 1:0] TX_DATAPATH_SEL          = 3,                       // TX word, as RX_DATAPATH_SEL; bit 1: M4 = 2
+    parameter int          SERDES_ENABLE            = 0,                       // SERDES_CFG (0x5C) after reset: bit 0, the SerDes on
+    parameter int          SERDES_AUTO_INIT         = 0,                       // ... bit 1: read back only
     parameter int          PLL_EN_ADPLL_CTRL        = 0,                       // PLL_CFG0 after reset: bit 0, PLL on
     parameter int          PLL_CONFIG_SEL           = 0,                       // ... bit 1: 1 the line from PLL_CFG1, 0 fixed
     parameter int          PLL_SET_OP_LOCK          = 1,                       // ... read back only
@@ -436,7 +440,7 @@ module ccfpga_serdes
     csr.rx_clkcor_seq[3] = {6'h0, RX_CLKCOR_SEQ_1_3};
     csr.pll_cfg0         = PLL_OP_RESET;
     csr.pll_cfg1         = PLL_DIV_RESET;
-    csr.serdes_cfg       = '0;
+    csr.serdes_cfg       = {1'b0, 1'(SERDES_AUTO_INIT), 1'(SERDES_ENABLE)};
     refclk_sel_o        <= csr.pll_cfg0[10];
     refclk_rterm_o      <= csr.pll_cfg0[11];
   endtask
@@ -550,10 +554,8 @@ module ccfpga_serdes
           8'h27: begin csr.rx_clkcor_seq[1] = masked(csr.rx_clkcor_seq[1], d, m); end
           8'h28: begin csr.rx_clkcor_seq[2] = masked(csr.rx_clkcor_seq[2], d, m); end
           8'h29: begin csr.rx_clkcor_seq[3] = masked(csr.rx_clkcor_seq[3], d, m); end
-          SERDES_CFG_ADDR: begin
-            if (cfg_wr) begin
-              csr.serdes_cfg = d[2:0];
-            end
+          SERDES_CFG_ADDR: begin  // the config file, or the regfile as on the chip
+            csr.serdes_cfg = 3'(masked(16'(csr.serdes_cfg), d, m));
           end
           PLL_CFG0_ADDR: begin
             // [9:1] take only a write that leaves the PLL off (bit 0 = 0):
@@ -942,6 +944,8 @@ module ccfpga_serdes
     n += chk_range("RX_BUF_BYPASS", RX_BUF_BYPASS, 0, 1);
     n += chk_range("RX_CLKCOR_USE", RX_CLKCOR_USE, 0, 1);
     n += chk_range("RX_RESETDONE_GATE", RX_RESETDONE_GATE, 0, 1);
+    n += chk_range("SERDES_ENABLE", SERDES_ENABLE, 0, 1);
+    n += chk_range("SERDES_AUTO_INIT", SERDES_AUTO_INIT, 0, 1);
     n += chk_range("PLL_EN_ADPLL_CTRL", PLL_EN_ADPLL_CTRL, 0, 1);
     n += chk_range("PLL_CONFIG_SEL", PLL_CONFIG_SEL, 0, 1);
     n += chk_range("PLL_SET_OP_LOCK", PLL_SET_OP_LOCK, 0, 1);
