@@ -142,7 +142,7 @@ Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-mod
 | Icarus Verilog | [iverilog#1650](https://github.com/steveicarus/iverilog/issues/1650) | function `output` arguments | open |
 | Icarus Verilog | [iverilog#1651](https://github.com/steveicarus/iverilog/issues/1651) | typed assignment pattern `s_t'{a: ...}` | open |
 | Icarus Verilog | [iverilog#1652](https://github.com/steveicarus/iverilog/issues/1652) | field write to an element of an array of packed structs | closed (fixed on master) |
-| Icarus Verilog | [iverilog#1653](https://github.com/steveicarus/iverilog/issues/1653) | `?:` with `$sformatf()` and a string literal crashes `ivl` | open |
+| Icarus Verilog | [iverilog#1653](https://github.com/steveicarus/iverilog/issues/1653) | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
 | Icarus Verilog | [iverilog#438](https://github.com/steveicarus/iverilog/issues/438#issuecomment-6390247886) (comment) | `wait` on a function call: internal error | open |
 | Verible | [verible#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration | open |
 | Cologne Chip | [gatemate-pipe#12](https://github.com/colognechip/gatemate-pipe/issues/12) = [openCologne-PCIE#28](https://github.com/chili-chips-ba/openCologne-PCIE/issues/28) | DS1001 Table 2.51: `RX_ALIGN_COMMA_WORD` width and default | open |
