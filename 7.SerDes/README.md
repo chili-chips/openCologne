@@ -10,6 +10,10 @@
 
 Design a high-speed serial, **memory-mapped Chip-to-Chip (C2C) Interconnect**. The goal of such IP is to set the stage for creating compute clusters and Hyper Cubes made of GateMate FPGAs, all physically interconnected with SerDes, with this C2C on top of it, serving as logical and transport layer.
 
+<p align="center">
+  <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png">
+</p>
+
 ## Plan of Record
 Having thoroughly studied all options, the developers presented them in a project meeting on _July 11, 2025_, where team unanimously decided for the GateMate Chip2Chip SerDes:
 - not to mimic the semi-proprietary _Xilinx/AMD Aurora_
@@ -120,10 +124,12 @@ The same tests run in simulation and on boards: the sim mirrors each hardware se
 
 Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE); it runs with open tools only.
 
+---
 ## Community Outreach
 - [2025-08-10](https://www.linkedin.com/feed/update/urn:li:activity:7359764905572376577?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7359764905572376577%2C7360217016948985856%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287360217016948985856%2Curn%3Ali%3Aactivity%3A7359764905572376577%29)
 - [2025-02-21](https://www.linkedin.com/posts/patrick-urban-086177251_gatemate-fpga-colognechip-activity-7298662301677551616-4sw0?utm_source=share&utm_medium=member_desktop&rcm=ACoAAAJv-TcBSi_5ff0VNMrInrT-xg44YF3jnyU)
 
+---
 **Issues filed upstream**, from the 7.SerDes work:
 
 | Tool / project | Issue | What | State |
@@ -154,7 +160,9 @@ Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-mod
 State as of 2026-10-26.
 
 ## References
-- Cologne Chip [SerDes example design](https://github.com/pu-cc/gm_serdes_lb) and latest [datasheet](https://colognechip.com/docs/ds1001-gatemate1-datasheet-latest.pdf)
+- Cologne Chip latest [datasheet](https://colognechip.com/docs/ds1001-gatemate1-datasheet-latest.pdf)
+- Cologne Chip [SerDes LB example](https://github.com/pu-cc/gm_serdes_lb) -- Includes **serdestool.py** tool for register map helpers
+- [Intergalaktik 2-chip SerDes test](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/1.pcb#ver1)
 - Xilinx PG046 - [Aurora 8B/10B](https://docs.amd.com/r/en-US/pg046-aurora-8b10b/Introduction?tocId=Tqe8wtK9r1zAUq13hUnVEw)
     - Xilinx SP002 - [Aurora 8B/10B Protocol Spec](https://docs.amd.com/v/u/en-US/aurora_8b10b_protocol_spec_sp002)
 - BerkeleyLab [ChitChat](https://berkeleylab.github.io/Bedrock/_gen_md/serial_io/chitchat/README_md.html) protocol
