@@ -80,6 +80,7 @@ Every SerDes setting is a parameter, with its name and default. The model's own 
 | `BHV_RX_PIPE_STAGES` | `3` | package | RX output delay, in clocks |
 | `BHV_RX_TCO_NS` | `0.1` | package | RX clock to outputs |
 | `BHV_VERBOSE` | `0` | package | Debug prints |
+| `SERDES_ENABLE_DEFAULT`, `SERDES_AUTO_INIT_DEFAULT` | `0`, `0` | package | Defaults of `SERDES_ENABLE` and `SERDES_AUTO_INIT`, the two parameters the vendor model lacks: `CC_SERDES`'s reset value of `0x5C`, so a design can start the BFM as it starts the chip. `0` as the vendor model: the SerDes starts off |
 
 Defines: `+define+CDR_MODEL=FAST` in Verilator, `-DCDR_MODEL=FAST` in Icarus. Edit the others in [`ccfpga_serdes_pkg.sv`](ccfpga_serdes_pkg.sv).
 
@@ -115,7 +116,7 @@ The model takes all 115 `ccfpga_serdes` parameters, with their names and default
 | | `PLL_REF_BYPASS` | `PLL_CFG0` bit 9: `PLL_CLK_O` straight from the reference |
 | Datapath (2) | `RX_DATAPATH_SEL`, `TX_DATAPATH_SEL` | 16, 32 or 64 bits a word; `TX_DATAPATH_SEL[1]` is M4 = 2 |
 | Resets (10) | `RX_PMA_RESET_TIME`, `RX_EQA_RESET_TIME`, `RX_CDR_RESET_TIME`, `RX_PCS_RESET_TIME`, `RX_BUF_RESET_TIME`, `TX_PMA_RESET_TIME`, `TX_PCS_RESET_TIME` | the TX and RX reset sequences, in timer ticks |
-| | `RX_RESET_TIMER_PRESC` | the timers tick every 2^N clocks |
+| | `RX_RESET_TIMER_PRESC` | the RX timers tick every 2N + 1 clocks, as the vendor model (DS1001 Table 2.40 gives no formula) |
 | | `RX_WAIT_CDR_LOCK` | RX reset done waits for the CDR lock |
 | | `RX_RESETDONE_GATE` | 1: RX reset done stays low |
 | CDR (1) | `RX_CDR_FORCE_LOCK` | the CDR reports lock at once |
@@ -144,7 +145,7 @@ The model takes all 115 `ccfpga_serdes` parameters, with their names and default
 
 - **Register and config file:** the address map (`0x00` to `0x42` RX/TX, `0x50` to `0x5B` PLL, `0x5C` SerDes config), masked writes, the `regfile_rdy_o` handshake. Status registers of blocks not modelled read back as converged, so code that polls them goes on. `PLL_CFG5` bit 0 reads the PLL lock.
 - **PLL:** the line rate from `PLL_FCNTRL`, `PLL_MAIN_DIVSEL` and `PLL_OUT_DIVSEL`, from the measured reference; the core clock for the datapath width. On an absolute time grid, so rates off the 100 fs grid don't drift (tested: 3 Gb/s for 5 ms).
-- **TX:** 8b/10b with running disparity, `tx_char_dispmode` / `dispval` forcing, per-byte bypass, the TX buffer (32 words; `TX_BUFFER_ADDR_WIDTH` must stay 5) with its errors, serializer, electrical idle, polarity, PRBS7/15/23/31 with error injection (each rising edge of `TX_PRBS_FORCE_ERR_I` makes one bit wrong, which the checker counts as 3). PRBS23 and 31 are extensions: DS1001 lists PRBS7 and 15.
+- **TX:** 8b/10b with running disparity, `tx_char_dispmode` / `dispval` forcing, per-byte bypass, the TX buffer (32 words; `TX_BUFFER_ADDR_WIDTH` must stay 5) with its errors, serializer, electrical idle, polarity, PRBS7/15/23/31 with error injection (each rising edge of `TX_PRBS_FORCE_ERR_I` makes one bit wrong, which the checker counts as 3), and DS1001's square waves on TX codes 110 and 111. PRBS23 and 31 are the vendor model's; DS1001 lists PRBS7 and 15.
 - **RX:** the receiver by [`CDR_MODEL`](#three-levels-of-line-and-receiver-cdr_model), deserializer, comma detection, byte and word alignment by `ALIGN_MCOMMA_VALUE`, `ALIGN_PCOMMA_VALUE`, `ALIGN_COMMA_ENABLE` and `ALIGN_COMMA_WORD` (= `RX_ALIGN_COMMA_WORD` of `CC_SERDES`), bit slide, polarity, 8b/10b decode with `not_in_table` and `disp_err`, the RX buffer with clock correction (below), PRBS checker. While comma alignment is on, a comma off the word boundary realigns (DS1001 Table 2.50).
 - **Reset sequencers,** TX and RX, with the PMA/PCS/CDR/EQA/BUF reset timers.
 - **Receiver detection, electrical-idle detection, PCS and PMA loopback.** Electrical idle is P = N for 20 UI ([line values](#line-values)), like an envelope detector; 8b/10b has an edge at least every 5 UI, so live traffic never looks idle. In `NONE` one TX can feed any number of receivers.
@@ -180,7 +181,7 @@ Where the datasheet says nothing, the model picks a behaviour at its ports, to c
 - **TX buffer:** `TX_BUF_ERR_O` is sticky until `TX_PCS_RESET_I`; with `TX_CLK_I` stopped, zero symbols go out and no error is flagged.
 - **PLL:** `PLL_CONFIG_SEL` = 0 ignores `PLL_CFG1`; `PLL_REF_BYPASS` puts the reference on `PLL_CLK_O`. With the PLL on, a write drops any change to `PLL_CFG0[9:1]` or `PLL_CFG1`, and the model gives a `$warning`: set them with bit 0 = 0, then turn the PLL on. Our own IC Link bring-up fell into this one.
 
-Rules taken straight from DS1001 are tagged `DS`: `RX_EI_EN_O` at the default `RX_EI_BW_SEL`, and register defaults.
+Rules taken straight from DS1001 are tagged `DS`: `RX_EI_EN_O` at the default `RX_EI_BW_SEL`.
 
 ### RX buffer and clock correction
 

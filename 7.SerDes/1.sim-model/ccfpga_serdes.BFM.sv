@@ -46,7 +46,8 @@
 //   how: README.md, next to this file.
 //
 //   It takes 117 parameters: the vendor model's 115, plus SERDES_ENABLE and
-//   SERDES_AUTO_INIT of CC_SERDES. It acts on 39:
+//   SERDES_AUTO_INIT of CC_SERDES (defaults and why: ccfpga_serdes_pkg).
+//   It acts on 39:
 //   resets, comma alignment and slide, RX buffer and clock correction,
 //   datapath widths, loopback, PLL rates and lock, the TX buffer,
 //   electrical idle, the SerDes enable. 8 more only set a register value to
@@ -61,7 +62,7 @@
 //   Where DS1001 is silent, the BFM picks a behaviour at its ports: comma
 //   alignment (16 commas), lane rotation at 16/32 bits, the reset stages,
 //   regfile timing and the writes it drops, PRBS counts. Rules taken
-//   straight from DS1001 are tagged DS (RX_EI_EN_O, register defaults).
+//   straight from DS1001 are tagged DS (RX_EI_EN_O).
 //   tb_rules checks them.
 //
 //   The line: idle (electrical idle) is P = N for 20 UI; TX_ELEC_IDLE_I
@@ -117,7 +118,7 @@ module ccfpga_serdes
     parameter logic [ 2:0] RX_AFE_VCMSEL            = 4,                       // ... common mode, analog, not modelled
     parameter logic [ 3:0] RX_AFE_GAIN              = 8,                       // ... gain, analog, not modelled
     parameter logic [ 4:0] RX_AFE_PEAK              = 16,                      // ... peaking, analog, not modelled
-    parameter logic [ 7:0] RX_CDR_CKP               = 8'hF8,                   // CDR loop gains (DS1001 Table 2.48): not modelled (BHV_CDR_KP)
+    parameter logic [ 7:0] RX_CDR_CKP               = {3'b101, 5'b01111},      // CDR loop gains: not modelled (BHV_CDR_KP)
     parameter logic [ 7:0] RX_CDR_CKI               = {3'b000, 5'b00000},      // ... not modelled
     parameter logic [14:0] RX_CDR_LOCK_CFG          = 15'b000_1000_1101_0101,  // CDR lock detector: not modelled (BHV_CDR_LOCK_EDGES)
     parameter logic [ 1:0] RX_CDR_SET_ACC_CONFIG    = 2'b00,                   // CDR accumulator presets: not modelled
@@ -165,8 +166,8 @@ module ccfpga_serdes
     parameter logic [ 4:0] TX_PCS_RESET_TIME        = 3,                       // ... PCS
     parameter int          TX_PMA_LOOPBACK          = 0,                       // LOOPBACK_I = 010 loops only with this != 0
     parameter logic [ 1:0] TX_DATAPATH_SEL          = 3,                       // TX word, as RX_DATAPATH_SEL; bit 1: M4 = 2
-    parameter int          SERDES_ENABLE            = 0,                       // SERDES_CFG (0x5C) after reset: bit 0, the SerDes on
-    parameter int          SERDES_AUTO_INIT         = 0,                       // ... bit 1: read back only
+    parameter int          SERDES_ENABLE            = SERDES_ENABLE_DEFAULT,   // not in the vendor model (ccfpga_serdes_pkg):
+    parameter int          SERDES_AUTO_INIT         = SERDES_AUTO_INIT_DEFAULT,// SERDES_CFG (0x5C) after reset, bit 0 SerDes on, bit 1 read back
     parameter int          PLL_EN_ADPLL_CTRL        = 0,                       // PLL_CFG0 after reset: bit 0, PLL on
     parameter int          PLL_CONFIG_SEL           = 0,                       // ... bit 1: 1 the line from PLL_CFG1, 0 fixed
     parameter int          PLL_SET_OP_LOCK          = 1,                       // ... read back only
@@ -182,8 +183,8 @@ module ccfpga_serdes
     parameter logic [ 5:0] PLL_FCNTRL               = 58,                      // word clock divider M1 (DS1001 Table 2.17)
     parameter logic [ 5:0] PLL_MAIN_DIVSEL          = 27,                      // N1, N2, N3: the line rate
     parameter logic [ 1:0] PLL_OUT_DIVSEL           = 0,                       // M3: line rate / 1, 2 or 4
-    parameter logic [ 4:0] PLL_CI                   = 3,                       // PLL loop (DS1001 Table 2.59): analog, not modelled
-    parameter logic [ 9:0] PLL_CP                   = 80,                      // ... analog, not modelled
+    parameter logic [ 4:0] PLL_CI                   = 1,                       // PLL loop: analog, not modelled
+    parameter logic [ 9:0] PLL_CP                   = 60,                      // ... analog, not modelled
     parameter logic [ 3:0] PLL_AO                   = 0,                       // ... analog, not modelled
     parameter logic [ 2:0] PLL_SCAP                 = 0,                       // ... analog, not modelled
     parameter int          PLL_SCAP_AUTO_CAL        = 1,                       // ... analog, not modelled
@@ -1009,14 +1010,14 @@ module ccfpga_serdes
   // the buffer waits: a large TX reset time no longer overflows it
   localparam int TX_BUF_START = (1 << TX_BUFFER_ADDR_WIDTH) / 2;
 
-  // DS1001 Tables 2.34 and 2.52: 001 PRBS-7, 010 PRBS-15, the rest
-  // reserved. Here also: 011 PRBS-23, 100 PRBS-31;
-  // TX 101 data, 110 a 2-UI square wave, 111 half a word high, half low;
-  // RX 101 to 111 no checker. A reserved code gives a $warning, once.
+  // DS1001 Tables 2.34 and 2.52: 001 PRBS-7, 010 PRBS-15; TX 110 a 2-UI
+  // square wave, 111 half a word high, half low. As the vendor model, also
+  // 011 PRBS-23, 100 PRBS-31 (reserved in DS1001). TX 101 sends data, RX 101
+  // to 111 check nothing: a code neither defines gives a $warning, once.
   bit [1:0] prbs_warned;
 
   task automatic prbs_sel_check(bit [2:0] sel, int side);
-    if (sel > 3'b010 && !prbs_warned[side]) begin
+    if (((side == 0) ? (sel == 3'b101) : (sel > 3'b100)) && !prbs_warned[side]) begin
       prbs_warned[side] = HI;
       $warning("%m: %s_PRBS_SEL_I = %b is reserved (DS1001 Table %s)", (side == 0) ? "TX" : "RX", sel,
                (side == 0) ? "2.34" : "2.52");
@@ -1315,7 +1316,8 @@ module ccfpga_serdes
   real rx_ei_deadline;
 
   // RX_EI_EN_O, on the reference clock: idle for RX_EI_BW_SEL clocks (1 to
-  // 8); RX_EI_BIAS = 0 turns the detector off. As DS1001 Table 2.43.
+  // 8), as DS1001 Table 2.43; RX_EI_BIAS = 0 turns the detector off, as
+  // the vendor model.
   int rx_ei_run;
 
   always @(posedge clk_ref_i) begin : rx_ei_out

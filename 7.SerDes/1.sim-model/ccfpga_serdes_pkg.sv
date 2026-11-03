@@ -103,6 +103,15 @@ package ccfpga_serdes_pkg;
   localparam int  BHV_RX_PIPE_STAGES    = 3;      // RX output delay, in clocks
   localparam real BHV_RX_TCO_NS         = 0.1;    // RX clock to outputs
 
+  // Defaults of SERDES_ENABLE and SERDES_AUTO_INIT, the two BFM parameters
+  // the vendor model does not have. They are CC_SERDES parameters: the
+  // reset value of SERDES_CFG (0x5C), bits 0 (SerDes on) and 1, which the
+  // bitstream sets on the chip. They let a design start the BFM as it starts
+  // the chip, with SERDES_ENABLE = 1, instead of writing 0x5C at run time.
+  // 0, as the vendor model's reset value: the SerDes starts off.
+  localparam int  SERDES_ENABLE_DEFAULT    = 0;
+  localparam int  SERDES_AUTO_INIT_DEFAULT = 0;
+
   // The RX word counter starts at a random symbol at each RX start, as on
   // the silicon: the comma then lands in any lane ALIGN_COMMA_WORD allows
   // (any; even; 0 or 4). Logic that assumes lane 0 fails here, not on the
