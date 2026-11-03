@@ -10,10 +10,6 @@
 
 Design a high-speed serial, **memory-mapped Chip-to-Chip (C2C) Interconnect**. The goal of such IP is to set the stage for creating compute clusters and Hyper Cubes made of GateMate FPGAs, all physically interconnected with SerDes, with this C2C on top of it, serving as logical and transport layer.
 
-<p align="center">
-  <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png">
-</p>
-
 ## Plan of Record
 Having thoroughly studied all options, the developers presented them in a project meeting on _July 11, 2025_, where team unanimously decided for the GateMate Chip2Chip SerDes:
 - not to mimic the semi-proprietary _Xilinx/AMD Aurora_
@@ -28,7 +24,28 @@ Given that GateMate proprietary (aka "legacy") PnR is rather unreliable and inse
 
 ## Where to start
 
-Start with the standalone [SerDes loopback test](2.prbs-loopback/README.md), to get used to the hardware platform, SerDes settings, cabling and work with RF-class signaling in general. Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, with simulation and build.
+Start with the standalone [SerDes loopback test](2.prbs-loopback/README.md), to get used to the hardware platform, SerDes settings, cabling and work with RF-class signaling in general. 
+
+<p align="center">
+  <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png">
+  <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="70%" src="0.doc/SerDes-Loopback.jpg">
+</p>
+
+## We are the next step
+
+Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, with simulation and build. The same tests run in sim and on boards: the sim mirrors each hardware setup. Details, and the GateMate-to-ECP5 steps: [test setups](0.doc/test-setups.md).
+
+<p align="center">
+  <img width="80%" alt="Test jig: simulation with two eduBOS5 SoCs and two SerDes BFMs, lines crossed; setup 1 one GateMate EVB with TX cabled to its own RX; setup 2 two ULX5M-GS boards crossed at 1.25, 2.5 and 5 Gb/s, with a host PC on the UART console; setup 3 a ULX5M-GS (GateMate) to a ULX4M-LD (Lattice ECP5, LiteICLink) at 2.5 Gb/s, the most both sides take" src="0.doc/iclink-testjig.drawio.png">
+</p>
+
+| # | Hardware | Link |
+|---|---|---|
+| 1 | one GateMate EVB | one way: its SerDes TX cabled to its own RX |
+| 2 | two ULX5M-GS boards | two way, at 1.25, 2.5 and 5 Gb/s |
+| 3 | ULX5M-GS (GateMate) and ULX4M-LD (Lattice ECP5) | two way, GateMate to LiteICLink on ECP5, at 2.5 Gb/s |
+
+Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE); it runs with open tools only.
 
 | Folder | What | Status |
 |---|---|---|
@@ -47,18 +64,6 @@ Design notes, in `0.doc`:
 | [Serial Wishbone protocol](0.doc/serwb-protocol.md) | the frame, Etherbone, the interoperability proof, preamble look-alikes, SerWB against PCIe |
 | [Test setups](0.doc/test-setups.md) | the three hardware setups, GateMate to Lattice ECP5 |
 
-### One SerDes module, chip and simulation
-
-A design instantiates `ccfpga_serdes` once, with no `` `ifdef SYNTHESIS ``. The file list picks its body:
-
-| File (in [1.sim-model](1.sim-model/README.md)) | For | What |
-|---|---|---|
-| `ccfpga_serdes.SYNTH.sv` | synthesis | `CC_SERDES`, the hard macro, behind `ccfpga_serdes` ports and parameters; names only, no logic |
-| `ccfpga_serdes.BFM.sv` | simulation | our open-source BFM, a drop-in for Cologne Chip's simulation model `ccfpga_serdes` |
-
-- **Why:** `CC_SERDES` and the vendor simulation model have other port names and parameter sets, so a design used to carry both behind an `` `ifdef ``, and the chip's settings went untested in simulation.
-- **Bring-up:** the same in both: parameters (`SERDES_ENABLE`, `PLL_EN_ADPLL_CTRL`, ...), regfile writes, or both.
-- **Users:** [3.iclink-sv](3.iclink-sv/README.md) here and openCologne-PCIE's `phy_top`.
 
 ## IC Link in SystemVerilog
 
@@ -87,7 +92,7 @@ The SoC needs no LiteX, so neither does the core. LiteX users take only the SV c
 One GateMate. Solid boxes are done; dashed ones, tagged NEXT, come next.
 
 <p align="center">
-  <img width="100%" alt="Design internals of one GateMate: SoC (eduBOS5, Wishbone bus, RAM and UART, PeakRDL CSRs), Serial Wishbone (Etherbone, packetizer (done), optional scrambler, FIFO pump (done)), and the PHY (PRBS, lane aligner, I/O flops, CC_SERDES hard macro with the 8b/10b inside) to a 2.5 Gb/s serial line" src="0.doc/iclink-internals.drawio.png">
+  <img width="80%" alt="Design internals of one GateMate: SoC (eduBOS5, Wishbone bus, RAM and UART, PeakRDL CSRs), Serial Wishbone (Etherbone, packetizer (done), optional scrambler, FIFO pump (done)), and the PHY (PRBS, lane aligner, I/O flops, CC_SERDES hard macro with the 8b/10b inside) to a 2.5 Gb/s serial line" src="0.doc/iclink-internals.drawio.png">
 </p>
 
 | Block | RTL | From | Status |
@@ -108,21 +113,19 @@ One GateMate. Solid boxes are done; dashed ones, tagged NEXT, come next.
 - **Line rates:** 1.25, 2.5 (default) and 5 Gb/s, by the parameter `LINE_RATE`, from one 100 MHz reference ([clocks and line rate](3.iclink-sv/1.hw/README.md#clocks-and-line-rate)).
 - **Latency,** TX data in to RX data out: 28 clocks on the BFM, at every line rate (0.9 us at 2.5 Gb/s).
 
-## Test setups
+---
+# One SerDes module, chip and simulation
 
-The same tests run in simulation and on boards: the sim mirrors each hardware setup. Details, and the GateMate-to-ECP5 steps: [test setups](0.doc/test-setups.md).
+A design instantiates `ccfpga_serdes`. The file list picks its body:
 
-<p align="center">
-  <img width="100%" alt="Test jig: simulation with two eduBOS5 SoCs and two SerDes BFMs, lines crossed; setup 1 one GateMate EVB with TX cabled to its own RX; setup 2 two ULX5M-GS boards crossed at 1.25, 2.5 and 5 Gb/s, with a host PC on the UART console; setup 3 a ULX5M-GS (GateMate) to a ULX4M-LD (Lattice ECP5, LiteICLink) at 2.5 Gb/s, the most both sides take" src="0.doc/iclink-testjig.drawio.png">
-</p>
-
-| # | Hardware | Link |
+| File (in [1.sim-model](1.sim-model/README.md)) | For | What |
 |---|---|---|
-| 1 | one GateMate EVB | one way: its SerDes TX cabled to its own RX |
-| 2 | two ULX5M-GS boards | two way, at 1.25, 2.5 and 5 Gb/s |
-| 3 | ULX5M-GS (GateMate) and ULX4M-LD (Lattice ECP5) | two way, GateMate to LiteICLink on ECP5, at 2.5 Gb/s |
+| `ccfpga_serdes.SYNTH.sv` | synthesis | `CC_SERDES`, the hard macro, behind `ccfpga_serdes` ports and parameters; names only, no logic |
+| `ccfpga_serdes.BFM.sv` | simulation | our open-source BFM, a drop-in for Cologne Chip's simulation model `ccfpga_serdes` |
 
-Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE); it runs with open tools only.
+- **Why:** `CC_SERDES` and the vendor simulation model have other port names and parameter sets, so a design used to carry both behind an `` `ifdef ``, and the chip's settings went untested in simulation.
+- **Bring-up:** the same in both: parameters (`SERDES_ENABLE`, `PLL_EN_ADPLL_CTRL`, ...), regfile writes, or both.
+- **Users:** [3.iclink-sv](3.iclink-sv/README.md) here and openCologne-PCIE's `phy_top`.
 
 ---
 ## Community Outreach
