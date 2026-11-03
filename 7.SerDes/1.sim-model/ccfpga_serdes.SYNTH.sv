@@ -51,34 +51,35 @@
 //     TX_BUFFER_ADDR_WIDTH has no CC_SERDES parameter.
 //   - Ports: the BFM's, onto the CC_SERDES pins. CC_SERDES has its own
 //     serial pins and reference clock and no config, scan or BFM reset
-//     ports: those inputs are unused, those outputs constant. The SerDes
+//     ports: those inputs are unused, the serial and termination outputs
+//     unconnected, the others constant. The SerDes
 //     enable is SERDES_ENABLE, or a regfile write to 0x5C, as in the BFM.
 //==========================================================================
 
 module ccfpga_serdes #(
     parameter int          TX_BUFFER_ADDR_WIDTH     = 5,  // no CC_SERDES parameter
-    parameter int          RX_WAIT_CDR_LOCK         = 1,
-    parameter int          RX_RESETDONE_GATE        = 0,
+    parameter logic [ 0:0] RX_WAIT_CDR_LOCK         = 1,
+    parameter logic [ 0:0] RX_RESETDONE_GATE        = 0,
     parameter logic [ 4:0] RX_RESET_TIMER_PRESC     = 0,
     parameter logic [ 4:0] RX_PMA_RESET_TIME        = 3,
     parameter logic [ 4:0] RX_EQA_RESET_TIME        = 3,
     parameter logic [ 4:0] RX_CDR_RESET_TIME        = 3,
     parameter logic [ 4:0] RX_PCS_RESET_TIME        = 3,
     parameter logic [ 4:0] RX_BUF_RESET_TIME        = 3,
-    parameter int          RX_CALIB_OVR             = 0,
+    parameter logic [ 0:0] RX_CALIB_OVR             = 0,
     parameter logic [ 3:0] RX_CALIB_VAL             = 0,
     parameter logic [ 2:0] RX_RTERM_VCMSEL          = 4,
-    parameter int          RX_RTERM_PD              = 0,
+    parameter logic [ 0:0] RX_RTERM_PD              = 0,
     parameter logic [ 7:0] RX_EQA_CKP_HF            = 8'hA3,
     parameter logic [ 7:0] RX_EQA_CKP_LF            = 8'hA3,
     parameter logic [15:0] RX_EQA_CONFIG            = 16'h01C0,
     parameter logic [ 7:0] RX_EQA_CKP_OFFSET        = 8'h01,
-    parameter int          RX_EN_EQA                = 0,
+    parameter logic [ 0:0] RX_EN_EQA                = 0,
     parameter logic [ 3:0] RX_EQA_LOCK_CFG          = 0,
-    parameter int          RX_TH_MON1_OVR           = 0,  // RX_EN_EQA_EXT_VALUE
-    parameter int          RX_TH_MON2_OVR           = 0,  // RX_EN_EQA_EXT_VALUE
-    parameter int          RX_TAPW_OVR              = 0,  // RX_EN_EQA_EXT_VALUE
-    parameter int          RX_AFE_OFFSET_OVR        = 0,  // RX_EN_EQA_EXT_VALUE
+    parameter logic [ 0:0] RX_TH_MON1_OVR           = 0,  // RX_EN_EQA_EXT_VALUE
+    parameter logic [ 0:0] RX_TH_MON2_OVR           = 0,  // RX_EN_EQA_EXT_VALUE
+    parameter logic [ 0:0] RX_TAPW_OVR              = 0,  // RX_EN_EQA_EXT_VALUE
+    parameter logic [ 0:0] RX_AFE_OFFSET_OVR        = 0,  // RX_EN_EQA_EXT_VALUE
     parameter logic [ 4:0] RX_TH_MON1               = 8,
     parameter logic [ 4:0] RX_TH_MON2               = 8,
     parameter logic [ 4:0] RX_TAPW                  = 8,
@@ -88,9 +89,9 @@ module ccfpga_serdes #(
     parameter logic [ 4:0] RX_AFE_PEAK              = 16,
     parameter logic [ 7:0] RX_CDR_CKP               = 8'hF8,
     parameter logic [ 7:0] RX_CDR_CKI               = 0,
-    parameter logic [14:0] RX_CDR_LOCK_CFG          = 8'hD5,
+    parameter logic [ 7:0] RX_CDR_LOCK_CFG          = 8'hD5,
     parameter logic [ 1:0] RX_CDR_SET_ACC_CONFIG    = 0,
-    parameter int          RX_CDR_FORCE_LOCK        = 0,
+    parameter logic [ 0:0] RX_CDR_FORCE_LOCK        = 0,
     parameter logic [14:0] RX_CDR_FREQ_ACC          = 0,
     parameter logic [15:0] RX_CDR_PHASE_ACC         = 0,
     parameter logic [ 9:0] ALIGN_MCOMMA_VALUE       = 10'h283,
@@ -102,8 +103,8 @@ module ccfpga_serdes #(
     parameter logic [ 5:0] RX_MON_PH_OFFSET         = 0,
     parameter logic [ 3:0] RX_EI_BIAS               = 0,
     parameter logic [ 3:0] RX_EI_BW_SEL             = 4,
-    parameter int          RX_BUF_BYPASS            = 0,
-    parameter int          RX_CLKCOR_USE            = 0,
+    parameter logic [ 0:0] RX_BUF_BYPASS            = 0,
+    parameter logic [ 0:0] RX_CLKCOR_USE            = 0,
     parameter logic [ 9:0] RX_CLKCOR_SEQ_1_0        = 10'h1F7,
     parameter logic [ 9:0] RX_CLKCOR_SEQ_1_1        = 10'h1F7,
     parameter logic [ 9:0] RX_CLKCOR_SEQ_1_2        = 10'h1F7,
@@ -112,8 +113,8 @@ module ccfpga_serdes #(
     parameter logic [ 5:0] RX_CLKCOR_MAX_LAT        = 39,
     parameter logic [ 1:0] RX_DATAPATH_SEL          = 3,
     parameter logic [ 5:0] RX_DBG_SRAM_DELAY        = 6'h05,
-    parameter logic [ 3:0] RX_DBG_SEL               = 0,
-    parameter int          RX_DBG_MODE              = 0,
+    parameter logic [ 1:0] RX_DBG_SEL               = 0,
+    parameter logic [ 0:0] RX_DBG_MODE              = 0,
     parameter logic [ 4:0] TX_SEL_PRE               = 0,
     parameter logic [ 4:0] TX_SEL_POST              = 0,
     parameter logic [ 2:0] TX_TAIL_CASCODE          = 4,
@@ -126,28 +127,28 @@ module ccfpga_serdes #(
     parameter logic [ 4:0] TX_CM_RAISE              = 0,
     parameter logic [ 4:0] TX_CM_THRESHOLD_0        = 14,
     parameter logic [ 4:0] TX_CM_THRESHOLD_1        = 16,
-    parameter int          TX_CALIB_OVR             = 0,
+    parameter logic [ 0:0] TX_CALIB_OVR             = 0,
     parameter logic [ 3:0] TX_CALIB_VAL             = 0,
-    parameter int          TX_CM_REG_EN             = 1,
+    parameter logic [ 0:0] TX_CM_REG_EN             = 1,
     parameter logic [ 7:0] TX_CM_REG_KI             = 8'h80,
     parameter logic [ 4:0] TX_PMA_RESET_TIME        = 3,
     parameter logic [ 4:0] TX_PCS_RESET_TIME        = 3,
-    parameter int          TX_PMA_LOOPBACK          = 0,
+    parameter logic [ 1:0] TX_PMA_LOOPBACK          = 0,
     parameter logic [ 1:0] TX_DATAPATH_SEL          = 3,
-    parameter int          SERDES_ENABLE            = 0,
-    parameter int          SERDES_AUTO_INIT         = 0,
-    parameter int          PLL_EN_ADPLL_CTRL        = 0,
-    parameter int          PLL_CONFIG_SEL           = 0,
-    parameter int          PLL_SET_OP_LOCK          = 0,
-    parameter int          PLL_ENFORCE_LOCK         = 0,
-    parameter int          PLL_DISABLE_LOCK         = 0,
-    parameter int          PLL_LOCK_WINDOW          = 1,
-    parameter int          PLL_FAST_LOCK            = 1,
-    parameter int          PLL_SYNC_BYPASS          = 0,
-    parameter int          PLL_PFD_SELECT           = 0,
-    parameter int          PLL_REF_BYPASS           = 0,
-    parameter int          PLL_REF_SEL              = 0,
-    parameter int          PLL_REF_RTERM            = 1,
+    parameter logic [ 0:0] SERDES_ENABLE            = 0,
+    parameter logic [ 0:0] SERDES_AUTO_INIT         = 0,
+    parameter logic [ 0:0] PLL_EN_ADPLL_CTRL        = 0,
+    parameter logic [ 0:0] PLL_CONFIG_SEL           = 0,
+    parameter logic [ 0:0] PLL_SET_OP_LOCK          = 0,
+    parameter logic [ 0:0] PLL_ENFORCE_LOCK         = 0,
+    parameter logic [ 0:0] PLL_DISABLE_LOCK         = 0,
+    parameter logic [ 0:0] PLL_LOCK_WINDOW          = 1,
+    parameter logic [ 0:0] PLL_FAST_LOCK            = 1,
+    parameter logic [ 0:0] PLL_SYNC_BYPASS          = 0,
+    parameter logic [ 0:0] PLL_PFD_SELECT           = 0,
+    parameter logic [ 0:0] PLL_REF_BYPASS           = 0,
+    parameter logic [ 0:0] PLL_REF_SEL              = 0,
+    parameter logic [ 0:0] PLL_REF_RTERM            = 1,
     parameter logic [ 5:0] PLL_FCNTRL               = 58,
     parameter logic [ 5:0] PLL_MAIN_DIVSEL          = 27,
     parameter logic [ 1:0] PLL_OUT_DIVSEL           = 0,
@@ -155,21 +156,21 @@ module ccfpga_serdes #(
     parameter logic [ 9:0] PLL_CP                   = 80,
     parameter logic [ 3:0] PLL_AO                   = 0,
     parameter logic [ 2:0] PLL_SCAP                 = 0,
-    parameter int          PLL_SCAP_AUTO_CAL        = 1,
+    parameter logic [ 0:0] PLL_SCAP_AUTO_CAL        = 1,
     parameter logic [ 1:0] PLL_FILTER_SHIFT         = 2,
     parameter logic [ 2:0] PLL_SAR_LIMIT            = 2,
     parameter logic [10:0] PLL_FT                   = 512,
-    parameter int          PLL_OPEN_LOOP            = 0,
+    parameter logic [ 0:0] PLL_OPEN_LOOP            = 0,
     parameter logic [ 2:0] PLL_BISC_MODE            = 4,
     parameter logic [ 3:0] PLL_BISC_TIMER_MAX       = 15,
     parameter logic [ 4:0] PLL_BISC_CP_MIN          = 4,
     parameter logic [ 4:0] PLL_BISC_CP_MAX          = 18,
     parameter logic [ 4:0] PLL_BISC_CP_START        = 12,
-    parameter int          PLL_BISC_OPT_DET_IND     = 0,
-    parameter int          PLL_BISC_PFD_SEL         = 0,
-    parameter int          PLL_BISC_DLY_DIR         = 0,
-    parameter int          PLL_BISC_CAL_SIGN        = 0,
-    parameter int          PLL_BISC_CAL_AUTO        = 1,
+    parameter logic [ 0:0] PLL_BISC_OPT_DET_IND     = 0,
+    parameter logic [ 0:0] PLL_BISC_PFD_SEL         = 0,
+    parameter logic [ 0:0] PLL_BISC_DLY_DIR         = 0,
+    parameter logic [ 0:0] PLL_BISC_CAL_SIGN        = 0,
+    parameter logic [ 0:0] PLL_BISC_CAL_AUTO        = 1,
     parameter logic [ 4:0] PLL_BISC_DLY_PFD_MON_REF = 0,
     parameter logic [ 4:0] PLL_BISC_DLY_PFD_MON_DIV = 2,
     parameter logic [ 2:0] PLL_BISC_COR_DLY         = 1 
@@ -194,6 +195,12 @@ module ccfpga_serdes #(
     output logic        reset_core_pll_n_o,
     output logic        refclk_sel_o,
     output logic        refclk_rterm_o,
+    // Serial pins: CC_SERDES has none. The chip's SerDes drives and senses
+    // its own dedicated pads, which no netlist reaches, so these four stay
+    // unconnected here: no level on a pin the chip does not have. They exist
+    // for the BFM (ccfpga_serdes.BFM.sv), whose serializer drives TX and
+    // samples RX, so phy_top takes either file unchanged. top.sv drops them
+    // under SYNTHESIS
     input  logic        RX_SERIO_P_B,
     input  logic        RX_SERIO_N_B,
     output logic        TX_SERIO_P_B,
@@ -229,6 +236,8 @@ module ccfpga_serdes #(
     output logic        tx_resetdone_o,
     output logic        rx_detect_done_o,
     output logic        rx_present_o,
+    // the wrapper's termination calibration output: no CC_SERDES pin, left
+    // unconnected like the serial pins above
     output logic        TERM_SERIO_O,
     input  logic        rx_reset_i,
     input  logic        rx_pma_reset_i,
@@ -261,17 +270,15 @@ module ccfpga_serdes #(
 );
 
   // The BFM-only inputs have no CC_SERDES pin: the chip has its own serial
-  // pins and reference clock, and no config, scan or BFM reset ports
+  // pins and reference clock, and no config, scan or BFM reset ports;
+  // TX_BUFFER_ADDR_WIDTH sizes the BFM's TX buffer only
   logic unused;
-  assign unused = ^{clk_ref_i, clk_cfg_i, reset_n_i, reset_reg_n_i, reset_core_tx_n_i, reset_core_rx_n_i, testmode_i, scan_enable_i, scan_in_i, RX_SERIO_P_B, RX_SERIO_N_B, cfg_en_i, reset_cfg_i, cfgfile_di_i, cfgfile_valid_i, cfgfile_addr_i};
+  assign unused = ^{1'(TX_BUFFER_ADDR_WIDTH), clk_ref_i, clk_cfg_i, reset_n_i, reset_reg_n_i, reset_core_tx_n_i, reset_core_rx_n_i, testmode_i, scan_enable_i, scan_in_i, RX_SERIO_P_B, RX_SERIO_N_B, cfg_en_i, reset_cfg_i, cfgfile_di_i, cfgfile_valid_i, cfgfile_addr_i};
 
   assign scan_out_o = '0;
   assign reset_core_pll_n_o = 1'b1;
-  assign refclk_sel_o = 1'(PLL_REF_SEL);
-  assign refclk_rterm_o = 1'(PLL_REF_RTERM);
-  assign TX_SERIO_P_B = '0;
-  assign TX_SERIO_N_B = '0;
-  assign TERM_SERIO_O = '0;
+  assign refclk_sel_o = PLL_REF_SEL;
+  assign refclk_rterm_o = PLL_REF_RTERM;
 
   CC_SERDES #(
       .RX_WAIT_CDR_LOCK        (RX_WAIT_CDR_LOCK),
@@ -386,7 +393,7 @@ module ccfpga_serdes #(
       .PLL_BISC_DLY_PFD_MON_REF(PLL_BISC_DLY_PFD_MON_REF),
       .PLL_BISC_DLY_PFD_MON_DIV(PLL_BISC_DLY_PFD_MON_DIV),
       .PLL_BISC_COR_DLY        (PLL_BISC_COR_DLY),
-      .RX_EN_EQA_EXT_VALUE     ({1'(RX_AFE_OFFSET_OVR), 1'(RX_TAPW_OVR), 1'(RX_TH_MON2_OVR), 1'(RX_TH_MON1_OVR)})
+      .RX_EN_EQA_EXT_VALUE     ({RX_AFE_OFFSET_OVR, RX_TAPW_OVR, RX_TH_MON2_OVR, RX_TH_MON1_OVR})
   ) u_serdes (
       .REGFILE_CLK_I         (clk_reg_i),
       .TX_CLK_I              (clk_core_tx_i),

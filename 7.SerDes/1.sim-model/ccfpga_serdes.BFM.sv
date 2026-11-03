@@ -228,8 +228,8 @@ module ccfpga_serdes
     output logic        refclk_rterm_o = '0,
     input  logic        RX_SERIO_P_B,
     input  logic        RX_SERIO_N_B,
-    output logic        TX_SERIO_P_B = '0,
-    output logic        TX_SERIO_N_B = '0,
+    output logic        TX_SERIO_P_B,       // driven by the serializer only (tx_line), from time 0
+    output logic        TX_SERIO_N_B,
     input  logic        regfile_we_i,
     input  logic        regfile_en_i,
     input  logic [ 7:0] regfile_addr_i,
@@ -261,7 +261,7 @@ module ccfpga_serdes
     output logic        tx_resetdone_o = '0,
     output logic        rx_detect_done_o = '0,
     output logic        rx_present_o = '0,
-    output logic        TERM_SERIO_O = '0,
+    output logic        TERM_SERIO_O,       // termination calibration: not modelled, unconnected
     input  logic        rx_reset_i,
     input  logic        rx_pma_reset_i,
     input  logic        rx_eqa_reset_i,
@@ -1255,6 +1255,7 @@ module ccfpga_serdes
     real                     t0, step;
     longint                  k;
     frame = {CDR_NONE_ID_BITS'(cdr_none.my_id), HI};
+    tx_line(LO, LO);   // electrical idle until the ID goes out
     #1.0;
     for (int i = 0; i <= CDR_NONE_ID_BITS; i++) begin
       tx_line(TX_SERIO_P_B, frame[i]);
