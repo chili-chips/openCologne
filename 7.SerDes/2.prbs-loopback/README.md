@@ -2,9 +2,14 @@
 
 Cologne Chip's `serdestool.py` drives `CC_SERDES` over JTAG. Needs python3 with `pyftdi` (`pip install pyftdi`), a GateMate EVB, and on it a bitstream of `serdes_lb.v` (a `CC_SERDES` loopback design, from `serdestool.py -m serdes_lb.v`), built with the flow in [3.build](../3.iclink-sv/3.build/README.md).
 
-## References
-- Measuring Eye Diagrams on [Rigol MSO5000](https://www.youtube.com/watch?si=vo3GYcDNML9LsX7S&v=JcJbcKl5llo&feature=youtu.be)
-  
+Clock sources and SMA connectors are soldered to PCB. P and N signals of the TX and RX channel are connected into a loopback with a short RF cable, as shown below:
+
+<p align="center" width="100%">
+   <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="../0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png"> 
+   <img width="50%" src="../0.doc/SerDes-Loopback.jpg">
+</p>
+
+ 
 ## Verifying board setup
 
 It checks the board setup. A loopback test (`python3 serdestool.py --tcloopback`):
@@ -136,12 +141,9 @@ A PRBS test (`python3 serdestool.py --tcprbs`):
     INFO:  RX_PRBS_LOCKED: 1, RX_PRBS_ERR_CNT: 7
 ```
 
-P and N signals of the TX and RX channel are connected as in the following image:
-
-<p align="center" width="100%">
-    <img width="50%" src="../0.doc/SerDes-Loopback.jpg">
-</p>
-
-
-
+#### References
+- [Intergalaktik SerDes Loopback test](https://github.com/chili-chips-ba/openCologne/issues/76#issue-6170309059)
+- [openCologne-PCIE SerDes Loopback test](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
+- Measuring Eye Diagrams on [Rigol MSO5000](https://www.youtube.com/watch?si=vo3GYcDNML9LsX7S&v=JcJbcKl5llo&feature=youtu.be)
+  
 ### End of Document
