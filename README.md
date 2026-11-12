@@ -1,5 +1,6 @@
 [![NLnet:Funded](https://badgen.net/badge/NLnet/Funded/08C)](https://nlnet.nl/)
 [![Stars](https://badgen.net/github/stars/chili-chips/openCologne?label=Stars)](https://github.com/chili-chips/openCologne/stargazers)
+[![GitLab:Mirror](https://badgen.net/badge/GitLab/Mirror/orange)](https://gitlab.com/chili-chips/openCologne)
 [![License:BSD-3](https://badgen.net/badge/License/BSD-3/blue)](LICENSES)
 [![Lint](https://badgen.net/github/checks/chili-chips/openCologne/main/run-lint?label=Lint)](https://github.com/chili-chips/openCologne/actions/workflows/lint.yml)
 [![Verible](https://badgen.net/github/checks/chili-chips/openCologne/main/verible?label=Verible)](https://github.com/chili-chips/openCologne/actions/workflows/verible.yml)
