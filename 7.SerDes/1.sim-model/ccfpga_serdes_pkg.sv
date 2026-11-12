@@ -453,11 +453,11 @@ package ccfpga_serdes_pkg;
 
   // One decoded byte, as the RX elastic buffer holds it
   typedef struct packed {
-    bit       comma;
-    bit       k;
-    bit       disp;  // disparity error
-    bit       nit;   // not in table
-    bit [7:0] d;
+    bit       comma;  // [11]
+    bit       k;      // [10]
+    bit       disp;   // [9]    disparity error
+    bit       nit;    // [8]    not in table
+    bit [7:0] d;      // [7:0]
   } rx_byte_t;
 
   typedef rx_byte_t [7:0] rx_word_t;
@@ -465,35 +465,35 @@ package ccfpga_serdes_pkg;
   // One deserializer word, and what the comma aligner lets through: pass,
   // the word reaches the decoder; open, the decoder decodes it
   typedef struct packed {
-    bit        pass;
-    bit        open;
-    bit [79:0] sym;
+    bit        pass;  // [81]
+    bit        open;  // [80]
+    bit [79:0] sym;   // [79:0]
   } rx_raw_t;
 
   // RX_BUF_CFG (regfile 0x25)
   typedef struct packed {
-    bit [1:0] rsvd;
-    bit [5:0] max_lat;     // RX_CLKCOR_MAX_LAT
-    bit [5:0] min_lat;     // RX_CLKCOR_MIN_LAT
-    bit       clkcor_use;  // RX_CLKCOR_USE
-    bit       bypass;      // RX_BUF_BYPASS
+    bit [1:0] rsvd;        // [15:14]
+    bit [5:0] max_lat;     // [13:8] RX_CLKCOR_MAX_LAT
+    bit [5:0] min_lat;     // [7:2]  RX_CLKCOR_MIN_LAT
+    bit       clkcor_use;  // [1]    RX_CLKCOR_USE
+    bit       bypass;      // [0]    RX_BUF_BYPASS
   } rx_buf_cfg_t;
 
   // SERDES_CFG (0x5C)
   typedef struct packed {
-    bit testmode;
-    bit auto_init;  // RX_SERDES_AUTO_INIT
-    bit en;         // the SerDes enable
+    bit testmode;   // [2]
+    bit auto_init;  // [1]   RX_SERDES_AUTO_INIT
+    bit en;         // [0]   the SerDes enable
   } serdes_cfg_t;
 
   // The registers the model uses. PLL_CFG0/1 hold the settings in use: they
   // change only while the PLL is off, or from the config file.
   typedef struct packed {
-    rx_buf_cfg_t    rx_buf_cfg;     // 0x25
-    bit [3:0][15:0] rx_clkcor_seq;  // 0x26..0x29: RX_CLKCOR_SEQ_1_0..3
-    bit [11:0]      pll_cfg0;       // 0x50
-    bit [13:0]      pll_cfg1;       // 0x51
-    serdes_cfg_t    serdes_cfg;     // 0x5C
+    rx_buf_cfg_t    rx_buf_cfg;     // [108:93] 0x25
+    bit [3:0][15:0] rx_clkcor_seq;  // [92:29] 0x26..0x29: RX_CLKCOR_SEQ_1_0..3
+    bit [11:0]      pll_cfg0;       // [28:17] 0x50
+    bit [13:0]      pll_cfg1;       // [16:3]  0x51
+    serdes_cfg_t    serdes_cfg;     // [2:0]   0x5C
   } csr_t;
 
   // Lanes of a datapath word: 16, 32 or 64 bits (RX_DATAPATH_SEL 0, 1, 2/3)

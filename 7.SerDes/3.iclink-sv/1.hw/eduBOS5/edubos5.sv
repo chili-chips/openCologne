@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 CHILI.CHIPS.LLC
+// SPDX-FileCopyrightText: 2022 Chili.CHIPS
 //
 // SPDX-License-Identifier: BSD-3-Clause
 
@@ -14,7 +14,11 @@ module edubos5
     parameter bit TARGET_IS_ASIC  = 1'b0,  // 1: x0 forced to 0 by a read mux, not RAM init
     // 1: a STORE holds its request until dmem_rdy, stalling the core; for a
     // bus that can make a store wait. 0: a STORE is a one-cycle request
-    parameter bit STORE_WAITS_RDY = 1'b0
+    parameter bit STORE_WAITS_RDY = 1'b0,
+    // 1: the Zicntr counters, read with csrrs/csrrc rd, csr, x0 (rdcycle,
+    // rdtime, rdinstret and the h halves; time is cycle, at the fixed clock).
+    // Any other SYSTEM instruction halts the core, as with 0
+    parameter bit EN_COUNTERS     = 1'b0
 ) (
     input logic clk,
     input logic arst_n, // reset button
@@ -110,12 +114,13 @@ module edubos5
   //-------------------------------------------------
   instr_t              instr;
   instr_decode_t       instr_decode;
+  logic                cnt_rd;  // a SYSTEM instruction that reads a counter
 
   always_comb begin : _instr_decode
 
     instr_decode = '0;
 
-    case (instr.opcode)
+    unique case (instr.opcode)
       ALUREG:  instr_decode.ALUREG = HI;
       ALUIMM:  instr_decode.ALUIMM = HI;
       BRNCH:   instr_decode.BRNCH = HI;
@@ -126,7 +131,10 @@ module edubos5
       LOAD:    instr_decode.LOAD = HI;
       STORE:   instr_decode.STORE = HI;
       FENCE:   instr_decode.FENCE = HI;
-      SYSTEM:  instr_decode.SYSTEM = HI;
+      SYSTEM: begin
+        instr_decode.SYSTEM = ~cnt_rd;  // a halt
+        instr_decode.CNT    = cnt_rd;
+      end
       default: instr_decode.SYSTEM = HI;
     endcase
   end : _instr_decode
@@ -134,6 +142,61 @@ module edubos5
   instr_decode_t instr_decode_reg;
   assign NC_imem_rdy   = imem_rdy;
   assign NC_decode_reg = {instr_decode_reg.FENCE, instr_decode_reg.SYSTEM};
+
+  //-------------------------------------------------
+  // Zicntr counters (EN_COUNTERS)
+  //-------------------------------------------------
+  cpu_data_t cnt_rdat;  // the counter the instruction reads
+
+  generate
+    if (EN_COUNTERS == 1'b1) begin : g_cnt
+      // 64-bit cycle and instret as 32-bit halves: the high half takes the
+      // carry flagged a clock ahead (*_max: the low half is all ones), so no
+      // 64-bit carry chain, and the halves are never out of step
+      logic [31:0] cycle_lo, cycle_hi, instret_lo, instret_hi;
+      logic cycle_max, instret_max;
+
+      // csrrs/csrrc with rs1 x0, or csrrsi/csrrci with uimm 0 (no write; the
+      // same bits), of 0xC00-0xC02 or 0xC80-0xC82
+      assign cnt_rd = instr.grp.imm.func3[1] & (instr.grp.reg2reg.rs1 == '0)
+                    & (instr.grp.imm.imm11_0[11:8] == 4'hC) & (instr.grp.imm.imm11_0[6:2] == '0)
+                    & (instr.grp.imm.imm11_0[1:0] != 2'b11);
+
+      // [1]: instret, else cycle or time; [7]: the high half
+      assign cnt_rdat = instr.grp.imm.imm11_0[1]
+                      ? (instr.grp.imm.imm11_0[7] ? instret_hi : instret_lo)
+                      : (instr.grp.imm.imm11_0[7] ? cycle_hi : cycle_lo);
+
+      always_ff @(negedge arst_n or posedge clk) begin
+        if (arst_n == LO) begin
+          cycle_lo    <= '0;
+          cycle_hi    <= '0;
+          cycle_max   <= 1'b0;
+          instret_lo  <= '0;
+          instret_hi  <= '0;
+          instret_max <= 1'b0;
+        end
+        else begin
+          cycle_lo  <= cycle_lo + 32'd1;
+          cycle_max <= (cycle_lo == 32'hFFFF_FFFE);
+          if (cycle_max) begin
+            cycle_hi <= cycle_hi + 32'd1;
+          end
+          if (state == FETCH_INSTR) begin  // an instruction retires
+            instret_lo  <= instret_lo + 32'd1;
+            instret_max <= (instret_lo == 32'hFFFF_FFFE);
+            if (instret_max) begin
+              instret_hi <= instret_hi + 32'd1;
+            end
+          end
+        end
+      end
+    end
+    else begin : g_no_cnt
+      assign cnt_rd   = 1'b0;
+      assign cnt_rdat = '0;
+    end
+  endgenerate
   always_ff @(posedge clk) begin : _instr_decode_flop
     if (go2exec) begin
       instr_decode_reg <= instr_decode;
@@ -157,25 +220,22 @@ module edubos5
 
     imm_store = {
       {20{instr.grp.store.imm11_5[11]}},  //[31:12] upper part is sign-expanded
-      instr.grp.store.imm11_5
-      ,  //-\
+      instr.grp.store.imm11_5,  //-\ [11:0]
       instr.grp.store.imm4_0
-    };  //-/ [11:0]
+    };  //-/
 
     imm_brnch = {
       {20{instr.grp.brnch.imm12}},  //[31:12] sign-expanded
-      instr.grp.brnch.imm11
-      ,  //-\
-      instr.grp.brnch.imm10_5,  // | [11:1]
+      instr.grp.brnch.imm11,  //-\ [11:1]
+      instr.grp.brnch.imm10_5,  // |
       instr.grp.brnch.imm4_1,  //-/
       1'b0
     };  //[0]
 
     imm_jump = {
       {12{instr.grp.jump.imm20}},  //[31:20] sign-expanded
-      instr.grp.jump.imm19_12
-      ,  //-\
-      instr.grp.jump.imm11,  // | [19:1]
+      instr.grp.jump.imm19_12,  //-\ [19:1]
+      instr.grp.jump.imm11,  // |
       instr.grp.jump.imm10_1,  //-/
       1'b0
     };  //[0]
@@ -269,7 +329,7 @@ module edubos5
     dmem_addr_next = cpu_addr_t'(ls_offset_reg + cpu_addr_t'(rs1_reg));
     //differentiating between STORE instructions
     if (instr_decode_reg.STORE) begin
-      case (funct3_store_t'(funct3_imm))
+      unique case (funct3_store_t'(funct3_imm))
         SB: begin
           dmem_wdat_next = {4{rs2_reg[7:0]}};
 
@@ -305,7 +365,7 @@ module edubos5
       endcase
     end
     //differentiating between load instructions
-    case (funct3_imm)
+    unique case (funct3_imm)
       LB: begin
         unique case (dmem_addr[1:0])
           2'b00: load_to_reg = {{24{dmem_rdat_reg[7]}}, dmem_rdat_reg[7:0]};
@@ -344,7 +404,7 @@ module edubos5
   //--------------
   logic take_brnch;
   always_comb begin : _branch
-    case (funct3_brnch)
+    unique case (funct3_brnch)
       BEQ:     take_brnch = eq;
       BNE:     take_brnch = !eq;
       BLT:     take_brnch = lt;
@@ -382,7 +442,7 @@ module edubos5
     rf_we = (state == FETCH_INSTR) & (instr.grp.reg2reg.rd != '0)  //RF[0] is not writable!
     & |{instr_decode_reg.ALUIMM, instr_decode_reg.ALUREG,
               instr_decode_reg.JALR, instr_decode_reg.JAL,
-              instr_decode_reg.AUIPC, instr_decode_reg.LUI,
+              instr_decode_reg.AUIPC, instr_decode_reg.LUI, instr_decode_reg.CNT,
               instr_decode_reg.LOAD & dmem_rdy_reg};  //Dont change to FETCH_INSTR
     unique if (instr_decode_reg.JAL | instr_decode_reg.JALR) begin
       rf_wdat = {inc_pc, 2'd0};  // JUMP: Save return PC address
@@ -397,7 +457,7 @@ module edubos5
       rf_wdat = alu_out;  // ALU*: Save the result of ALU operation
     end
     else begin
-      rf_wdat = load_to_reg;  // LOAD: Save the data read from memory, and other
+      rf_wdat = load_to_reg;  // LOAD: Save the data read from memory, and other (CNT: funct3 as LW)
     end
 
   end : _rf_writeback
@@ -413,7 +473,7 @@ module edubos5
       imem_vld <= '1;
     end
     else if (!store_stall) begin
-      case (state)
+      unique case (state)
 
         FETCH_INSTR: begin
           // IMEM expected to always output in one cycle
@@ -487,7 +547,7 @@ module edubos5
     if (EN_WAIT4REGS == 1) begin : g_ce_3stg
       // A flop, high in the 1st EXECUTE cycle: the pipeline registers load at
       // the edge that ends it, the 2nd after the instruction arrives
-      // (edubos5.3STG-ONLY.mcp.xdc relies on it). EXECUTE is entered from
+      // (edubos5.3STG-ONLY.mcp.tcl relies on it). EXECUTE is entered from
       // WAIT4REGS or reset. A SYSTEM instruction stays in EXECUTE (a halt)
       // with go2exec low: its sources are frozen, so nothing needs to reload.
       always_ff @(negedge arst_n or posedge clk) begin
@@ -570,6 +630,11 @@ module edubos5
     if (state == WAIT_DATA) begin
       dmem_rdat_reg <= dmem_rdat;
     end
+    else if (instr_decode.CNT & (state == EXECUTE)) begin
+      // a counter read, written back whole, as a LW (funct3 01x or 11x): no
+      // new input on the timing-critical rf_wdat mux
+      dmem_rdat_reg <= cnt_rdat;
+    end
 
     dmem_rdy_reg <= dmem_rdy;
 
@@ -578,13 +643,13 @@ module edubos5
   // MCP capture side: the registers the sources feed (pc and the FSM load
   // nothing from them at the 1st edge either)
   `define EDUBOS5_MCP_CAPTURE {instr_decode_reg, funct3_brnch, funct7_alu, funct3_imm, \
-      pc_imm_reg, imm_uload_reg, rs1_reg, rs2_reg, ls_offset_reg, pc, \
+      pc_imm_reg, imm_uload_reg, rs1_reg, rs2_reg, ls_offset_reg, pc, dmem_rdat_reg, \
       u_alu.shifter, u_alu.aluin_1_31_reg, u_alu.aluin_2_31_reg, \
       u_alu.alu_and_reg, u_alu.alu_xor_reg, u_alu.alu_or_reg, u_alu.funct3_alu_reg, \
       u_alu.alu_plus_reg, u_alu.alu_minus_reg}
 
 `ifdef EDUBOS5_MCP_CHECK
-  // Proof of edubos5.3STG-ONLY.mcp.xdc (simulation; 5.sim, CORE=edubos5_3stg):
+  // Proof of edubos5.3STG-ONLY.mcp.tcl (simulation; 5.sim, CORE=edubos5_3stg):
   // the instruction port and the register file reads change only on a fetch
   // (FETCH_INSTR, FETCH_TARGET), hold 2 clocks from the last one, and their
   // paths get 2 cycles.
@@ -733,6 +798,25 @@ module edubos5
       rvfi_order <= rvfi_order + 64'd1;
     end
   end : _rvfi_order
+
+  // EN_COUNTERS: a counter read returns the counter of its EXECUTE clock, the
+  // one before it retires: cycle is the clocks since reset less 1, instret the
+  // instructions retired before it (rvfi_order). Insn bit 21: instret; 27: the
+  // high half. riscv-formal has no Zicntr check of its own
+  logic [63:0] fv_cycle, fv_cnt;
+  assign fv_cnt = rvfi_insn[21] ? rvfi_order : fv_cycle - 64'd1;
+
+  always_ff @(negedge arst_n or posedge clk) begin : _fv_cnt
+    if (arst_n == LO) begin
+      fv_cycle <= '0;
+    end
+    else begin
+      fv_cycle <= fv_cycle + 64'd1;
+      if (EN_COUNTERS && rvfi_valid && instr_decode_reg.CNT && rvfi_rd_addr != 5'd0) begin
+        assert (rvfi_rd_wdata == (rvfi_insn[27] ? fv_cnt[63:32] : fv_cnt[31:0]));
+      end
+    end
+  end : _fv_cnt
 `endif
 
 endmodule : edubos5
