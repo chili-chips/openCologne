@@ -61,7 +61,7 @@ It’s important to note that these results do not yet clearly define the bounda
 
 Another concern arises: if a 250-input multiplexer fails during routing, what does that say about our place-and-route tools and routing architecture? Notably, a 250-input mux is common in CPU designs for handling write-backs, also consider that a complete 32x32 register file requires a 1024-input mux!
 
-Since this test hit a wall, we conducted a similar, yet less routing-constrained more memory-oriented [test](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/3.LUTRAM_adjusted_stress_test). We chose to include this test despite it not fully addressing the distributed memory capacity. It serves instead as a case illustrating the limitations of the toolchain and architecture.
+Since this test hit a wall, we conducted a similar, yet less routing-constrained more memory-oriented [test](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/3.LUTRAM_adjusted_stress_test). We chose to include this test despite it not fully addressing the distributed memory capacity. It serves instead as a case illustrating the limitations of the toolchain and architecture.
 
 
 
@@ -85,4 +85,4 @@ Post-synthesis and post-pnr sims are avaliable also in iverilog and verilator, c
 
 ## PrjPeppercorn re-run (2026-10)
 
-Yosys 0.69 + nextpnr-himbaechel 0.11.1-77: LUTRAM now routes up to 96 instances; 128 runs out of logic. Tables and steps: [8.StressTest](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest#prjpeppercorn-re-runs).
+Yosys 0.69 + nextpnr-himbaechel 0.11.1-77: LUTRAM now routes up to 96 instances; 128 runs out of logic. Tables and steps: [8.StressTest](https://github.com/chili-chips/openCologne/tree/main/8.StressTest#prjpeppercorn-re-runs).

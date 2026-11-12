@@ -13,7 +13,7 @@ The whole thing is called _TetriSaraj_, and essentially a port:
 - to Olimex _GateMate1-EVB_ board with CologneChip tools.
 
 For the complete design detail (game logic, system block diagram, memory mapping etc.), please visit the original project repo: 
-- https://github.com/chili-chips-ba/openXC7-TetriSaraj
+- https://github.com/chili-chips/openXC7-TetriSaraj
 
 ## Surprise, surprise...
 
@@ -39,7 +39,7 @@ In addition to the _GateMateA1-EVB_, you will also need:
 - monitor with VGA port connected to it.
 - _SimpleIO Extension Board_ or, yet better, the new _**joyIO**_ card
 
-<img width=400 src="https://github.com/chili-chips-ba/openCologne/blob/main/0.doc/Intergalaktik/joyIO.png">
+<img width=400 src="https://github.com/chili-chips/openCologne/blob/main/0.doc/Intergalaktik/joyIO.png">
 
 ## The Gameplay
 
@@ -77,7 +77,7 @@ To synthesize and run the design locally, one must install the _CologneChip tool
 Stay tuned for the arrival of stereo soundtrack to TetriSaraj play...
 
 ## References
-1) Also available on [Xilinx Artix7](https://github.com/chili-chips-ba/openXC7-TetriSaraj) and [Gowin LittleBee](https://github.com/chili-chips-ba/openXC7-TetriSaraj/tree/main/99.more-boards/0.tang-nano-9k), thanks to [SymbioticEDA](https://www.symbioticeda.com) support
+1) Also available on [Xilinx Artix7](https://github.com/chili-chips/openXC7-TetriSaraj) and [Gowin LittleBee](https://github.com/chili-chips/openXC7-TetriSaraj/tree/main/99.more-boards/0.tang-nano-9k), thanks to [SymbioticEDA](https://www.symbioticeda.com) support
 
 2) Community Outreach:
 > - [Dec.15, 2024](https://www.linkedin.com/feed/update/urn:li:activity:7273353028055769089?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7273353028055769089%2C7274166171325607936%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287274166171325607936%2Curn%3Ali%3Aactivity%3A7273353028055769089%29)

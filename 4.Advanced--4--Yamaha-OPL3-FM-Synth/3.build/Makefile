@@ -197,7 +197,7 @@ OFLFLAGS = --cable dirtyJtag # BEWARE: When using Olimex GateMate it is a must t
 # Github reference: https://github.com/verilator/verilator
 # Installation reference: https://verilator.org/guide/latest/install.html
 # To use Verilator for simulation you need to make a `sim_main.cpp` file and a Makefile suited for Verilator
-# See: https://github.com/chili-chips-ba/openCologne/tree/main/4.Advanced--4--Yamaha-OPL3-FM-Synth/2.sim 
+# See: https://github.com/chili-chips/openCologne/tree/main/4.Advanced--4--Yamaha-OPL3-FM-Synth/2.sim 
 # Where I have verilator.mk file that takes care of the Verilator side of things and a Makefile that is specific to the project
 #-------------------------------
 # cocotb
@@ -208,7 +208,7 @@ OFLFLAGS = --cable dirtyJtag # BEWARE: When using Olimex GateMate it is a must t
 # Dependencies: python3.6+, GNU Make 3+, An HDL Simulator(Icarus, Verilator, GHDL...) 
 #    pip install cocotb 
 
-# See: https://github.com/chili-chips-ba/openCologne/tree/main/4.Advanced--4--Yamaha-OPL3-FM-Synth/2.sim/cocotb
+# See: https://github.com/chili-chips/openCologne/tree/main/4.Advanced--4--Yamaha-OPL3-FM-Synth/2.sim/cocotb
 # There is a config.mk file for cocotb with setups for different flags that can be found in the documentation
 # There is a Makefile that takes into account all of the needed simulation files and their names(RTL file, testbench...)
 # And the testbench written in python  

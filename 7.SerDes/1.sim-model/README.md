@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 **One instance, chip and simulation.** [`ccfpga_serdes.SYNTH.sv`](ccfpga_serdes.SYNTH.sv) is `ccfpga_serdes` for the chip: `CC_SERDES` behind the same ports and parameters, with `CC_SERDES`'s defaults, names only, no logic. A design instantiates `ccfpga_serdes` once, with no `` `ifdef SYNTHESIS ``: the file list takes `.SYNTH.sv` for synthesis and `.BFM.sv` for simulation.
 
-It was developed in [openCologne](https://github.com/chili-chips-ba/openCologne) (7.SerDes) and is used by [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE). This folder is the master copy.
+It was developed in [openCologne](https://github.com/chili-chips/openCologne) (7.SerDes) and is used by [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE). This folder is the master copy.
 
 | File | Content |
 |---|---|

@@ -8,7 +8,7 @@ The GateMate routing network is mostly standard, island-based, though still with
 
 The primary motivation for this work is to get a first hand feel for how GateMate fares in both typical and extreme workloads, and contrast it the FPGAs in the same nominal capacity tier. The goal is to understand its useability, efficiency, power outlay, as well as the overall pros and cons in comparison to its peers. 
 
-**[This](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/6.sw_analysis) folder is dedicated to testing the architecture by modelling and simulation. There you can find steps to reproduce the figures and results in this readme.**
+**[This](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/6.sw_analysis) folder is dedicated to testing the architecture by modelling and simulation. There you can find steps to reproduce the figures and results in this readme.**
 
 ### LUT-tree Logic - L2T4
 
@@ -16,7 +16,7 @@ The unique feature of the CCGM1A1 is its LUT-tree logic element for combinatoria
 
 There's a trade-off here between using an L2T4 and a LUT4:
 - **Less area consumed:** A single L2T4 requires only 12 configuration bits compared to 16 for a LUT4.
-- **Reduced combinatorial versatility:** An L2T4 can implement **520** (find out how [here](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/6.sw_analysis)) different 4-input logic functions, whereas a LUT4 can implement **65,536** (these results are obtained using basic combinatorics).
+- **Reduced combinatorial versatility:** An L2T4 can implement **520** (find out how [here](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/6.sw_analysis)) different 4-input logic functions, whereas a LUT4 can implement **65,536** (these results are obtained using basic combinatorics).
 
     ![Lut-tree](0.doc/LUT_CPE.png)
 
@@ -95,7 +95,7 @@ Alleviating the imposed limits of L2T4 an L2T5 primitive is formed. With the cos
 
 ## 8-input logic -- experimental
 
-Furthermore, combining the two independent L2T4 blocks with one more LUT2, we get an 8-input LUT tree. Our [analysis](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/6.sw_analysis) yielded **671848/2<sup>256</sup>** distinct functions of 8-inputs feasible to implement in this structure. We see that it's no good for real, 8-input independent variable logic functions, considering the cons of not being able to realize non-decomposable functions, which amplify in this case.
+Furthermore, combining the two independent L2T4 blocks with one more LUT2, we get an 8-input LUT tree. Our [analysis](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/6.sw_analysis) yielded **671848/2<sup>256</sup>** distinct functions of 8-inputs feasible to implement in this structure. We see that it's no good for real, 8-input independent variable logic functions, considering the cons of not being able to realize non-decomposable functions, which amplify in this case.
 
 This feature is still experimental, as the synthesis and PnR tools are not yet suited to accomodate this primitive, as discussed [here](https://github.com/chili-chips-ba/openCologne/issues/28).
 
@@ -125,7 +125,7 @@ Points 1. and 2. are clear from the first 5 tests. Fine-grained locally containe
 
 The CPEs consisting of two L2T4 make this a quasi-41k LUT4 device, but the logic capacity is in reality around 24k LUT4s, using popular FPGA vendors (Intel, Lattice, Gowin) as reference. In conclusion, logic defficiency of LUT-trees degrades the device logic capacity, for most applications, providing a logic capacity of 24k LUT4s, at 28% more configuration bits. The most prominent features of the CCGM1A1 are its abundant DFFs relative to its equivalent logic capacity and the generous amount of BRAM provided.
 
-The maximum frequency of the chip is an area of dispute. Tool reports on STA laregly depend on the operating environment specified by the `-tm` option in `p_r`. It's unclear what results may be expected in terms of Fmax, since it's proven that at times, p_r produces a non-functioning configuration for `-tm 1`, see [issue61](https://github.com/chili-chips-ba/openCologne/issues/61).  **Maximum proven frequency at `-tm 3` of CCGM1A1 of 137 MHz** obtained [here](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/5.fpga_torture).
+The maximum frequency of the chip is an area of dispute. Tool reports on STA laregly depend on the operating environment specified by the `-tm` option in `p_r`. It's unclear what results may be expected in terms of Fmax, since it's proven that at times, p_r produces a non-functioning configuration for `-tm 1`, see [issue61](https://github.com/chili-chips-ba/openCologne/issues/61).  **Maximum proven frequency at `-tm 3` of CCGM1A1 of 137 MHz** obtained [here](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/5.fpga_torture).
 
 
 ## PrjPeppercorn re-runs

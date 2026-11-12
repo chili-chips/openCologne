@@ -78,4 +78,4 @@ GowinSynthesis finish
 
 ## PrjPeppercorn re-run (2026-10)
 
-Yosys 0.69 + nextpnr-himbaechel 0.11.1-77: one core needs 107% of CPEs (legacy `p_r`: 123%), still does not fit. Tables and steps: [8.StressTest](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest#prjpeppercorn-re-runs).
+Yosys 0.69 + nextpnr-himbaechel 0.11.1-77: one core needs 107% of CPEs (legacy `p_r`: 123%), still does not fit. Tables and steps: [8.StressTest](https://github.com/chili-chips/openCologne/tree/main/8.StressTest#prjpeppercorn-re-runs).

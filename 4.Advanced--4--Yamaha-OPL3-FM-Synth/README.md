@@ -9,7 +9,7 @@ This is a triple exciting port of @gtaylormb [project](https://github.com/gtaylo
 
 Regarding excitment/challenge#2, having tried [Synlig plugin](https://github.com/chipsalliance/synlig) and [Yosys-Slang](https://github.com/povik/yosys-slang), we ended up converging on @zachjs's [SV2V](https://github.com/zachjs/sv2v). This can also be viewed as an independant validation and confirmation of @pu-cc's advice on the opensource flow that works best for _SystemVerilog_.
 
-To get started, first install SV2V and other tools, as explained in [0.doc](https://github.com/chili-chips-ba/openCologne/blob/main/0.doc/1.README.Tool-Installs.txt). Then:
+To get started, first install SV2V and other tools, as explained in [0.doc](https://github.com/chili-chips/openCologne/blob/main/0.doc/1.README.Tool-Installs.txt). Then:
 ```
 % cd 3.build
 % make synth

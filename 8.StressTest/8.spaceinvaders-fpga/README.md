@@ -17,7 +17,7 @@ The **Space Invaders** design—adapted from [this repository](https://gitlab.co
 - **User Interface:** PS/2 keyboard interface
 - **Interrupt System:** For handling external events
 
-This project is a **real-world use case** of a heterogeneous SoC architecture, as opposed to synthetic benchmarks like [corescore_cc](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/1.corescore_cc), [LUTRAM_Stress_Test](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/2.LUTRAM_stress_test), and [fpga-torture](https://github.com/chili-chips-ba/openCologne/tree/main/8.StressTest/5.fpga_torture).
+This project is a **real-world use case** of a heterogeneous SoC architecture, as opposed to synthetic benchmarks like [corescore_cc](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/1.corescore_cc), [LUTRAM_Stress_Test](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/2.LUTRAM_stress_test), and [fpga-torture](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/5.fpga_torture).
 
 ## FPGA Resource Utilization Comparison
 | **Resource**         | **CCGM1A1 (GateMate)**            | **GW2AR-18CQN88P C8/I7 (Gowin)**           |

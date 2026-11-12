@@ -7,7 +7,7 @@ and [DIYMORE-5102](https://www.diymore.cc/products/i2s-pcm5102-dac-decoder-32bit
 
 For this project, the DIYMORE-5102 board is being used. While there isn’t a specific schematic available for this model, 
 the CJMCU-5102 has the same pinout and is commonly referenced. You can view the 
-[schematic](https://github.com/chili-chips-ba/openCologne/blob/main/10.Bonus--6--I2S-DAC/0.doc/pcm5102.Audio-DAC_schematic.png) 
+[schematic](https://github.com/chili-chips/openCologne/blob/main/10.Bonus--6--I2S-DAC/0.doc/pcm5102.Audio-DAC_schematic.png) 
 for the CJMCU-5102, which should be applicable. The datasheet for the PCM5102 chip is also useful for understanding the board’s functionality.
 
 ![image](https://github.com/user-attachments/assets/b65447dc-02d2-4038-83d1-7df84db0824d)

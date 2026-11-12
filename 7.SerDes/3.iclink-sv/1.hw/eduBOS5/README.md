@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 # eduBOS5
 
-The CPU of our SoC: Chili.CHIPS' compact RV32I core. These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips-ba/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `54c5409` (2026-10-25). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
+The CPU of our SoC: Chili.CHIPS' compact RV32I core. These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `54c5409` (2026-10-25). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
 
 | File | What |
 |---|---|
@@ -18,7 +18,7 @@ The CPU of our SoC: Chili.CHIPS' compact RV32I core. These files are copied unch
 
 Not yet in the 7.SerDes top or its QA flow: that comes with the SoC.
 
-For the parameters, the pipelines and their cycles per instruction, the validation (riscv-formal, the multicycle proof) and the WaveCrux views, see the [eduBOS5 README in openPCIE](https://github.com/chili-chips-ba/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md).
+For the parameters, the pipelines and their cycles per instruction, the validation (riscv-formal, the multicycle proof) and the WaveCrux views, see the [eduBOS5 README in openPCIE](https://github.com/chili-chips/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md).
 
 To update: copy these five files again from openPCIE and update the commit above.
 

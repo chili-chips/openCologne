@@ -1,12 +1,12 @@
 [![NLnet:Funded](https://badgen.net/badge/NLnet/Funded/08C)](https://nlnet.nl/)
-[![Stars](https://badgen.net/github/stars/chili-chips-ba/openCologne?label=Stars)](https://github.com/chili-chips-ba/openCologne/stargazers)
+[![Stars](https://badgen.net/github/stars/chili-chips/openCologne?label=Stars)](https://github.com/chili-chips/openCologne/stargazers)
 [![License:BSD-3](https://badgen.net/badge/License/BSD-3/blue)](LICENSES)
-[![Lint](https://badgen.net/github/checks/chili-chips-ba/openCologne/main/run-lint?label=Lint)](https://github.com/chili-chips-ba/openCologne/actions/workflows/lint.yml)
-[![Verible](https://badgen.net/github/checks/chili-chips-ba/openCologne/main/verible?label=Verible)](https://github.com/chili-chips-ba/openCologne/actions/workflows/verible.yml)
+[![Lint](https://badgen.net/github/checks/chili-chips/openCologne/main/run-lint?label=Lint)](https://github.com/chili-chips/openCologne/actions/workflows/lint.yml)
+[![Verible](https://badgen.net/github/checks/chili-chips/openCologne/main/verible?label=Verible)](https://github.com/chili-chips/openCologne/actions/workflows/verible.yml)
 [![SerDes:Pass](https://badgen.net/badge/SerDes/Pass/green)](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
 [![PrjPeppercorn:Pass](https://badgen.net/badge/PrjPeppercorn/Pass/green)](https://github.com/YosysHQ/prjpeppercorn)
 [![LiteX:YES](https://badgen.net/badge/LiteX/YES/green)](7.SerDes/3.iclink-sv/4.litex)
-[![eduBOS5:YES](https://badgen.net/badge/eduBOS5/YES/green)](https://github.com/chili-chips-ba/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md)
+[![eduBOS5:YES](https://badgen.net/badge/eduBOS5/YES/green)](https://github.com/chili-chips/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md)
 [![PeakRDL:YES](https://badgen.net/badge/PeakRDL/YES/green)](7.SerDes)
 
 [Click here](https://github.com/chili-chips-ba/openCologne-PCIE) if interested in our new CologneChip project, which is about designing the first fully open-source **PCIE EndPoint**.
@@ -14,7 +14,7 @@
 ----
 Currently there are few FPGA vendors in Europe. One of these vendors, CologneChip. Their GateMate device has a somewhat unique feature set for the 20K class, most notably the high-speed SerDes. It is also one of the rare families designed around 2-input [LUT trees and muxes](https://github.com/chili-chips-ba/openCologne/issues/28#issue-2442939220), vs. the mainstream microRAM-based LUTs with 4, 5 or 6 address inputs. 
 <p align="center">
-   <img width=250 src="https://github.com/chili-chips-ba/openCologne/blob/main/0.doc/artwork/opencologne.logo.svg">
+   <img width=250 src="https://github.com/chili-chips/openCologne/blob/main/0.doc/artwork/opencologne.logo.svg">
 </p>
 Given recent appearances of affordable boards, GateMate challenge at the moment is to get hold of, and grow roots in the open hardware dev community... which is also an opportunity. We are firmly set to help GateMate achieve this goal. 
 
@@ -24,14 +24,14 @@ How? By pursuing a three-pronged approach:
 
 2) Create and validate a portfolio of **well-documented examples** that put GateMate resources to good use. Be it by tapping into SystemVerilog or VHDL RTL, HLS design methodologies, demonstrating pure hardware FSM implementations, or HW/SW co-design, utilizing SOC techniques, or possibly even reaching into Amaranth and LiteX build frameworks... the goal is to expand GateMate audience, faciliate silicon adoption, and ultimately have it gain a foothold in the market.
 
-3) Engage with [CologneChip](https://www.colognechip.com/programmable-logic/gatemate) staff to resolve [issues](https://github.com/chili-chips-ba/openCologne/issues) identified in this course.
+3) Engage with [CologneChip](https://www.colognechip.com/programmable-logic/gatemate) staff to resolve [issues](https://github.com/chili-chips/openCologne/issues) identified in this course.
 
 
 The practical execution of this strategy is organized into 3 game levels with 9 play milestones.
 
 ## *Level I – Warm Up*
 
-**Play 1** - Form development team and get to know CologneChip GateMate silicon and dev tools, see our [0.doc](https://github.com/chili-chips-ba/openCologne/tree/main/0.doc) folder. Procure [Olimex](https://www.olimex.com/Products/FPGA/GateMate/GateMateA1-EVB/open-source-hardware) boards and familiarize with hardware platform. Light up onboard LEDs with our very special [blinky](https://github.com/chili-chips-ba/openCologne/tree/main/1.Blinky--Verilog-VHDL-Python.Amaranth/3.build). It contains _Verilog_, _VHDL_ and _Amaranth_ versions, as well as an example of how to use **CologneChip Internal Logic Analyzer (ILA)** for Olimex board. The **Makefile** and **CCF** in there are your essential _Getting Started Guide_, and golden reference to leverage from for your project.
+**Play 1** - Form development team and get to know CologneChip GateMate silicon and dev tools, see our [0.doc](https://github.com/chili-chips/openCologne/tree/main/0.doc) folder. Procure [Olimex](https://www.olimex.com/Products/FPGA/GateMate/GateMateA1-EVB/open-source-hardware) boards and familiarize with hardware platform. Light up onboard LEDs with our very special [blinky](https://github.com/chili-chips/openCologne/tree/main/1.Blinky--Verilog-VHDL-Python.Amaranth/3.build). It contains _Verilog_, _VHDL_ and _Amaranth_ versions, as well as an example of how to use **CologneChip Internal Logic Analyzer (ILA)** for Olimex board. The **Makefile** and **CCF** in there are your essential _Getting Started Guide_, and golden reference to leverage from for your project.
 
 **Play 2** - Port to GateMate a selected subset of simpler examples from the [ULX3S-MISC](https://github.com/emard/ulx3s-misc/tree/master/examples) portfolio. The goal is to enable a few standard PMODs and peripherals, mostly GPIO-based, including PSRAM/HyperRAM.
 
@@ -41,7 +41,7 @@ The practical execution of this strategy is organized into 3 game levels with 9 
 
 **Play 4** - Port to GateMate a couple of advanced ULX3S examples. Now without restrictions related to PCB development support, we are choosing these examples for their purely FPGA value. We may also modify them, write mutations and variants, looking to find a better fit for GateMate internal architecture, or letting creativity a free hand to play and experiment.
 
-**Play 5** - Adapt [TetriSaraj](https://github.com/chili-chips-ba/openXC7-TetriSaraj) HW/SW project to GateMate. This is a serious SOC. Its hardware includes a RISC-V microkontroller, Instruction, and Data RAM, Frame Buffer with Video Subsystem, and high-speed I/O for VGA. On the software side, this is a bare-metal, "free-standing" C that implements the logic of a Tetrisoid gate.
+**Play 5** - Adapt [TetriSaraj](https://github.com/chili-chips/openXC7-TetriSaraj) HW/SW project to GateMate. This is a serious SOC. Its hardware includes a RISC-V microkontroller, Instruction, and Data RAM, Frame Buffer with Video Subsystem, and high-speed I/O for VGA. On the software side, this is a bare-metal, "free-standing" C that implements the logic of a Tetrisoid gate.
 
 **Play 6** - Design and manufacture the ULX5M board.
 
@@ -148,7 +148,7 @@ We are proud to have initiated GateMate enablement in opensource [Amaranth](http
   <img width=500 src="0.doc/Intergalaktik/IO-boards.jpg">
 </p>
    
-Click [here](https://github.com/intergalaktik/Extension_Boards_for_Olimex_GateMate) for more on extension cards. For ULX5M, check [this](https://github.com/chili-chips-ba/openCologne/tree/main/6.PCB.advanced).
+Click [here](https://github.com/intergalaktik/Extension_Boards_for_Olimex_GateMate) for more on extension cards. For ULX5M, check [this](https://github.com/chili-chips/openCologne/tree/main/6.PCB.advanced).
 
 #### ULX5M-v02 bringup
 [![ULX5M blinks LEDs on its own](6.PCB.advanced/0.doc/ulx5m-gs.v02.4.debug.jpg)](https://www.youtube.com/watch?v=LA20pfW7X00 "ULX5M is counting!")
@@ -270,7 +270,7 @@ This project was funded through the NGI0 Entrust Fund, a fund established by NLn
 
 Feel like helping the GateMate community grow better and larger?! Reach out to fpga@chili-chips.com, or join our <a href="https://discord.gg/F5UPDFFdsH">GateMate Discord Channel</a>.
 
-Don't feel shy to ask for help ===> [![issues](https://badgen.net/github/open-issues/chili-chips-ba/openCologne?label=issues)](https://github.com/chili-chips-ba/openCologne/issues).
+Don't feel shy to ask for help ===> [![issues](https://badgen.net/github/open-issues/chili-chips/openCologne?label=issues)](https://github.com/chili-chips/openCologne/issues).
 
 ## Contribution Guidelines
 
