@@ -39,7 +39,7 @@ In addition to the _GateMateA1-EVB_, you will also need:
 - monitor with VGA port connected to it.
 - _SimpleIO Extension Board_ or, yet better, the new _**joyIO**_ card
 
-<img width=400 src="https://github.com/chili-chips/openCologne/blob/main/0.doc/Intergalaktik/joyIO.png">
+<img width=400 src="../0.doc/Intergalaktik/joyIO.png">
 
 ## The Gameplay
 
