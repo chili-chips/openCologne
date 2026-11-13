@@ -392,7 +392,7 @@ module iclink_serdes_gm
       .regfile_di_i        (reg_wr.data),
       .regfile_do_o        (NC_regfile_do_o),
       .regfile_rdy_o       (NC_regfile_rdy_o),
-      .cfg_en_i            (1'b0),                // the regfile does it all
+      .cfg_en_i            (1'b0),                  // the regfile does it all
       .reset_cfg_i         (1'b0),
       .cfgfile_di_i        (16'h0),
       .cfgfile_valid_i     (1'b0),
