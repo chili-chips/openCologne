@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 # FIFO pump
 
-A message link between the two eduBOS5 CPUs, ahead of remote memory access: each CPU pushes 32-bit words into a TX FIFO, the pump streams them to the other side, and the other CPU pops them from an RX FIFO. Both firmwares take part. It is the eduBOS5 <-> FIFO <-> link architecture planned for [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/2.rtl/6.soc), there with the PCIe PIPE in place of this PHY, so the FIFO side and its firmware carry over. Back to the [7.SerDes README](../README.md).
+A message link between the two eduBOS5 CPUs, ahead of remote memory access: each CPU pushes 32-bit words into a TX FIFO, the pump streams them to the other side, and the other CPU pops them from an RX FIFO. Both firmwares take part. It is the eduBOS5 <-> FIFO <-> link architecture planned for [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/6.soc), there with the PCIe PIPE in place of this PHY, so the FIFO side and its firmware carry over. Back to the [7.SerDes README](../README.md).
 
 **Status:** the RTL ([`iclink_serwb_pump.sv`](../3.iclink-sv/1.hw/iclink_serwb_pump.sv), `iclink_serwb_fifo.sv`, `iclink_serwb_line.sv`) and its unit tests are done, at W = 2 and W = 4. It runs in the board top on setup 1 (`sim_top`, 2.5 and 5 Gb/s), after the PRBS test, and between two sides 200 ppm apart (`sim_link_ppm`, 2.5 Gb/s). Not yet: the CSRs, the firmware and the board.
 

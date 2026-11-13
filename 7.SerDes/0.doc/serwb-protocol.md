@@ -180,6 +180,6 @@ Data never produces these symbols, so a PCIe receiver that lost its place finds 
 
 The same codes mean different things: K28.3 is SerWB's XOFF and PCIe's IDL, K28.1 is SerWB's fill and PCIe's FTS. The two framings cannot share a lane.
 
-**For openCologne-PCIE**, which reuses the FIFO pump's eduBOS5 <-> FIFO architecture ([`2.rtl/6.soc`](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/2.rtl/6.soc)): the CPU side (FIFOs, CSRs, firmware) carries over unchanged. On the line side the PCIe transaction and data link layers replace the SerWB packetizer. They frame each TLP with STP, sequence number, LCRC and END, and hand data plus K flags to the PIPE: the same byte + K flag shape as this PHY. PCIe Gen3 and later (128b/130b) have no K symbols at all; they frame with tokens and sync headers. That does not apply to GateMate, whose SerDes tops out at 5 Gb/s (Gen2).
+**For openCologne-PCIE**, which reuses the FIFO pump's eduBOS5 <-> FIFO architecture ([`2.rtl/6.soc`](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/6.soc)): the CPU side (FIFOs, CSRs, firmware) carries over unchanged. On the line side the PCIe transaction and data link layers replace the SerWB packetizer. They frame each TLP with STP, sequence number, LCRC and END, and hand data plus K flags to the PIPE: the same byte + K flag shape as this PHY. PCIe Gen3 and later (128b/130b) have no K symbols at all; they frame with tokens and sync headers. That does not apply to GateMate, whose SerDes tops out at 5 Gb/s (Gen2).
 
 #### End-of-Document

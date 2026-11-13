@@ -45,7 +45,7 @@ Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, w
 | 2 | two ULX5M-GS boards | two way, at 1.25, 2.5 and 5 Gb/s |
 | 3 | ULX5M-GS (GateMate) and ULX4M-LD (Lattice ECP5) | two way, GateMate to LiteICLink on ECP5, at 2.5 Gb/s |
 
-Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE); it runs with open tools only.
+Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE); it runs with open tools only.
 
 | Folder | What | Status |
 |---|---|---|
@@ -165,14 +165,14 @@ State as of 2026-10-26.
 ## References
 - Cologne Chip latest [datasheet](https://colognechip.com/docs/ds1001-gatemate1-datasheet-latest.pdf)
 - Cologne Chip [SerDes LB example](https://github.com/pu-cc/gm_serdes_lb) -- Includes **serdestool.py** tool for register map helpers
-- [Intergalaktik 2-chip SerDes test](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/1.pcb#ver1)
+- [Intergalaktik 2-chip SerDes test](https://github.com/chili-chips/openCologne-PCIE/tree/main/1.pcb#ver1)
 - Xilinx PG046 - [Aurora 8B/10B](https://docs.amd.com/r/en-US/pg046-aurora-8b10b/Introduction?tocId=Tqe8wtK9r1zAUq13hUnVEw)
     - Xilinx SP002 - [Aurora 8B/10B Protocol Spec](https://docs.amd.com/v/u/en-US/aurora_8b10b_protocol_spec_sp002)
 - BerkeleyLab [ChitChat](https://berkeleylab.github.io/Bedrock/_gen_md/serial_io/chitchat/README_md.html) protocol
 - LiteX [IC Link](https://github.com/enjoy-digital/liteiclink)
 - [MesaBusProtocol](https://github.com/blackmesalabs/MesaBusProtocol)
 - T. Ibrahimović, N. Osmić, [eduBOS5: A Case Study in Structured SystemVerilog and PPA Optimization for Resource-Constrained RISC-V FPGA Cores](https://doi.org/10.1109/Austrochip67945.2025.11183711), Austrochip 2025, IEEE. The CPU in our SoC.
-- The [SerDes BFM](1.sim-model/README.md), shared with openCologne-PCIE; openCologne-PCIE [SerDes loopback tests](https://github.com/chili-chips-ba/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
+- The [SerDes BFM](1.sim-model/README.md), shared with openCologne-PCIE; openCologne-PCIE [SerDes loopback tests](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
 - [Transputer](http://www.bitsavers.org/components/inmos/transputer/C011_Link_Adaptor.pdf)
 - [LiteX 1000basex](https://github.com/pu-cc/liteeth/tree/gatemate1000basex)
 - [Sending Data Structures from chip to chip](https://www.reddit.com/r/FPGA/comments/1m8gl5o/how_to_send_a_struct_from_one_dev_board_to_another)
