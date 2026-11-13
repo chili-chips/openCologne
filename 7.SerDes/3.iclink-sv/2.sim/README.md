@@ -17,9 +17,9 @@ Needs Verilator 5 (`--binary --timing`; we use 5.052) and Icarus Verilog 13. Onl
 
 The SerDes in simulation is our open-source SerDes BFM, [`1.sim-model`](../../1.sim-model/README.md): a behavioural model at the `ccfpga_serdes` level (Cologne Chip's sim model), not `CC_SERDES`. `iclink_serdes_gm.sv` instantiates `ccfpga_serdes` once: the build takes `ccfpga_serdes.SYNTH.sv` (`CC_SERDES`), the simulation the BFM. Verilator runs our RTL with the BFM in place of the hard macro, so no co-simulation (VProc) is needed. Once the eduBOS5 SoC is in, its RTL will run the test firmware the same way.
 
-<p align="center">
+<div align="center">
   <img width="100%" alt="tb_phy_oneway: the test sequence drives the PHY (iclink_serdes_gm); the SerDes BFM stands in for CC_SERDES, its serial TX looped to its RX through an XOR for fault injection" src="../../0.doc/iclink-tb.drawio.png">
-</p>
+</div>
 
 ## Tests
 
@@ -91,27 +91,27 @@ The pictures below were taken on 2026-10-21, before the PHY moved to one clock a
 
 The whole `phy_oneway` run, about 200 us: bring-up, the data stream with `check`, then PRBS7, 15 and 31, and the deliberate bit flips (`flip`).
 
-<p align="center"><img width="100%" alt="WaveCrux: the whole phy_oneway run" src="images/wavecrux-oneway-overview.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: the whole phy_oneway run" src="images/wavecrux-oneway-overview.png"></div>
 
 Bring-up: the bring-up FSM releases the SerDes resets, TX is ready, the comma alignment locks, RX is ready (`rx_invalid` reads ff for a few clocks, until the first words arrive); then the checker locks on the data stream.
 
-<p align="center"><img width="100%" alt="WaveCrux: phy_oneway bring-up" src="images/wavecrux-oneway-bringup.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: phy_oneway bring-up" src="images/wavecrux-oneway-bringup.png"></div>
 
 Data: one 64-bit word per 32 ns clock, 80 bits on the 2.5 Gb/s line (`ser_txp`). The word ending in `bc` carries the K28.5 comma in lane 0.
 
-<p align="center"><img width="100%" alt="WaveCrux: phy_oneway data on the serial line" src="images/wavecrux-oneway-data.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: phy_oneway data on the serial line" src="images/wavecrux-oneway-data.png"></div>
 
 A deliberate bit flip (cursor). Through the BFM's receiver and the decoder, lane 3 reports an invalid symbol (`rx_invalid` = 08) and `rx_bad` counts the word.
 
-<p align="center"><img width="100%" alt="WaveCrux: a flipped bit caught in phy_oneway" src="images/wavecrux-oneway-flip.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: a flipped bit caught in phy_oneway" src="images/wavecrux-oneway-flip.png"></div>
 
 The same during PRBS7: `rx_prbs_errors` counts the flip.
 
-<p align="center"><img width="100%" alt="WaveCrux: a flipped bit counted by the PRBS checker" src="images/wavecrux-oneway-prbs-flip.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: a flipped bit counted by the PRBS checker" src="images/wavecrux-oneway-prbs-flip.png"></div>
 
 `phy_twoway`: a flip on the A->B line. Rows are A's, then B's. Only B sees it: B's `rx_invalid` and `rx_bad` go up; A's stay 0.
 
-<p align="center"><img width="100%" alt="WaveCrux: phy_twoway, a flip on A->B seen by B only" src="images/wavecrux-twoway-flip-ab.png"></p>
+<div align="center"><img width="100%" alt="WaveCrux: phy_twoway, a flip on A->B seen by B only" src="images/wavecrux-twoway-flip-ab.png"></div>
 
 ### Decoders
 

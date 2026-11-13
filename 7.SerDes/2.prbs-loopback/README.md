@@ -4,10 +4,10 @@ Cologne Chip's `serdestool.py` drives `CC_SERDES` over JTAG. Needs python3 with 
 
 Clock sources and SMA connectors are soldered to PCB. P and N signals of the TX and RX channel are connected into a loopback with a short RF cable, as shown below:
 
-<p align="center" width="100%">
+<div align="center" width="100%">
    <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="../0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png"> 
    <img width="50%" src="../0.doc/SerDes-Loopback.jpg">
-</p>
+</div>
 
  
 ## Verifying board setup

@@ -26,11 +26,11 @@ The format of LiteICLink `8ef8d79`, which our port keeps so it interoperates. Th
 
 At a glance:
 
-<p align="center"><img width="100%" alt="A Serial Wishbone packet, left to right: idle fill, preamble, port, length, zero byte, payload (Etherbone on port 0, FIFO pump on port 2), CRC32, idle fill" src="serwb-packet-simple.drawio.png"></p>
+<div align="center"><img width="100%" alt="A Serial Wishbone packet, left to right: idle fill, preamble, port, length, zero byte, payload (Etherbone on port 0, FIFO pump on port 2), CRC32, idle fill" src="serwb-packet-simple.drawio.png"></div>
 
 In detail, word by word and on the line:
 
-<p align="center"><img width="100%" alt="Serial Wishbone packet: preamble, port and length, payload (Etherbone on port 0, FIFO pump on port 2), CRC32; on the line, 8b/10b symbols with K28.1 fill, K28.5 comma and XON/XOFF between packets" src="serwb-packet.drawio.png"></p>
+<div align="center"><img width="100%" alt="Serial Wishbone packet: preamble, port and length, payload (Etherbone on port 0, FIFO pump on port 2), CRC32; on the line, 8b/10b symbols with K28.1 fill, K28.5 comma and XON/XOFF between packets" src="serwb-packet.drawio.png"></div>
 
 **Packet**, in 32-bit words:
 

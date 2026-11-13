@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 The same tests run in simulation and on boards: the sim mirrors each hardware setup ([2.sim](../3.iclink-sv/2.sim/README.md)). Back to the [7.SerDes README](../README.md).
 
-<p align="center">
+<div align="center">
   <img width="100%" alt="Test jig: simulation with two eduBOS5 SoCs and two SerDes BFMs, lines crossed; setup 1 one GateMate EVB with TX cabled to its own RX; setup 2 two ULX5M-GS boards crossed at 1.25, 2.5 and 5 Gb/s, with a host PC on the UART console; setup 3 a ULX5M-GS (GateMate) to a ULX4M-LD (Lattice ECP5, LiteICLink) at 2.5 Gb/s, the most both sides take" src="iclink-testjig.drawio.png">
-</p>
+</div>
 
 | # | Hardware | Link | Tests | In simulation |
 |---|---|---|---|---|

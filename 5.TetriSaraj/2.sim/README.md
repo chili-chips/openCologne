@@ -1,8 +1,8 @@
 # HW/SW co-sim with VProc VIP
 by Simon Southwell
-<p align="center">
+<div align="center">
 <img src="0.doc/wyvernSemi.png">
-</p>
+</div>
 
 
 ## First things first

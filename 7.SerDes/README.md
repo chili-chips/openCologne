@@ -26,18 +26,18 @@ Given that GateMate proprietary (aka "legacy") PnR is rather unreliable and inse
 
 Start with the standalone [SerDes loopback test](2.prbs-loopback/README.md), to get used to the hardware platform, SerDes settings, cabling and work with RF-class signaling in general. 
 
-<p align="center">
+<div align="center">
   <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png">
   <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="70%" src="0.doc/SerDes-Loopback.jpg">
-</p>
+</div>
 
 ## We are the next step
 
 Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, with simulation and build. The same tests run in sim and on boards: the sim mirrors each hardware setup. Details, and the GateMate-to-ECP5 steps: [test setups](0.doc/test-setups.md).
 
-<p align="center">
+<div align="center">
   <img width="80%" alt="Test jig: simulation with two eduBOS5 SoCs and two SerDes BFMs, lines crossed; setup 1 one GateMate EVB with TX cabled to its own RX; setup 2 two ULX5M-GS boards crossed at 1.25, 2.5 and 5 Gb/s, with a host PC on the UART console; setup 3 a ULX5M-GS (GateMate) to a ULX4M-LD (Lattice ECP5, LiteICLink) at 2.5 Gb/s, the most both sides take" src="0.doc/iclink-testjig.drawio.png">
-</p>
+</div>
 
 | # | Hardware | Link |
 |---|---|---|
@@ -91,9 +91,9 @@ The SoC needs no LiteX, so neither does the core. LiteX users take only the SV c
 
 One GateMate. Solid boxes are done; dashed ones, tagged NEXT, come next.
 
-<p align="center">
+<div align="center">
   <img width="80%" alt="Design internals of one GateMate: SoC (eduBOS5, Wishbone bus, RAM and UART, PeakRDL CSRs), Serial Wishbone (Etherbone, packetizer (done), optional scrambler, FIFO pump (done)), and the PHY (PRBS, lane aligner, I/O flops, CC_SERDES hard macro with the 8b/10b inside) to a 2.5 Gb/s serial line" src="0.doc/iclink-internals.drawio.png">
-</p>
+</div>
 
 | Block | RTL | From | Status |
 |---|---|---|---|
@@ -183,9 +183,9 @@ State as of 2026-10-26.
 
 - Primer on [Eye Diagrams](https://incompliancemag.com/eye-diagram-part1) and [Equivalent Time Sampling](https://www.tek.com/en/documents/application-note/real-time-versus-equivalent-time-sampling) (vs. real-time)
 
-<p align="center" width="100%">
+<div align="center" width="100%">
     <img width="65%" src="0.doc/Eye-Diagrams.png">
-</p>
+</div>
 
 - Gowin primer on SerDes Signal Integrity ([SI](https://www.gowinsemi.com/en/market/market_detail/48)) measurements 
 

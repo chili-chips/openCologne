@@ -20,7 +20,7 @@ LiteICLink's Serial Wishbone carries user streams on its packet ports, next to E
  '---------------------------------------- all on one clock, clk_core ----------------------------------------'
 ```
 
-<p align="center"><img width="100%" alt="Serial Wishbone packet format" src="serwb-packet.drawio.png"></p>
+<div align="center"><img width="100%" alt="Serial Wishbone packet format" src="serwb-packet.drawio.png"></div>
 
 ## How it works
 
@@ -78,7 +78,7 @@ Planned:
 
 How much buffer, where the thresholds sit, and how the levels move. Measured with `sim_serwb_pump` at W = 2: two pumps wired on the digital bus, a `LINE_LAT`-clock line between them each way: 31 clocks, 3 more than the PHY's 28 on the BFM (`sim_phy_oneway` prints it), to err on the slow side. One clock for both pumps and both CPUs, as on the chip.
 
-<p align="center"><img width="100%" alt="FIFO pump end to end, all on clk_core: CPU A, TX FIFO, packetizer, the link, depacketizer, RX FIFO with XOFF level 832 and XON level 512, CPU B; the flow-control loop from the RX FIFO level through B's line mux and the line back to A's packetizer" src="serwb-pump-e2e.drawio.png"></p>
+<div align="center"><img width="100%" alt="FIFO pump end to end, all on clk_core: CPU A, TX FIFO, packetizer, the link, depacketizer, RX FIFO with XOFF level 832 and XON level 512, CPU B; the flow-control loop from the RX FIFO level through B's line mux and the line back to A's packetizer" src="serwb-pump-e2e.drawio.png"></div>
 
 **The round trip.** One clock and no synchronizers, so the loop is short. From B's RX FIFO reaching the XOFF level to A stopping takes 3 + `LINE_LAT` clocks: the pause flop, the request flop, the TX flop, the line, then the K28.3 detect flop on A. Words A sent before it stopped still land: another `LINE_LAT` clocks of them.
 
@@ -104,7 +104,7 @@ At W = 4 (`LINE_LAT` 31 line clocks, 5 Gb/s) the pump moves on every other clock
 4. **Levels are exact.** One clock: each FIFO level is a flop, from both pointers of the same clock. A word becomes readable 3 clocks after it is written (the RAM write flop, then the commit pointer, so the RAM always holds what the reader may take).
 5. **A LiteICLink peer** (setup 3) sends packets of at most 16 words and reacts to XOFF in its own clocks; 192 words is 3 us of line at 2.5 Gb/s, well above its pipeline.
 
-<p align="center"><img width="100%" alt="FIFO levels over time: B's RX FIFO rises to 832, XOFF, peaks at 896 and holds; A's TX FIFO fills to 1024; B reads again, falls to 512, XON; then B refills and drains in a sawtooth between 512 and about 900 while A's TX FIFO empties" src="../3.iclink-sv/2.sim/images/pump-levels.png"></p>
+<div align="center"><img width="100%" alt="FIFO levels over time: B's RX FIFO rises to 832, XOFF, peaks at 896 and holds; A's TX FIFO fills to 1024; B reads again, falls to 512, XON; then B refills and drains in a sawtooth between 512 and about 900 while A's TX FIFO empties" src="../3.iclink-sv/2.sim/images/pump-levels.png"></div>
 
 **Fill and empty, as measured** (B's CPU stops reading, A's keeps pushing):
 
@@ -121,7 +121,7 @@ Re-run, in `7.SerDes/3.iclink-sv/2.sim`: `make sim_serwb_pump`, then `python3 pl
 
 The software side of the data flow, planned for the demo: one polling loop, the same on A and B, over the [CSRs](#csrs-planned) above.
 
-<p align="center"><img width="100%" alt="Flow chart: reset, enable the pump, wait for link up; then a main loop: send (a message to send? room for n + 1 words? write header and n words to TX_DATA, seq + 1), then receive (a header waiting? read it; magic and seq as expected? read n words with a timeout and use them, else count a loss and drop words to the next header), check errors, and again" src="edubos5-pump-fw.drawio.png"></p>
+<div align="center"><img width="100%" alt="Flow chart: reset, enable the pump, wait for link up; then a main loop: send (a message to send? room for n + 1 words? write header and n words to TX_DATA, seq + 1), then receive (a header waiting? read it; magic and seq as expected? read n words with a timeout and use them, else count a loss and drop words to the next header), check errors, and again" src="edubos5-pump-fw.drawio.png"></div>
 
 **Messages.** A header word `{0xA5, seq, 8'h00, n}`, then `n` payload words (`n` <= 255). The pump does not know where a message starts or ends: it packs words into packets of 16, so a message may span two packets.
 

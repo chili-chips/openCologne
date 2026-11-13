@@ -14,9 +14,9 @@
 
 ----
 Currently there are few FPGA vendors in Europe. One of these vendors, CologneChip. Their GateMate device has a somewhat unique feature set for the 20K class, most notably the high-speed SerDes. It is also one of the rare families designed around 2-input [LUT trees and muxes](https://github.com/chili-chips-ba/openCologne/issues/28#issue-2442939220), vs. the mainstream microRAM-based LUTs with 4, 5 or 6 address inputs. 
-<p align="center">
+<div align="center">
    <img width=250 src="https://github.com/chili-chips/openCologne/blob/main/0.doc/artwork/opencologne.logo.svg">
-</p>
+</div>
 Given recent appearances of affordable boards, GateMate challenge at the moment is to get hold of, and grow roots in the open hardware dev community... which is also an opportunity. We are firmly set to help GateMate achieve this goal. 
 
 How? By pursuing a three-pronged approach:
@@ -145,9 +145,9 @@ Most importantly, the `GateMate proprietary P_R tool has repeatedly proved to be
 We are proud to have initiated GateMate enablement in opensource [Amaranth](https://github.com/amaranth-lang/amaranth) and [PipelineC](https://github.com/JulianKemmerer/PipelineC) dev frameworks. This project has also introduced GateMate to [Source Code Linting](https://github.com/chipsalliance/verible) for not only style, format, syntax and semantics, but also the [CDC](https://github.com/chili-chips-ba/openCologne/issues/29), a topic that is admittedly insufficiently covered by opensource chip design movement in general.
 
 ## A peek into our PCB track
-<p align="center">
+<div align="center">
   <img width=500 src="0.doc/Intergalaktik/IO-boards.jpg">
-</p>
+</div>
    
 Click [here](https://github.com/intergalaktik/Extension_Boards_for_Olimex_GateMate) for more on extension cards. For ULX5M, check [this](https://github.com/chili-chips/openCologne/tree/main/6.PCB.advanced).
 
@@ -155,25 +155,25 @@ Click [here](https://github.com/intergalaktik/Extension_Boards_for_Olimex_GateMa
 [![ULX5M blinks LEDs on its own](6.PCB.advanced/0.doc/ulx5m-gs.v02.4.debug.jpg)](https://www.youtube.com/watch?v=LA20pfW7X00 "ULX5M is counting!")
 
 #### ULX5M-v02 mounted on the CM4-BB3 carrier card, with HDMI test image
-<p align="center">
+<div align="center">
    <img width=600 src="6.PCB.advanced/0.doc/ulx5m-gs.v02.5.with-CM4_BB3.jpg">
    <img width=600 src="6.PCB.advanced/0.doc/ulx5m-gs.v02.6.with-CM4_BB3.HDMI.jpg">
-</p>
+</div>
 
 #### ULX5M-v02 mounted on the CM4 "Piunora" carrier card, with HDMI test image
-<p align="center">
+<div align="center">
    <img width=600 src="6.PCB.advanced/0.doc/ulx5m-gs.v02.7.with-CM4_Piunora.jpg">
    <img width=600 src="6.PCB.advanced/0.doc/ulx5m-gs.v02.8.with-CM4_Piunora.HDMI.jpg">
-</p>
+</div>
 
 
 ## GateMate SerDes as InterChip Link
 
 Our flagship: two GateMate chips talk over their SerDes, as one memory-mapped system. One CPU reads and writes the other chip's registers and memory as if they were its own. It is LiteX's [LiteICLink](https://github.com/enjoy-digital/liteiclink), hand-ported to SystemVerilog, so it can be linted, simulated with open tools, and dropped into LiteX as an SV core.
 
-<p align="center">
+<div align="center">
   <img width="100%" alt="Two GateMates, each with eduBOS5, PeakRDL CSRs, Serial Wishbone, the SerDes PHY and the SerDes BFM in front of the CC_SERDES hard macro, linked over a 2.5 Gb/s SerDes link" src="7.SerDes/0.doc/iclink-flagship.drawio.png">
-</p>
+</div>
 
 - **Full end-to-end sim with open tools.** In sim, our [SerDes BFM](7.SerDes/1.sim-model/README.md) (shared with [openCologne-PCIE](https://github.com/chili-chips-ba/openCologne-PCIE)) stands in for the wire and the `CC_SERDES` hard macro. No VProc: the RTL runs as built.
 - **The SerDes hard macro, used to the full.** `CC_SERDES` does the 8b/10b encoding and decoding, the comma alignment, the RX clock crossing and the clock correction between two boards; the fabric keeps only PRBS, a lane aligner and flops. The Lattice reference, LiteICLink on ECP5, encodes and decodes 8b/10b in the FPGA fabric.
@@ -183,9 +183,9 @@ Our flagship: two GateMate chips talk over their SerDes, as one memory-mapped sy
 
 End-to-end test jig: the same tests run in sim and on boards.
 
-<p align="center">
+<div align="center">
   <img width="100%" alt="Test jig: simulation with two eduBOS5 SoCs and two SerDes BFMs, lines crossed; setup 1 one GateMate EVB with TX cabled to its own RX; setup 2 two ULX5M-GS boards crossed at 1.25, 2.5 and 5 Gb/s, with a host PC on the UART console; setup 3 a ULX5M-GS (GateMate) to a ULX4M-LD (Lattice ECP5, LiteICLink) at 2.5 Gb/s, the most both sides take" src="7.SerDes/0.doc/iclink-testjig.drawio.png">
-</p>
+</div>
 
 More in [7.SerDes](7.SerDes): design internals, test jig, build and QA.
 
@@ -202,61 +202,61 @@ We are grateful to:
   - **NLnet Foundation's** sponsorship for this opportunity to put our hand and brains on GateMate.
   - **[Intergalaktik doo](https://intergalaktik.eu)** for their unreserved sharing of the first-hand insights into open-source community vibe, participation on the project, and openess to our wish to play a part in the ULX* unabated evolution.
 
-<p align="center">
+<div align="center">
     <img src="https://github.com/chili-chips-ba/openeye/assets/67533663/18e7db5c-8c52-406b-a58e-8860caa327c2">
     <img width="115" alt="NGI-Entrust-Logo" src="https://github.com/chili-chips-ba/openeye-CamSI/assets/67533663/013684f5-d530-42ab-807d-b4afd34c1522">
-</p>
+</div>
 
 This project was funded through the NGI0 Entrust Fund, a fund established by NLnet with financial support from the European Commission's Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101069594.
 
 ### Partners and Contributors
 
-<p align="center">
+<div align="center">
   <a href="https://intergalaktik.eu"><img width="50%" alt="Intergalaktik logo" src="0.doc/artwork/Intergalaktik.logo.png"></a>
   <a href="https://radiona.org"><img width="20%" alt="Radiona logo" src="0.doc/artwork/Radiona.logo.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://colognechip.com"><img width="45%" alt="Cologne Chip logo" src="0.doc/artwork/Cologne-Chip.logo.png"></a>
   <a href="https://colognechip.com/programmable-logic/gatemate"><img width="20%" alt="GateMate FPGA logo" src="0.doc/artwork/GateMate.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://github.com/chili-chips-ba/openCologne-PCIE"><img width="15%" alt="openCologne-PCIE project logo: SerDes BFM" src="0.doc/artwork/openCologne-PCIE.hex.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://oshwa.org"><img width="15%" alt="Open Source Hardware Association logo" src="0.doc/artwork/oshw-logo-filled-black.png"></a>
-</p>
+</div>
 
 ### Tools and Building Blocks
 
-<p align="center">
+<div align="center">
   <a href="https://www.kicad.org"><img width="25%" alt="KiCad logo" src="0.doc/artwork/kicad_logo.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://github.com/enjoy-digital/litex"><img width="22%" alt="LiteX logo" src="0.doc/artwork/LiteX.logo.png"></a>
   <a href="https://github.com/tarik-ibrahimovic/eduBOS5"><img width="17%" alt="eduBOS5 logo" src="0.doc/artwork/eduBOS5.logo.png"></a>
   <a href="https://riscv.org"><img width="12%" alt="RISC-V logo" src="0.doc/artwork/RISC-V-logo.svg"></a>
   <a href="https://peakrdl.readthedocs.io"><img width="14%" alt="PeakRDL logo" src="0.doc/artwork/PeakRDL.logo.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://github.com/yosyshq"><img width="20%" alt="Yosys logo" src="0.doc/artwork/Yosys.logo.png"></a>
   <a href="https://github.com/YosysHQ/prjpeppercorn"><img width="20%" alt="prjpeppercorn logo: nextpnr for GateMate" src="0.doc/artwork/prjpeppercorn.logo.png"></a>
   <a href="https://github.com/trabucayre/openFPGALoader"><img width="20%" alt="openFPGALoader logo" src="0.doc/artwork/openFPGAloader.logo.png"></a>
   <a href="https://www.veripool.org/verilator"><img width="20%" alt="Verilator logo" src="0.doc/artwork/Verilator.logo.png"></a>
   <a href="https://github.com/steveicarus/iverilog"><img width="20%" alt="Icarus Verilog logo" src="0.doc/artwork/Icarus-Verilog.logo.png"></a>
-</p>
+</div>
 
-<p align="center">
+<div align="center">
   <a href="https://github.com/MikePopoloski/slang"><img width="25%" alt="MikePopoloski slang logo" src="0.doc/artwork/slang.logo.png"></a>
   <a href="https://www.chipsalliance.org/projects"><img width="15%" alt="Chips Alliance SV Tools logo" src="0.doc/artwork/ChipsAlliance-SV-Tools.logo.png"></a>
   <a href="https://github.com/chipsalliance/verible"><img width="25%" alt="Verible logo" src="0.doc/artwork/Verible.logo.png"></a>
   <a href="https://www.drawio.com"><img width="25%" alt="draw.io logo" src="0.doc/artwork/drawio.logo.png"></a>
   <a href="https://wavecrux.app"><img width="30%" alt="WaveCrux logo" src="0.doc/artwork/WaveCrux.logo.png"></a>
-</p>
+</div>
 
 ## Community Outreach
 - [Project impact](https://www.linkedin.com/feed/update/urn:li:activity:7366484946456137732?commentUrn=urn%3Ali%3Acomment%3A%28activity%3A7366484946456137732%2C7367058727419461634%29&replyUrn=urn%3Ali%3Acomment%3A%28activity%3A7366484946456137732%2C7367071208963534851%29&dashCommentUrn=urn%3Ali%3Afsd_comment%3A%287367058727419461634%2Curn%3Ali%3Aactivity%3A7366484946456137732%29&dashReplyUrn=urn%3Ali%3Afsd_comment%3A%287367071208963534851%2Curn%3Ali%3Aactivity%3A7366484946456137732%29)

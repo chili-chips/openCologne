@@ -11,14 +11,14 @@ The project includes a constraints file to map the buttons and LEDs of the Simpl
 
 ## SimpleIO Extension Board plugged into Olimex
 
-<p align="center">
+<div align="center">
    <img src="https://github.com/user-attachments/assets/a29ccb74-e560-4b7b-8b7d-6de8e3c9d3e6">
-</p>
+</div>
 
 ### SimpleIO Board Schematic
 
-<p align="center">
+<div align="center">
    <img src="https://github.com/user-attachments/assets/ba7f5a5e-8d39-4a7a-93ba-f29508b2824d">
-</p>
+</div>
 
 #### End of Document

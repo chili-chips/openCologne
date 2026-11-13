@@ -12,16 +12,16 @@ The pictures below show expected results. Also see [this](https://www.linkedin.c
 simultaneously driving both 1.5" and 0.95" SPI LCD displays
 
 
-<p align="center" width="100%">
+<div align="center" width="100%">
     <img width="33%" src="https://github.com/user-attachments/assets/f95008b0-0579-4203-8a42-028c8021b3d5">
-</p>
+</div>
 
 ## 2) Olimex Board
 simultaneously driving both 1.5" and 0.95" SPI LCD displays
 
-<p align="center" width="100%">
+<div align="center" width="100%">
     <img width="33%" src="https://github.com/user-attachments/assets/b7a9971e-d7d6-4a61-9695-492366c72baf">
-</p>
+</div>
 
 To reproduce, please note the following tips:
 - Ensure the appropriate initialization files are available in the project directory and placed in the same folder as the Makefile.
@@ -37,13 +37,13 @@ This example is also supported for:
 - [2.2inch](http://www.lcdwiki.com/2.2inch_SPI_Module_ILI9341_SKU:MSP2202) MSP2202 SPI LCD with ILI9341 Controller
 
 
-<p align="center" width="100%">
+<div align="center" width="100%">
     <img width="90%" src="https://github.com/user-attachments/assets/f4ccde4b-41a3-4033-bf1c-254728c120ac">
-</p>
+</div>
 
-<p align="center" width="100%">
+<div align="center" width="100%">
     <img width="50%" src="https://github.com/user-attachments/assets/fd0694ce-29a6-4ff8-83af-c1e2f2d771cd">
-</p>
+</div>
 
 Also posted on [LinkedIn](https://www.linkedin.com/posts/chili-chips_gatemate-spi-lcd-activity-7233383297500733441-F4PM?utm_source=share&utm_medium=member_desktop) ...
 

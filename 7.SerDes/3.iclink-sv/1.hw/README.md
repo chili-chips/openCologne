@@ -44,9 +44,9 @@ top
 
 LiteICLink's PHY interface (8 bytes + 8 K flags per clock each way, PRBS, ready, comma alignment) on `CC_SERDES`, 64-bit datapath. As built:
 
-<p align="center">
+<div align="center">
   <img width="100%" alt="iclink_serdes_gm block diagram: clk_core (PLL_CLK_O) with iclink_prbs_tx and the tx_ser flops into CC_SERDES TX_DATA_I and TX_CHAR_IS_K_I (CC_SERDES encodes 8b/10b), and on the same clock, fed back into RX_CLK_I, the rx_ser flops, rx regs and iclink_prbs_rx; clk_reg domain with the bring-up FSM driving the PLL reset, regfile writes and TX/RX resets" src="../../0.doc/iclink-phy-rtl.drawio.png">
-</p>
+</div>
 
 - **TX:** `CC_SERDES` encodes 8b/10b: bytes on `TX_DATA_I`, K flags on `TX_CHAR_IS_K_I`, its own running disparity. LiteICLink encodes in the fabric; the line is the same.
 - **RX:** the comma alignment and the 8b/10b decoder of `CC_SERDES`, then a lane aligner in the fabric. `RX_ALIGN_COMMA_WORD` = 1X aligns the comma to 32 bits only, so it lands in lane 0 or 4 (DS1001 Figure 2.41); the lane aligner moves a lane-4 comma to lane 0.

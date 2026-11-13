@@ -11,9 +11,9 @@ The PSRAM Controller then forwards the command and returns a value if it is a re
 - `0x0223344`     - read from address 0x223344
 - `0x12233440708` - write to address 0x223344 data 0x0708
 
-<p align="center">
+<div align="center">
   <img src="0.doc/drawing.png">
-</p>
+</div>
 
 ## Sim steps
 Change directory to the 2.sim:

@@ -8,9 +8,9 @@ The project was adapted from the [ulx3s-misc](https://github.com/emard/ulx3s-mis
 
 The physical PS/2 port is one of two styles of connectors:  The 5-pin DIN or the 6-pin mini-DIN. Both connectors are electrically identical; the only difference is the connecor size, shape and arrangement of pins. 
 
-<p align="center">
+<div align="center">
   <img src="https://github.com/user-attachments/assets/54bec155-1d92-43a3-8a58-050d2185002c">
-</p>
+</div>
 
 This means that these two types of connectors can easily be changed with simple hard-wired adaptors. 
 
@@ -38,9 +38,9 @@ The Parity bit is 1 if there is an even number of 1's in the Data bits and 0 if 
 The keyboard must check Parity bit. If incorrect, it should respond as if it had received an
 invalid command. Data sent from the Device to the Host is read on the falling edge of the clock signal; Data sent from the Host to the Device is read on the rising edge. The clock frequency must be in the range 10-to-16.7kHz.
 
-<p align="center">
+<div align="center">
    <img src="https://github.com/user-attachments/assets/4808ad5c-2116-4ad3-b57b-0d3a6bcd649b">
-</p>
+</div>
 
 ## Simulation
 Running the simulation in `2.sim/cocotb` with:
@@ -49,9 +49,9 @@ make
 ```
 You can get a simple waveform of recieving `0X1C` data, i.e. the scan code of key `A`, from the keyboard. The Data bits are `0001_1100` in binary, and transmitted the LSB first. The Parity bit is 0, as the Data already contains odd number of 1s.
 
-<p align="center">
+<div align="center">
   <img src="https://github.com/user-attachments/assets/819dba78-73c2-4501-bfc8-fd9616a7b24f">
-</p>
+</div>
 
 ## See for yourself
 
