@@ -29,6 +29,7 @@ Start with the standalone [SerDes loopback test](2.prbs-loopback/README.md), to 
 <div align="center">
   <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="60%" src="0.doc/EVK-PRBS-Loopback-via-SMA-RF-cable.png">
   <img alt="CologneChip EVK with SMA RF connectors, for SerDes PRBS loopback" width="70%" src="0.doc/SerDes-Loopback.jpg">
+  <img alt="CologneChip SerDes characterization jig" width="70%" src="0.doc/CologneChip-Serdes-Characterization-Jig.png">
 </div>
 
 ## We are the next step
