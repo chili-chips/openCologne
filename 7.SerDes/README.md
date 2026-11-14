@@ -140,6 +140,8 @@ A design instantiates `ccfpga_serdes`. The file list picks its body:
 |---|---|---|---|
 | LiteX | litex#2686 | `PRBSRX`: `pause` and `with_errors_saturation` have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
 | Verilator | verilator#8894 | no error for a (local)param used before its declaration | closed (fixed: `USEBEFOREDECL`) |
+| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6), [#7](https://github.com/chili-chips/openCologne/issues/7) | 0.17.0, wrong results: an element of a packed array of packed structs is written as 1 bit; element writes in a constant function land as 1-bit writes | open |
+| JanusHDL | [#8](https://github.com/chili-chips/openCologne/issues/8) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0, not supported yet: typedef return of a constant function, packed struct pattern as a localparam, `W'(x)`, queue of queues, queue of `realtime`, write to a struct member element ([side by side](3.iclink-sv/2.sim/README.md)) | open |
 | Verilator | [verilator#9228](https://github.com/verilator/verilator/issues/9228) | splitting an `always_ff` calls `$urandom` once per copy: signals set under one random condition diverge (`TB_SERWB_TX`; workaround in `tb_serwb_tx.sv`, `tb_serwb_rx.sv`) | open |
 | Verilator | [verilator#9226](https://github.com/verilator/verilator/issues/9226) | a continuous-assign alias read through a function returns a later value | open (hidden by default since 5f0d585da, fails with `-fno-coalesce`) |
 | Verilator | verilator#8896 | `always @*` with an intra-assignment delay never finishes | open, now [verilator#9196](https://github.com/verilator/verilator/issues/9196) |
@@ -159,8 +161,9 @@ A design instantiates `ccfpga_serdes`. The file list picks its body:
 | Project Peppercorn | [prjpeppercorn#37](https://github.com/YosysHQ/prjpeppercorn/issues/37) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open |
 | Project Peppercorn | [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36) | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's [`multicycle-sdc`](https://github.com/chili-chips/nextpnr/tree/multicycle-sdc) branch has cell-level `-to`; the pump is the test case | open |
 | nextpnr | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908) | GateMate delay estimate (100 ps + 100 ps a tile) about 5x below routed delays on short hops: the placer optimizes against delays it underestimates | open |
+| Vivado XSIM | [AMD forum](https://adaptivesupport.amd.com/s/question/0D5Pd000026YeziKAC/xsim-20261-simulation-engine-not-responding-at-an-event-control-in-a-forked-process-of-a-behavioral-model) | 2026.1: "Simulation engine not responding" at an event control in a forked process of the SerDes BFM (`tb_rules`, 64 bits); workaround in `ccfpga_serdes.BFM.sv` | open |
 
-State as of 2026-11-13, retested on the latest tools. Numbers without a link were filed from an account that is no longer available.
+State as of 2026-11-13, retested on the latest tools. Numbers without a link were filed from an account that is no longer available. JanusHDL has no public tracker (it is closed source, so it can read encrypted IP): its issues are in our repos, under the [`JanusHDL` label](https://github.com/issues?q=org%3Achili-chips+label%3AJanusHDL).
 
 ## References
 - Cologne Chip latest [datasheet](https://colognechip.com/docs/ds1001-gatemate1-datasheet-latest.pdf)

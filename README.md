@@ -269,6 +269,19 @@ This project was funded through the NGI0 Entrust Fund, a fund established by NLn
 - [LED 64x64](https://www.linkedin.com/posts/ahmed-imamovic_etfpga-fpga-rtl-activity-7242253055411331073-E36f?utm_source=share&utm_medium=member_desktop)
 - [LCD](https://www.linkedin.com/posts/chili-chips_gatemate-spi-lcd-activity-7233383297500733441-F4PM?utm_source=share&utm_medium=member_desktop)
 
+**Issues filed upstream**, still open, from the [7.SerDes](7.SerDes/README.md#community-outreach) work (full table there):
+
+| Tool / project | Issues | What |
+|---|---|---|
+| nextpnr, Project Peppercorn | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908), [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36), [#37](https://github.com/YosysHQ/prjpeppercorn/issues/37), [#38](https://github.com/YosysHQ/prjpeppercorn/issues/38), [#39](https://github.com/YosysHQ/prjpeppercorn/issues/39) | GateMate: delay estimate far below routed delays; multicycle paths; smaller bitstreams; modular P&R; VeeRwolf packed to 107% |
+| Verilator | [#9228](https://github.com/verilator/verilator/issues/9228), [#9226](https://github.com/verilator/verilator/issues/9226), [#9196](https://github.com/verilator/verilator/issues/9196) | `$urandom` in a split `always_ff`; an alias read through a function; `always @*` with a delay |
+| Icarus Verilog | [#1779](https://github.com/steveicarus/iverilog/issues/1779) to [#1783](https://github.com/steveicarus/iverilog/issues/1783), [#266](https://github.com/steveicarus/iverilog/issues/266), [#597](https://github.com/steveicarus/iverilog/issues/597) | SystemVerilog our test benches use: event arrays, queues, typed patterns, enum `name()`, `output` arguments |
+| Verible | [#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration |
+| Vivado XSIM | [AMD forum](https://adaptivesupport.amd.com/s/question/0D5Pd000026YeziKAC/xsim-20261-simulation-engine-not-responding-at-an-event-control-in-a-forked-process-of-a-behavioral-model) | 2026.1: the engine dies at an event control in the SerDes BFM (worked around) |
+| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0: 2 wrong results, 6 constructs not supported yet |
+
+JanusHDL has no public tracker (closed source, so it can read encrypted IP): its issues are in our repos, under the [`JanusHDL` label](https://github.com/issues?q=org%3Achili-chips+label%3AJanusHDL).
+
 ## Community Involvement
 
 Feel like helping the GateMate community grow better and larger?! Reach out to fpga@chili-chips.com, or join our <a href="https://discord.gg/F5UPDFFdsH">GateMate Discord Channel</a>.
