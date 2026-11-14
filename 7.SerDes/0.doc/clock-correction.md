@@ -34,6 +34,4 @@ The PCIe clock-compensation unit is the SKP ordered set: COM and three SKP symbo
 
 Unless the silicon proves otherwise, a PCIe endpoint on `CC_SERDES` must keep `RX_CLKCOR_USE = 0` and run off the host's REFCLK (common clock, 0 ppm, SSC tracked by both sides). With a separate reference clock, SKP insertion and removal must be done in the fabric, symbol by symbol, as the PCIe spec defines it.
 
-Questions to Cologne Chip: [gatemate-pipe#14](https://github.com/colognechip/gatemate-pipe/issues/14).
-
 #### End-of-Document

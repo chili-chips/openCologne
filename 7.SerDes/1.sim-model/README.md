@@ -202,11 +202,63 @@ If the silicon works the same, three things follow for a protocol:
 2. An insertion repeats the previous word. It is safe only when that word is harmless to repeat: another sequence word, or idle.
 3. The sequence must sit aligned in the datapath word.
 
-PCIe's SKP ordered set meets none of these, so a PCIe endpoint should keep `RX_CLKCOR_USE = 0` and run from the host's REFCLK. How 7.SerDes uses clock correction, and the PCIe details: [clock correction](../0.doc/clock-correction.md). Questions to Cologne Chip: [gatemate-pipe#14](https://github.com/colognechip/gatemate-pipe/issues/14).
+PCIe's SKP ordered set meets none of these, so a PCIe endpoint should keep `RX_CLKCOR_USE = 0` and run from the host's REFCLK. How 7.SerDes uses clock correction, and the PCIe details: [clock correction](../0.doc/clock-correction.md).
 
 ### Implementation
 
 A behavioural model, not RTL: `#` delays (the serializer, sampler, CDR, clocks and PLL lock run in real time), queues and events. Processes are plain `always`, assignments blocking, in reverse pipeline order; non-blocking only where another process samples the same clock edge: outputs to the fabric, and what crosses between the RX buffer's two sides. The RX outputs change `BHV_RX_TCO_NS` after the `clk_core_rx_i` edge, like a flop, so logic on a clock derived from the same edge samples them cleanly. The 8b/10b codec and the PRBS are functions in the package.
+
+## DS1001, vendor model, BFM and SYNTH: where they differ
+
+DS1001 documents the HM; the other three are the `ccfpga_serdes` wrapper around it: the vendor model and the BFM in simulation, `ccfpga_serdes.SYNTH.sv` on the chip.
+
+| | DS1001: the HM, `CC_SERDES` | vendor model | BFM (simulation) | SYNTH (chip) |
+|---|---|---|---|---|
+| Ports | 61 pins | 84: the 61, and 23 of its own | the same 84 | the same 84; the 23 unused or constant |
+| Parameters | 208 (Yosys); defaults in the register map, Table 2.59 | 115: 110 of the HM's, 5 of its own | 117: + `SERDES_ENABLE`, `SERDES_AUTO_INIT` | the same 117, passed to `CC_SERDES` with its (Yosys) defaults |
+
+HM only, not set through the wrapper: 95 of the 208 parameters. The TX driver sets for electrical idle (`*_EI`) and receiver detection (`*_RXDET`), 12 each; test mode's port overrides (`*_OVR`, 26) and their values (e.g. `RX_RESET`, `TX_POLARITY`); debug, calibration and eye-measurement controls; `RX_CDR_TRANS_TH`, `SERDES_TESTMODE`.
+
+**1. Defaults that differ** (all others agree, wherever they exist)
+
+| Parameter | DS1001 | `CC_SERDES` (Yosys) | vendor model | BFM | SYNTH | the BFM models it |
+|---|---|---|---|---|---|---|
+| `RX_EI_BIAS` | 4 | 0 | 4 | **4** | **0** | yes: 0 is the detector off (as the vendor model) |
+| `PLL_SET_OP_LOCK` | 0 | 0 | 1 | 1 | 0 | read back only |
+| `RX_CDR_LOCK_CFG` | `8'hD5` | `8'hD5` | `15'h08D5` | `15'h08D5` | `8'hD5` | no |
+| `PLL_CI` | 3 | 3 | 1 | 1 | 3 | no |
+| `PLL_CP` | 80 | 80 | 60 | 60 | 80 | no |
+| `RX_CDR_CKP` | `8'hF8` | `8'hF8` | `8'hAF` | `8'hAF` | `8'hF8` | no |
+
+**`RX_EI_BIAS`: set it.** Left unset, the BFM's RX electrical-idle detector runs (4, as DS1001) while SYNTH gives the chip the Yosys default, 0. `rx_ei_en_o` is the PIPE's `RxElecIdle` (`ccfpga_pipe_top.sv`), so openCologne-PCIE's `phy_top` sets 4, as Cologne Chip's `ccfpga_pipe_wrapper.sv` does. It also sets `PLL_SET_OP_LOCK` (0); the other four are not modelled.
+
+**2. Where the BFM differs from the vendor model** (ports: none)
+
+| | vendor model | BFM | why |
+|---|---|---|---|
+| `SERDES_ENABLE`, `SERDES_AUTO_INIT` | – | 0, 0 | `CC_SERDES` parameters: the BFM starts like the chip |
+| SerDes enable | `0x5C` on the config port | also `SERDES_ENABLE`, and `0x5C` on the register file | as the chip |
+| `RX_EI_EN_O` | idle only with X or Z on both pins; with `RX_EI_BW_SEL` 1 to 15 never high (its filter takes the output, not the samples) | idle when P = N, after `RX_EI_BW_SEL` reference clocks, as DS1001 Table 2.43 | our line has no X or Z |
+
+**3. Where the wrapper (all three) differs from `CC_SERDES`**
+
+| | wrapper | `CC_SERDES` |
+|---|---|---|
+| `RX_CDR_LOCK_CFG` width | 15 bits | 8 bits |
+| Ports | 84, lower case, some renamed (`tx_powerdown_n_i`, `tx_resetdone_o`, `rx_detect_done_o`, `clk_core_pll_o` ...) | 61, upper case (`TX_POWER_DOWN_N_I`, `TX_RESET_DONE_O`, `TX_DETECT_RX_DONE_O`, `PLL_CLK_O` ...) |
+| Wrapper-only ports | 23: config port, scan, test, core resets, serial pins, reference clock | – |
+| Parameter names | `ALIGN_*`, `RX_RESETDONE_GATE` | `RX_ALIGN_*`, `RX_RESET_DONE_GATE` |
+| Wrapper-only parameters | `TX_BUFFER_ADDR_WIDTH`; four `RX_*_OVR` | one field, `RX_EN_EQA_EXT_VALUE` |
+| HM-only parameters | – | 95: `*_EI`, `*_RXDET`, `*_OVR`, debug (above) |
+
+**Notes**
+
+- DS1001 contradicts itself on 7 ADPLL defaults: Tables 2.18 and 2.19 give `PLL_CP` 12, `PLL_AO` 10, `PLL_SAR_LIMIT` 0, `PLL_SET_OP_LOCK` 1, `PLL_REF_RTERM` 0, `PLL_CONFIG_SEL` 1, `PLL_BISC_MODE` 0; its register map (Table 2.59) and `CC_SERDES` give 80, 0, 2, 0, 1, 0, 4.
+- DS1001 names some ports differently from `CC_SERDES`: `CLK_CORE_O`, `CLK_CORE_TX_I`, `CLK_CORE_RX_I`, `CLK_REG_I` (for `PLL_CLK_O`, `TX_CLK_I`, `RX_CLK_I`, `REGFILE_CLK_I`), `RX_PRBS_CNT_RESET_N_I`, and `RESET_CORE_TX_N_I`, a vendor-model port with no `CC_SERDES` pin.
+- PRBS codes 011 and 100: reserved in DS1001; the vendor model and the BFM give PRBS-23 and PRBS-31 there, TX and RX.
+- `RX_ALIGN_COMMA_WORD`: DS1001 (September 2026) Table 2.51 gives it a width of 10 and a default of `0x3FF`; the vendor model and the BFM take 2 bits, default 0 (`ALIGN_COMMA_WORD`).
+- The serial pins and the reference clock (`SER_TX_*`, `SER_RX_*`, `SER_CLK*`) are no ports of `CC_SERDES`: the chip's SerDes uses its own dedicated pads, so a design cannot name them as top-level ports. The wrapper's serial pins exist for simulation only.
+- RX clock correction: DS1001 does not describe its depth, matching and insert/remove behaviour; what the model does is in [RX buffer and clock correction](#rx-buffer-and-clock-correction).
 
 ## Verification
 
