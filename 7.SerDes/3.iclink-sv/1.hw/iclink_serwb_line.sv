@@ -32,16 +32,16 @@ module iclink_serwb_line
     parameter  int W  = 2,     // the pump's SerWB words a clock: 2 or 4
     localparam int NP = W / 2  // PHY words a pump clock
 ) (
-    input  logic clk,
-    input  logic arst_n,
-    output logic half_clk_strobe, // 1 (W = 2), or every other clock (W = 4)
+    input  logic               clk,
+    input  logic               arst_n,
+    output logic               half_clk_strobe,  // 1 (W = 2), or every other clock (W = 4)
 
-    input  phy_word_t [NP-1:0] pump_tx,   // from the pump, [0] first on the line
-    output phy_word_t          line_tx,   // to the PHY
-    input  phy_word_t          line_rx,   // from the PHY
-    input  logic               line_err,  // a bad symbol or a buffer error, this clock
-    output phy_word_t [NP-1:0] pump_rx,   // to the pump, [0] first on the line
-    output logic               pump_err   // line_err, over the words in pump_rx
+    input  phy_word_t [NP-1:0] pump_tx,          // from the pump, [0] first on the line
+    output phy_word_t          line_tx,          // to the PHY
+    input  phy_word_t          line_rx,          // from the PHY
+    input  logic               line_err,         // a bad symbol or a buffer error, this clock
+    output phy_word_t [NP-1:0] pump_rx,          // to the pump, [0] first on the line
+    output logic               pump_err          // line_err, over the words in pump_rx
 );
 
   if (!(W inside {2, 4})) begin : g_bad_w

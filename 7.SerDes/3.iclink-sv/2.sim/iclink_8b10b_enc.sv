@@ -52,8 +52,8 @@ module iclink_8b10b_enc
   for (genvar w = 0; w < NWORDS; w++) begin : g_word
     logic [4:0] code5b;
     logic [2:0] code3b;
-    assign code5b = d[w][4:0];
-    assign code3b = d[w][7:5];
+    assign      code5b = d[w][4:0];
+    assign      code3b = d[w][7:5];
 
     always_ff @(negedge arst_n or posedge clk) begin : _stage1
       if (!arst_n) begin

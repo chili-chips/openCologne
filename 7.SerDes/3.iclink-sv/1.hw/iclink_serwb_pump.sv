@@ -145,22 +145,22 @@ module iclink_serwb_pump
   logic  [  AW:0] txf_avail;
 
   iclink_serwb_fifo #(
-      .DEPTH (DEPTH),
-      .W     (W),
-      .WN    (1),
-      .COMMIT(1'b0)
+      .DEPTH  (DEPTH),
+      .W      (W),
+      .WN     (1),
+      .COMMIT (1'b0)
   ) u_tx_fifo (
-      .clk            (clk),
-      .arst_n         (arst_n),
-      .half_clk_strobe(half_clk_strobe),
-      .w_word         (tx_data),
-      .w_valid        (tx_push & !tx_full),
-      .w_commit       (1'b0),
-      .w_rewind       (1'b0),
-      .w_used         (tx_used),
-      .r_word         (txf_word),
-      .r_take         (txf_take),
-      .r_avail        (txf_avail)
+      .clk             (clk),
+      .arst_n          (arst_n),
+      .half_clk_strobe (half_clk_strobe),
+      .w_word          (tx_data),
+      .w_valid         (tx_push & !tx_full),
+      .w_commit        (1'b0),
+      .w_rewind        (1'b0),
+      .w_used          (tx_used),
+      .r_word          (txf_word),
+      .r_take          (txf_take),
+      .r_avail         (txf_avail)
   );
 
   assign tx_full = (tx_used >= (AW + 1)'(DEPTH));
@@ -230,20 +230,20 @@ module iclink_serwb_pump
   end
 
   iclink_serwb_tx #(
-      .W(W)
+      .W (W)
   ) u_packetizer (
-      .clk            (clk),
-      .arst_n         (arst_n),
-      .half_clk_strobe(half_clk_strobe),
-      .hdr_valid      (tx_state == T_HDR),
-      .hdr_port       (PORT),
-      .hdr_words      (tx_words),
-      .hdr_ready      (hdr_ready),
-      .d_word         (txf_word),
-      .d_take         (txf_take),
-      .o_word         (pk_word),
-      .o_valid        (pk_valid),
-      .o_ready        (pk_ready)
+      .clk             (clk),
+      .arst_n          (arst_n),
+      .half_clk_strobe (half_clk_strobe),
+      .hdr_valid       (tx_state == T_HDR),
+      .hdr_port        (PORT),
+      .hdr_words       (tx_words),
+      .hdr_ready       (hdr_ready),
+      .d_word          (txf_word),
+      .d_take          (txf_take),
+      .o_word          (pk_word),
+      .o_valid         (pk_valid),
+      .o_ready         (pk_ready)
   );
 
   // flow control requests: on a change of pause, and every REFRESH_CLKS
@@ -387,23 +387,23 @@ module iclink_serwb_pump
   end
 
   iclink_serwb_rx #(
-      .W           (W),
-      .MAX_WORDS   (MAX_WORDS),
-      .TIMEOUT_CLKS(TIMEOUT_CLKS)
+      .W            (W),
+      .MAX_WORDS    (MAX_WORDS),
+      .TIMEOUT_CLKS (TIMEOUT_CLKS)
   ) u_depacketizer (
-      .clk            (clk),
-      .arst_n         (arst_n),
-      .half_clk_strobe(half_clk_strobe),
-      .i_hold         (pause),            // we asked the far side to pause: no timeout
-      .i_word         (rx_word),
-      .i_valid        (rx_valid),
-      .o_word         (dp_word),
-      .o_valid        (dp_valid),
-      .o_port         (dp_port),
-      .o_commit       (dp_commit),
-      .o_rewind       (dp_rewind),
-      .o_drop         (dp_drop),
-      .o_crc_error    (dp_crc_error)
+      .clk             (clk),
+      .arst_n          (arst_n),
+      .half_clk_strobe (half_clk_strobe),
+      .i_hold          (pause),            // we asked the far side to pause: no timeout
+      .i_word          (rx_word),
+      .i_valid         (rx_valid),
+      .o_word          (dp_word),
+      .o_valid         (dp_valid),
+      .o_port          (dp_port),
+      .o_commit        (dp_commit),
+      .o_rewind        (dp_rewind),
+      .o_drop          (dp_drop),
+      .o_crc_error     (dp_crc_error)
   );
 
   // a packet that finds no room writes nothing more and is rewound at its end
@@ -415,22 +415,22 @@ module iclink_serwb_pump
   end
 
   iclink_serwb_fifo #(
-      .DEPTH (DEPTH),
-      .W     (W),
-      .RN    (1),
-      .COMMIT(1'b1)
+      .DEPTH  (DEPTH),
+      .W      (W),
+      .RN     (1),
+      .COMMIT (1'b1)
   ) u_rx_fifo (
-      .clk            (clk),
-      .arst_n         (arst_n),
-      .half_clk_strobe(half_clk_strobe),
-      .w_word         (dp_word),
-      .w_valid        (rxf_valid),
-      .w_commit       (keep),
-      .w_rewind       ((dp_commit && !keep) || dp_rewind),
-      .w_used         (rxf_used),
-      .r_word         (rx_data),
-      .r_take         (TW'(rx_pop & !rx_empty)),
-      .r_avail        (rx_avail)
+      .clk             (clk),
+      .arst_n          (arst_n),
+      .half_clk_strobe (half_clk_strobe),
+      .w_word          (dp_word),
+      .w_valid         (rxf_valid),
+      .w_commit        (keep),
+      .w_rewind        ((dp_commit && !keep) || dp_rewind),
+      .w_used          (rxf_used),
+      .r_word          (rx_data),
+      .r_take          (TW'(rx_pop & !rx_empty)),
+      .r_avail         (rx_avail)
   );
 
   assign rx_empty = (rx_avail == '0);

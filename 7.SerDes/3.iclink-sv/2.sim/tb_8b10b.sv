@@ -37,14 +37,14 @@ module tb_8b10b;
   symbol_t [1:0] symbol;
   logic    [1:0] disparity;
 
-  iclink_8b10b_enc #(.NWORDS(2)) u_enc (
-      .clk      (clk),
-      .arst_n   (arst_n),
-      .ce       (1'b1),
-      .d        (d),
-      .k        (k),
-      .symbol   (symbol),
-      .disparity(disparity)
+  iclink_8b10b_enc #(.NWORDS (2)) u_enc (
+      .clk       (clk),
+      .arst_n    (arst_n),
+      .ce        (1'b1),
+      .d         (d),
+      .k         (k),
+      .symbol    (symbol),
+      .disparity (disparity)
   );
 
   byte_t [1:0] rt_d;
@@ -53,13 +53,13 @@ module tb_8b10b;
 
   for (genvar w = 0; w < 2; w++) begin : g_rt
     iclink_8b10b_dec u_dec (
-        .clk    (clk),
-        .arst_n (arst_n),
-        .ce     (1'b1),
-        .symbol (symbol[w]),
-        .d      (rt_d[w]),
-        .k      (rt_k[w]),
-        .invalid(rt_invalid[w])
+        .clk     (clk),
+        .arst_n  (arst_n),
+        .ce      (1'b1),
+        .symbol  (symbol[w]),
+        .d       (rt_d[w]),
+        .k       (rt_k[w]),
+        .invalid (rt_invalid[w])
     );
   end
 
@@ -69,13 +69,13 @@ module tb_8b10b;
   logic    ex_invalid;
 
   iclink_8b10b_dec u_dec_ex (
-      .clk    (clk),
-      .arst_n (arst_n),
-      .ce     (1'b1),
-      .symbol (ex_symbol),
-      .d      (ex_d),
-      .k      (ex_k),
-      .invalid(ex_invalid)
+      .clk     (clk),
+      .arst_n  (arst_n),
+      .ce      (1'b1),
+      .symbol  (ex_symbol),
+      .d       (ex_d),
+      .k       (ex_k),
+      .invalid (ex_invalid)
   );
 
   task automatic fail(input string msg);

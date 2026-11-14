@@ -69,25 +69,25 @@ module tb_phy_oneway
   end : _buf_err
 
   iclink_serdes_gm #(
-      .LINE_RATE(LINE_RATE)
+      .LINE_RATE (LINE_RATE)
   ) dut (
-      .clk_ref       (clk_ref),
-      .ser_rxp       (ser_rxp),
-      .ser_rxn       (ser_rxn),
-      .ser_txp       (ser_txp),
-      .ser_txn       (ser_txn),
-      .clk_reg       (clk_reg),
-      .arst_n        (arst_n),
-      .ctrl          (ctrl),
-      .clk_core      (clk_core),
-      .tx_ready      (tx_ready),
-      .tx            (tx),
-      .rx_ready      (rx_ready),
-      .rx_aligned    (rx_aligned),
-      .rx            (rx),
-      .rx_invalid    (rx_invalid),
-      .rx_buf_err    (rx_buf_err),
-      .rx_prbs_errors(rx_prbs_errors)
+      .clk_ref        (clk_ref),
+      .ser_rxp        (ser_rxp),
+      .ser_rxn        (ser_rxn),
+      .ser_txp        (ser_txp),
+      .ser_txn        (ser_txn),
+      .clk_reg        (clk_reg),
+      .arst_n         (arst_n),
+      .ctrl           (ctrl),
+      .clk_core       (clk_core),
+      .tx_ready       (tx_ready),
+      .tx             (tx),
+      .rx_ready       (rx_ready),
+      .rx_aligned     (rx_aligned),
+      .rx             (rx),
+      .rx_invalid     (rx_invalid),
+      .rx_buf_err     (rx_buf_err),
+      .rx_prbs_errors (rx_prbs_errors)
   );
 
   //-----------------------------------------------------------------------

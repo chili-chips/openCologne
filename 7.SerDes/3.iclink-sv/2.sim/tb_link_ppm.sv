@@ -50,33 +50,33 @@ module tb_link_ppm
   end : _clk_reg
 
   link_side #(
-      .LINE_RATE(LINE_RATE),
-      .DIR      (1'b0)
+      .LINE_RATE (LINE_RATE),
+      .DIR       (1'b0)
   ) u_a (
-      .clk_ref(clk_ref_a),
-      .clk_reg(clk_reg),
-      .arst_n (arst_n),
-      .ser_rxp(b_txp),
-      .ser_rxn(b_txn),
-      .ser_txp(a_txp),
-      .ser_txn(a_txn),
-      .link   (link),
-      .run    (run)
+      .clk_ref (clk_ref_a),
+      .clk_reg (clk_reg),
+      .arst_n  (arst_n),
+      .ser_rxp (b_txp),
+      .ser_rxn (b_txn),
+      .ser_txp (a_txp),
+      .ser_txn (a_txn),
+      .link    (link),
+      .run     (run)
   );
 
   link_side #(
-      .LINE_RATE(LINE_RATE),
-      .DIR      (1'b1)
+      .LINE_RATE (LINE_RATE),
+      .DIR       (1'b1)
   ) u_b (
-      .clk_ref(clk_ref_b),
-      .clk_reg(clk_reg),
-      .arst_n (arst_n),
-      .ser_rxp(a_txp),
-      .ser_rxn(a_txn),
-      .ser_txp(b_txp),
-      .ser_txn(b_txn),
-      .link   (link),
-      .run    (run)
+      .clk_ref (clk_ref_b),
+      .clk_reg (clk_reg),
+      .arst_n  (arst_n),
+      .ser_rxp (a_txp),
+      .ser_rxn (a_txn),
+      .ser_txp (b_txp),
+      .ser_txn (b_txn),
+      .link    (link),
+      .run     (run)
   );
 
   initial begin : _run
@@ -185,25 +185,25 @@ module link_side
   endfunction
 
   iclink_serdes_gm #(
-      .LINE_RATE(LINE_RATE)
+      .LINE_RATE (LINE_RATE)
   ) u_phy (
-      .clk_ref       (clk_ref),
-      .ser_rxp       (ser_rxp),
-      .ser_rxn       (ser_rxn),
-      .ser_txp       (ser_txp),
-      .ser_txn       (ser_txn),
-      .clk_reg       (clk_reg),
-      .arst_n        (arst_n),
-      .ctrl          (ctrl),
-      .clk_core      (clk_core),
-      .tx_ready      (tx_ready),
-      .tx            (tx),
-      .rx_ready      (rx_ready),
-      .rx_aligned    (rx_aligned),
-      .rx            (rx),
-      .rx_invalid    (rx_invalid),
-      .rx_buf_err    (rx_buf_err),
-      .rx_prbs_errors(NC_prbs)
+      .clk_ref        (clk_ref),
+      .ser_rxp        (ser_rxp),
+      .ser_rxn        (ser_rxn),
+      .ser_txp        (ser_txp),
+      .ser_txn        (ser_txn),
+      .clk_reg        (clk_reg),
+      .arst_n         (arst_n),
+      .ctrl           (ctrl),
+      .clk_core       (clk_core),
+      .tx_ready       (tx_ready),
+      .tx             (tx),
+      .rx_ready       (rx_ready),
+      .rx_aligned     (rx_aligned),
+      .rx             (rx),
+      .rx_invalid     (rx_invalid),
+      .rx_buf_err     (rx_buf_err),
+      .rx_prbs_errors (NC_prbs)
   );
 
   always_comb begin
@@ -229,44 +229,44 @@ module link_side
 `endif
 
   iclink_serwb_line #(
-      .W(W)
+      .W (W)
   ) u_line (
-      .clk            (clk_core),
-      .arst_n         (rx_ready),
-      .half_clk_strobe(half_clk_strobe),
-      .pump_tx        (pump_tx),
-      .line_tx        (tx),
-      .line_rx        (rx),
-      .line_err       (1'b0),
-      .pump_rx        (pump_rx),
-      .pump_err       (NC_pump_err)
+      .clk             (clk_core),
+      .arst_n          (rx_ready),
+      .half_clk_strobe (half_clk_strobe),
+      .pump_tx         (pump_tx),
+      .line_tx         (tx),
+      .line_rx         (rx),
+      .line_err        (1'b0),
+      .pump_rx         (pump_rx),
+      .pump_err        (NC_pump_err)
   );
 
   iclink_serwb_pump #(
-      .W          (W),
-      .CLKCOR_CLKS(CLKCOR_CLKS)
+      .W           (W),
+      .CLKCOR_CLKS (CLKCOR_CLKS)
   ) u_pump (
-      .clk            (clk_core),
-      .arst_n         (rx_ready),
-      .half_clk_strobe(half_clk_strobe),
-      .tx_push      (run && !full),
-      .tx_data      (pattern(DIR, sent)),
-      .tx_full      (full),
-      .tx_used      (NC_used),
-      .tx_hold      (1'b0),
-      .rx_pop       (!empty),
-      .rx_data      (rdata),
-      .rx_empty     (empty),
-      .rx_avail     (NC_avail),
-      .tx_en        (link),
-      .phy_tx       (pump_tx),
-      .rx_en        (link),
-      .phy_rx       (pump_rx),
-      .remote_paused(NC_paused),
-      .pause        (NC_pause),
-      .crc_errors   (crc),
-      .drops        (drops),
-      .overflows    (ovf)
+      .clk             (clk_core),
+      .arst_n          (rx_ready),
+      .half_clk_strobe (half_clk_strobe),
+      .tx_push       (run && !full),
+      .tx_data       (pattern(DIR, sent)),
+      .tx_full       (full),
+      .tx_used       (NC_used),
+      .tx_hold       (1'b0),
+      .rx_pop        (!empty),
+      .rx_data       (rdata),
+      .rx_empty      (empty),
+      .rx_avail      (NC_avail),
+      .tx_en         (link),
+      .phy_tx        (pump_tx),
+      .rx_en         (link),
+      .phy_rx        (pump_rx),
+      .remote_paused (NC_paused),
+      .pause         (NC_pause),
+      .crc_errors    (crc),
+      .drops         (drops),
+      .overflows     (ovf)
   );
 
   always @(posedge clk_core) begin : _check

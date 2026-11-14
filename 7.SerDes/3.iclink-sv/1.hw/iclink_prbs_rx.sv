@@ -39,40 +39,40 @@ module iclink_prbs_rx
   end : _order
 
   iclink_prbs_chk #(
-      .WIDTH    (WIDTH),
-      .NSTATE   (7),
-      .TAP0     (5),
-      .TAP1     (6),
-      .PIPE_IDLE(PIPE_IDLE)
+      .WIDTH     (WIDTH),
+      .NSTATE    (7),
+      .TAP0      (5),
+      .TAP1      (6),
+      .PIPE_IDLE (PIPE_IDLE)
   ) u_chk7 (
       .clk,
       .arst_n,
-      .i     (data),
-      .errors(err7)
+      .i      (data),
+      .errors (err7)
   );
   iclink_prbs_chk #(
-      .WIDTH    (WIDTH),
-      .NSTATE   (15),
-      .TAP0     (13),
-      .TAP1     (14),
-      .PIPE_IDLE(PIPE_IDLE)
+      .WIDTH     (WIDTH),
+      .NSTATE    (15),
+      .TAP0      (13),
+      .TAP1      (14),
+      .PIPE_IDLE (PIPE_IDLE)
   ) u_chk15 (
       .clk,
       .arst_n,
-      .i     (data),
-      .errors(err15)
+      .i      (data),
+      .errors (err15)
   );
   iclink_prbs_chk #(
-      .WIDTH    (WIDTH),
-      .NSTATE   (31),
-      .TAP0     (27),
-      .TAP1     (30),
-      .PIPE_IDLE(PIPE_IDLE)
+      .WIDTH     (WIDTH),
+      .NSTATE    (31),
+      .TAP0      (27),
+      .TAP1      (30),
+      .PIPE_IDLE (PIPE_IDLE)
   ) u_chk31 (
       .clk,
       .arst_n,
-      .i     (data),
-      .errors(err31)
+      .i      (data),
+      .errors (err31)
   );
 
   always_ff @(negedge arst_n or posedge clk) begin : _count

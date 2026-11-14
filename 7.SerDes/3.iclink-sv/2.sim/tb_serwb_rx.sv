@@ -36,9 +36,9 @@ module tb_serwb_rx;
   assign half_clk_strobe = 1'b1;
 
   iclink_serwb_rx #(
-      .W           (W),
-      .MAX_WORDS   (16),
-      .TIMEOUT_CLKS(TIMEOUT_CLKS)
+      .W            (W),
+      .MAX_WORDS    (16),
+      .TIMEOUT_CLKS (TIMEOUT_CLKS)
   ) dut (
       .*
   );

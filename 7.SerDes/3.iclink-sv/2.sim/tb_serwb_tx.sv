@@ -33,7 +33,7 @@ module tb_serwb_tx;
 
   assign half_clk_strobe = 1'b1;
 
-  iclink_serwb_tx #(.W(W)) dut (.*);
+  iclink_serwb_tx #(.W (W)) dut (.*);
 
   // vectors; the payload words of all packets also as one stream, as the
   // TX FIFO holds them

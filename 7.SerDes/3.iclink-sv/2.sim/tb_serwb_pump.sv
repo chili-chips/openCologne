@@ -72,59 +72,59 @@ module tb_serwb_pump;
   logic a_tx_hold;  // phase 3: A's tx_hold while its FIFO fills
 
   iclink_serwb_pump #(
-      .W           (W),
-      .DEPTH       (DEPTH),
-      .TIMEOUT_CLKS(TIMEOUT)
+      .W            (W),
+      .DEPTH        (DEPTH),
+      .TIMEOUT_CLKS (TIMEOUT)
   ) u_a (
-      .clk            (clk_line),
-      .arst_n         (arst_n),
-      .half_clk_strobe(a_strobe),
-      .tx_push      (a_push),
-      .tx_data      (a_wdata),
-      .tx_full      (a_full),
-      .tx_used      (a_used),
-      .tx_hold      (a_tx_hold),
-      .rx_pop       (a_pop),
-      .rx_data      (a_rdata),
-      .rx_empty     (a_empty),
-      .rx_avail     (a_avail),
-      .tx_en        (link_en),
-      .phy_tx       (a_tx),
-      .rx_en        (link_en),
-      .phy_rx       (a_rx),
-      .remote_paused(a_paused),
-      .pause        (a_pause),
-      .crc_errors   (a_crc),
-      .drops        (a_drops),
-      .overflows    (a_ovf)
+      .clk             (clk_line),
+      .arst_n          (arst_n),
+      .half_clk_strobe (a_strobe),
+      .tx_push       (a_push),
+      .tx_data       (a_wdata),
+      .tx_full       (a_full),
+      .tx_used       (a_used),
+      .tx_hold       (a_tx_hold),
+      .rx_pop        (a_pop),
+      .rx_data       (a_rdata),
+      .rx_empty      (a_empty),
+      .rx_avail      (a_avail),
+      .tx_en         (link_en),
+      .phy_tx        (a_tx),
+      .rx_en         (link_en),
+      .phy_rx        (a_rx),
+      .remote_paused (a_paused),
+      .pause         (a_pause),
+      .crc_errors    (a_crc),
+      .drops         (a_drops),
+      .overflows     (a_ovf)
   );
 
   iclink_serwb_pump #(
-      .W           (W),
-      .DEPTH       (DEPTH),
-      .TIMEOUT_CLKS(TIMEOUT)
+      .W            (W),
+      .DEPTH        (DEPTH),
+      .TIMEOUT_CLKS (TIMEOUT)
   ) u_b (
-      .clk            (clk_line),
-      .arst_n         (arst_n),
-      .half_clk_strobe(b_strobe),
-      .tx_push      (b_push),
-      .tx_data      (b_wdata),
-      .tx_full      (b_full),
-      .tx_used      (b_used),
-      .tx_hold      (1'b0),
-      .rx_pop       (b_pop),
-      .rx_data      (b_rdata),
-      .rx_empty     (b_empty),
-      .rx_avail     (b_avail),
-      .tx_en        (link_en),
-      .phy_tx       (b_tx),
-      .rx_en        (link_en),
-      .phy_rx       (b_rx),
-      .remote_paused(b_paused),
-      .pause        (b_pause),
-      .crc_errors   (b_crc),
-      .drops        (b_drops),
-      .overflows    (b_ovf)
+      .clk             (clk_line),
+      .arst_n          (arst_n),
+      .half_clk_strobe (b_strobe),
+      .tx_push       (b_push),
+      .tx_data       (b_wdata),
+      .tx_full       (b_full),
+      .tx_used       (b_used),
+      .tx_hold       (1'b0),
+      .rx_pop        (b_pop),
+      .rx_data       (b_rdata),
+      .rx_empty      (b_empty),
+      .rx_avail      (b_avail),
+      .tx_en         (link_en),
+      .phy_tx        (b_tx),
+      .rx_en         (link_en),
+      .phy_rx        (b_rx),
+      .remote_paused (b_paused),
+      .pause         (b_pause),
+      .crc_errors    (b_crc),
+      .drops         (b_drops),
+      .overflows     (b_ovf)
   );
 
   // the line, both ways, LINE_LAT clocks
@@ -142,31 +142,31 @@ module tb_serwb_pump;
 
   // between each pump and the line: its line side, which makes its strobe
   iclink_serwb_line #(
-      .W(W)
+      .W (W)
   ) u_a_line (
-      .clk            (clk_line),
-      .arst_n         (arst_n),
-      .half_clk_strobe(a_strobe),
-      .pump_tx        (a_tx),
-      .line_tx        (a_ltx),
-      .line_rx        (a_lrx),
-      .line_err       (1'b0),
-      .pump_rx        (a_rx),
-      .pump_err       (NC_a_err)
+      .clk             (clk_line),
+      .arst_n          (arst_n),
+      .half_clk_strobe (a_strobe),
+      .pump_tx         (a_tx),
+      .line_tx         (a_ltx),
+      .line_rx         (a_lrx),
+      .line_err        (1'b0),
+      .pump_rx         (a_rx),
+      .pump_err        (NC_a_err)
   );
 
   iclink_serwb_line #(
-      .W(W)
+      .W (W)
   ) u_b_line (
-      .clk            (clk_line),
-      .arst_n         (arst_n),
-      .half_clk_strobe(b_strobe),
-      .pump_tx        (b_tx),
-      .line_tx        (b_ltx),
-      .line_rx        (b_lrx),
-      .line_err       (1'b0),
-      .pump_rx        (b_rx),
-      .pump_err       (NC_b_err)
+      .clk             (clk_line),
+      .arst_n          (arst_n),
+      .half_clk_strobe (b_strobe),
+      .pump_tx         (b_tx),
+      .line_tx         (b_ltx),
+      .line_rx         (b_lrx),
+      .line_err        (1'b0),
+      .pump_rx         (b_rx),
+      .pump_err        (NC_b_err)
   );
 
   // the words: a known sequence per direction

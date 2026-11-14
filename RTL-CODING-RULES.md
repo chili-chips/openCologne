@@ -37,6 +37,6 @@ For all new openCologne RTL. The older examples predate them. [7.SerDes/3.iclink
 - **Assertions:** only under an `ifdef`; the RTL is never changed for them.
 - **Clean diffs:** no blank-line or alignment changes beyond what `run-format.sh` makes; check `git diff` before a commit.
 - **Models follow the RTL:** a model keeps the ports, names and structure of the RTL it replaces, as the SerDes BFM does for `CC_SERDES`.
-- **Formatting:** `run-format.sh` (Verible): every body in `begin` ... `end`, case items too, alignment on, LF line endings, at most 100 columns. Run it last, after lint, before a commit; `run-format.sh --check` only lists unformatted files. It wraps `if`, `else` and loop bodies in `begin` ... `end` itself, but not case items.
+- **Formatting:** `run-format.sh` (Verible): every body in `begin` ... `end`, case items too, alignment on, at least one space before the `(` of a named parameter or port connection (`.NAME (signal)`), the names and the `=` of adjacent `logic` and `assign` lines in one column each, a module port list as one alignment (the same direction, type, dimension, name and comment columns in every group of ports), LF line endings, at most 100 columns. Run it last, after lint, before a commit; `run-format.sh --check` only lists unformatted files. It wraps `if`, `else` and loop bodies in `begin` ... `end` itself, but not case items.
 
 #### End-of-Document

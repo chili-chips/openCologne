@@ -71,19 +71,19 @@ module iclink_serdes_gm
 ) (
     // the BFM's reference and serial pins; ccfpga_serdes.SYNTH.sv does not
     // use them: CC_SERDES has its own
-    input  logic clk_ref,  // SerDes reference, 100 MHz
-    input  logic ser_rxp,
-    input  logic ser_rxn,
-    output logic ser_txp,
-    output logic ser_txn,
+    input  logic                       clk_ref,        // SerDes reference, 100 MHz
+    input  logic                       ser_rxp,
+    input  logic                       ser_rxn,
+    output logic                       ser_txp,
+    output logic                       ser_txn,
 
-    input logic      clk_reg,  // bring-up clock, the board clock
-    input logic      arst_n,   // reset, released on clk_reg
-    input phy_ctrl_t ctrl,     // any clock
+    input  logic                       clk_reg,        // bring-up clock, the board clock
+    input  logic                       arst_n,         // reset, released on clk_reg
+    input  phy_ctrl_t                  ctrl,           // any clock
 
-    output logic      clk_core,  // PLL_CLK_O: TX, RX and the logic on both
-    output logic      tx_ready,  // on clk_core: TX out of reset
-    input  phy_word_t tx,        // on clk_core, taken every clock
+    output logic                       clk_core,       // PLL_CLK_O: TX, RX and the logic on both
+    output logic                       tx_ready,       // on clk_core: TX out of reset
+    input  phy_word_t                  tx,             // on clk_core, taken every clock
 
     output logic                       rx_ready,       // on clk_core: RX out of reset, CDR locked
     output logic                       rx_aligned,     // on clk_core: comma alignment acquired
@@ -199,14 +199,14 @@ module iclink_serdes_gm
   end
 
   iclink_prbs_tx #(
-      .WIDTH(PHY_DW)
+      .WIDTH (PHY_DW)
   ) u_prbs_tx (
-      .clk     (clk_core),
-      .arst_n  (tx_ready),
-      .config_i(tx_prbs),
-      .i       (tx.d),
-      .o       (tx_payload),
-      .config_o(tx_prbs_on)
+      .clk      (clk_core),
+      .arst_n   (tx_ready),
+      .config_i (tx_prbs),
+      .i        (tx.d),
+      .o        (tx_payload),
+      .config_o (tx_prbs_on)
   );
 
   // CC_SERDES encodes: bytes and K flags go straight to it
@@ -315,15 +315,15 @@ module iclink_serdes_gm
   end
 
   iclink_prbs_rx #(
-      .WIDTH    (PHY_DW),
-      .PIPE_IDLE(1'b1)     // the 64-bit idle compare, a clock of its own
+      .WIDTH     (PHY_DW),
+      .PIPE_IDLE (1'b1)     // the 64-bit idle compare, a clock of its own
   ) u_prbs_rx (
-      .clk     (clk_core),
-      .arst_n  (rx_ready),
-      .config_i(ctrl.rx_prbs),
-      .pause   (rx_pause),
-      .i       (rx.d),
-      .errors  (rx_prbs_errors)
+      .clk      (clk_core),
+      .arst_n   (rx_ready),
+      .config_i (ctrl.rx_prbs),
+      .pause    (rx_pause),
+      .i        (rx.d),
+      .errors   (rx_prbs_errors)
   );
 
   //-----------------------------------------------------------------------
@@ -350,101 +350,101 @@ module iclink_serdes_gm
   logic        NC_rx_ei_en_o;
 
   ccfpga_serdes #(
-      .SERDES_ENABLE    (1),
-      .SERDES_AUTO_INIT (0),                   // the bring-up above sets the PLL up
-      .ALIGN_COMMA_WORD (2'b11),               // the comma in lane 0 or 4: the lane aligner
-      .RX_CLKCOR_USE    (1),                   // two boards: the ppm between them
-      .RX_CLKCOR_MIN_LAT(PHY_CLKCOR_MIN_LAT),
-      .RX_CLKCOR_MAX_LAT(PHY_CLKCOR_MAX_LAT),
-      .RX_CLKCOR_SEQ_1_0(PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_1(PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_2(PHY_CLKCOR_SEQ),
-      .RX_CLKCOR_SEQ_1_3(PHY_CLKCOR_SEQ)
+      .SERDES_ENABLE     (1),
+      .SERDES_AUTO_INIT  (0),                   // the bring-up above sets the PLL up
+      .ALIGN_COMMA_WORD  (2'b11),               // the comma in lane 0 or 4: the lane aligner
+      .RX_CLKCOR_USE     (1),                   // two boards: the ppm between them
+      .RX_CLKCOR_MIN_LAT (PHY_CLKCOR_MIN_LAT),
+      .RX_CLKCOR_MAX_LAT (PHY_CLKCOR_MAX_LAT),
+      .RX_CLKCOR_SEQ_1_0 (PHY_CLKCOR_SEQ),
+      .RX_CLKCOR_SEQ_1_1 (PHY_CLKCOR_SEQ),
+      .RX_CLKCOR_SEQ_1_2 (PHY_CLKCOR_SEQ),
+      .RX_CLKCOR_SEQ_1_3 (PHY_CLKCOR_SEQ)
   ) u_serdes (
-      .clk_ref_i           (clk_ref),
-      .clk_reg_i           (clk_reg),
-      .clk_cfg_i           (clk_reg),
-      .clk_core_tx_i       (clk_core),
-      .clk_core_rx_i       (clk_core),
-      .clk_core_rx_o       (NC_clk_core_rx_o),
-      .reset_n_i           (arst_n),
-      .reset_reg_n_i       (arst_n),
-      .reset_core_tx_n_i   (reset_core_pll_n),
-      .reset_core_rx_n_i   (reset_core_pll_n),
-      .testmode_i          (1'b0),
-      .scan_enable_i       (1'b0),
-      .scan_in_i           (7'h0),
-      .scan_out_o          (NC_scan_out_o),
-      .loopback_i          (3'b000),
-      .pll_reset_i         (pll_reset),
-      .clk_core_pll_o      (clk_core),
-      .reset_core_pll_n_o  (reset_core_pll_n),
-      .refclk_sel_o        (NC_refclk_sel_o),
-      .refclk_rterm_o      (NC_refclk_rterm_o),
-      .RX_SERIO_P_B        (ser_rxp),
-      .RX_SERIO_N_B        (ser_rxn),
-      .TX_SERIO_P_B        (ser_txp),
-      .TX_SERIO_N_B        (ser_txn),
-      .regfile_we_i        (reg_en),
-      .regfile_en_i        (reg_en),
-      .regfile_addr_i      (reg_wr.addr),
-      .regfile_mask_i      (16'hFFFF),
-      .regfile_di_i        (reg_wr.data),
-      .regfile_do_o        (NC_regfile_do_o),
-      .regfile_rdy_o       (NC_regfile_rdy_o),
-      .cfg_en_i            (1'b0),                  // the regfile does it all
-      .reset_cfg_i         (1'b0),
-      .cfgfile_di_i        (16'h0),
-      .cfgfile_valid_i     (1'b0),
-      .cfgfile_addr_i      (8'h0),
-      .tx_reset_i          (serdes_reset),
-      .tx_pcs_reset_i      (1'b0),
-      .tx_pma_reset_i      (1'b0),
-      .tx_elec_idle_i      (1'b0),
-      .tx_detect_rx_i      (1'b0),
-      .tx_prbs_sel_i       (3'b000),
-      .tx_prbs_force_err_i (1'b0),
-      .tx_powerdown_n_i    (1'b1),
-      .tx_data_i           (tx_ser.d),
-      .tx_char_is_k_i      (tx_ser.k),
-      .tx_polarity_i       (1'b0),
-      .tx_8b10b_en_i       (1'b1),
-      .tx_8b10b_bypass_i   ('0),
-      .tx_char_dispmode_i  ('0),
-      .tx_char_dispval_i   ('0),
-      .tx_buf_err_o        (NC_tx_buf_err_o),
-      .tx_resetdone_o      (tx_resetdone),
-      .rx_detect_done_o    (NC_rx_detect_done_o),
-      .rx_present_o        (NC_rx_present_o),
-      .TERM_SERIO_O        (NC_term_serio_o),
-      .rx_reset_i          (serdes_reset),
-      .rx_pma_reset_i      (1'b0),
-      .rx_eqa_reset_i      (1'b0),
-      .rx_cdr_reset_i      (1'b0),
-      .rx_pcs_reset_i      (1'b0),
-      .rx_buf_reset_i      (1'b0),
-      .rx_prbs_sel_i       (3'b000),
-      .rx_prbs_cnt_reset_i (1'b0),
-      .rx_powerdown_n_i    (1'b1),
-      .rx_en_ei_detector_i (1'b0),
-      .rx_comma_detect_en_i(1'b1),
-      .rx_slide_i          (1'b0),
-      .rx_polarity_i       (1'b0),
-      .rx_8b10b_en_i       (1'b1),
-      .rx_8b10b_bypass_i   ('0),
-      .rx_mcomma_align_i   (rx_align),
-      .rx_pcomma_align_i   (rx_align),
-      .rx_prbs_err_o       (NC_rx_prbs_err_o),
-      .rx_data_o           (rx_hm.d),
-      .rx_char_is_k_o      (rx_hm.k),
-      .rx_char_is_comma_o  (NC_rx_comma),
-      .rx_not_in_table_o   (rx_hm.not_in_table),
-      .rx_disp_err_o       (rx_hm.disp_err),
-      .rx_buf_err_o        (rx_hm.buf_err),
-      .rx_byte_is_aligned_o(rx_hm.aligned),
-      .rx_byte_realign_o   (NC_rx_byte_realign_o),
-      .rx_resetdone_o      (rx_hm.resetdone),
-      .rx_ei_en_o          (NC_rx_ei_en_o)
+      .clk_ref_i            (clk_ref),
+      .clk_reg_i            (clk_reg),
+      .clk_cfg_i            (clk_reg),
+      .clk_core_tx_i        (clk_core),
+      .clk_core_rx_i        (clk_core),
+      .clk_core_rx_o        (NC_clk_core_rx_o),
+      .reset_n_i            (arst_n),
+      .reset_reg_n_i        (arst_n),
+      .reset_core_tx_n_i    (reset_core_pll_n),
+      .reset_core_rx_n_i    (reset_core_pll_n),
+      .testmode_i           (1'b0),
+      .scan_enable_i        (1'b0),
+      .scan_in_i            (7'h0),
+      .scan_out_o           (NC_scan_out_o),
+      .loopback_i           (3'b000),
+      .pll_reset_i          (pll_reset),
+      .clk_core_pll_o       (clk_core),
+      .reset_core_pll_n_o   (reset_core_pll_n),
+      .refclk_sel_o         (NC_refclk_sel_o),
+      .refclk_rterm_o       (NC_refclk_rterm_o),
+      .RX_SERIO_P_B         (ser_rxp),
+      .RX_SERIO_N_B         (ser_rxn),
+      .TX_SERIO_P_B         (ser_txp),
+      .TX_SERIO_N_B         (ser_txn),
+      .regfile_we_i         (reg_en),
+      .regfile_en_i         (reg_en),
+      .regfile_addr_i       (reg_wr.addr),
+      .regfile_mask_i       (16'hFFFF),
+      .regfile_di_i         (reg_wr.data),
+      .regfile_do_o         (NC_regfile_do_o),
+      .regfile_rdy_o        (NC_regfile_rdy_o),
+      .cfg_en_i             (1'b0),                  // the regfile does it all
+      .reset_cfg_i          (1'b0),
+      .cfgfile_di_i         (16'h0),
+      .cfgfile_valid_i      (1'b0),
+      .cfgfile_addr_i       (8'h0),
+      .tx_reset_i           (serdes_reset),
+      .tx_pcs_reset_i       (1'b0),
+      .tx_pma_reset_i       (1'b0),
+      .tx_elec_idle_i       (1'b0),
+      .tx_detect_rx_i       (1'b0),
+      .tx_prbs_sel_i        (3'b000),
+      .tx_prbs_force_err_i  (1'b0),
+      .tx_powerdown_n_i     (1'b1),
+      .tx_data_i            (tx_ser.d),
+      .tx_char_is_k_i       (tx_ser.k),
+      .tx_polarity_i        (1'b0),
+      .tx_8b10b_en_i        (1'b1),
+      .tx_8b10b_bypass_i    ('0),
+      .tx_char_dispmode_i   ('0),
+      .tx_char_dispval_i    ('0),
+      .tx_buf_err_o         (NC_tx_buf_err_o),
+      .tx_resetdone_o       (tx_resetdone),
+      .rx_detect_done_o     (NC_rx_detect_done_o),
+      .rx_present_o         (NC_rx_present_o),
+      .TERM_SERIO_O         (NC_term_serio_o),
+      .rx_reset_i           (serdes_reset),
+      .rx_pma_reset_i       (1'b0),
+      .rx_eqa_reset_i       (1'b0),
+      .rx_cdr_reset_i       (1'b0),
+      .rx_pcs_reset_i       (1'b0),
+      .rx_buf_reset_i       (1'b0),
+      .rx_prbs_sel_i        (3'b000),
+      .rx_prbs_cnt_reset_i  (1'b0),
+      .rx_powerdown_n_i     (1'b1),
+      .rx_en_ei_detector_i  (1'b0),
+      .rx_comma_detect_en_i (1'b1),
+      .rx_slide_i           (1'b0),
+      .rx_polarity_i        (1'b0),
+      .rx_8b10b_en_i        (1'b1),
+      .rx_8b10b_bypass_i    ('0),
+      .rx_mcomma_align_i    (rx_align),
+      .rx_pcomma_align_i    (rx_align),
+      .rx_prbs_err_o        (NC_rx_prbs_err_o),
+      .rx_data_o            (rx_hm.d),
+      .rx_char_is_k_o       (rx_hm.k),
+      .rx_char_is_comma_o   (NC_rx_comma),
+      .rx_not_in_table_o    (rx_hm.not_in_table),
+      .rx_disp_err_o        (rx_hm.disp_err),
+      .rx_buf_err_o         (rx_hm.buf_err),
+      .rx_byte_is_aligned_o (rx_hm.aligned),
+      .rx_byte_realign_o    (NC_rx_byte_realign_o),
+      .rx_resetdone_o       (rx_hm.resetdone),
+      .rx_ei_en_o           (NC_rx_ei_en_o)
   );
 
 endmodule : iclink_serdes_gm

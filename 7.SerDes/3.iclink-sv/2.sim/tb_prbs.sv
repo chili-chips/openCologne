@@ -31,22 +31,22 @@ module tb_prbs;
   logic     [ 31:0] rx_errors;
   prbs_cfg_t        NC_tx_cfg;  // not checked: LiteX has no such output
 
-  iclink_prbs_tx #(.WIDTH(W)) u_tx (
-      .clk     (clk),
-      .arst_n  (arst_n),
-      .config_i(tx_config),
-      .i       (tx_i),
-      .o       (tx_o),
-      .config_o(NC_tx_cfg)
+  iclink_prbs_tx #(.WIDTH (W)) u_tx (
+      .clk      (clk),
+      .arst_n   (arst_n),
+      .config_i (tx_config),
+      .i        (tx_i),
+      .o        (tx_o),
+      .config_o (NC_tx_cfg)
   );
 
-  iclink_prbs_rx #(.WIDTH(W)) u_rx (
-      .clk     (clk),
-      .arst_n  (arst_n),
-      .config_i(rx_config),
-      .pause   (pause),
-      .i       (tx_o ^ flip),
-      .errors  (rx_errors)
+  iclink_prbs_rx #(.WIDTH (W)) u_rx (
+      .clk      (clk),
+      .arst_n   (arst_n),
+      .config_i (rx_config),
+      .pause    (pause),
+      .i        (tx_o ^ flip),
+      .errors   (rx_errors)
   );
 
   task automatic apply(input int n);

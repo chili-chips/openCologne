@@ -36,16 +36,16 @@ module tb_top #(
   end
 
   top #(
-      .LINE_RATE(LINE_RATE)
+      .LINE_RATE (LINE_RATE)
   ) dut (
-      .clk_ref(clk_ref),
-      .ser_rxp(ser_rxp),
-      .ser_rxn(ser_rxn),
-      .ser_txp(ser_txp),
-      .ser_txn(ser_txn),
-      .clk    (clk),
-      .btn_n  (btn_n),
-      .led    (led)
+      .clk_ref (clk_ref),
+      .ser_rxp (ser_rxp),
+      .ser_rxn (ser_rxn),
+      .ser_txp (ser_txp),
+      .ser_txn (ser_txn),
+      .clk     (clk),
+      .btn_n   (btn_n),
+      .led     (led)
   );
 
   initial begin

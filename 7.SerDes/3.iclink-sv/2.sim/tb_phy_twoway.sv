@@ -56,16 +56,16 @@ module tb_phy_twoway
       .SEED_TX      (SEED_A),
       .SEED_RX      (SEED_B)
   ) u_a (
-      .clk_ref(clk_ref),
-      .clk_reg(clk_reg),
-      .arst_n (arst_n),
-      .ser_rxp(b_txp ^ flip_ba),
-      .ser_rxn(b_txn ^ flip_ba),
-      .ser_txp(a_txp),
-      .ser_txn(a_txn),
-      .ctrl   (ctrl_a),
-      .send   (send),
-      .check  (check)
+      .clk_ref (clk_ref),
+      .clk_reg (clk_reg),
+      .arst_n  (arst_n),
+      .ser_rxp (b_txp ^ flip_ba),
+      .ser_rxn (b_txn ^ flip_ba),
+      .ser_txp (a_txp),
+      .ser_txn (a_txn),
+      .ctrl    (ctrl_a),
+      .send    (send),
+      .check   (check)
   );
 
   phy_side #(
@@ -73,16 +73,16 @@ module tb_phy_twoway
       .SEED_TX      (SEED_B),
       .SEED_RX      (SEED_A)
   ) u_b (
-      .clk_ref(clk_ref),
-      .clk_reg(clk_reg),
-      .arst_n (arst_n),
-      .ser_rxp(a_txp ^ flip_ab),
-      .ser_rxn(a_txn ^ flip_ab),
-      .ser_txp(b_txp),
-      .ser_txn(b_txn),
-      .ctrl   (ctrl_b),
-      .send   (send),
-      .check  (check)
+      .clk_ref (clk_ref),
+      .clk_reg (clk_reg),
+      .arst_n  (arst_n),
+      .ser_rxp (a_txp ^ flip_ab),
+      .ser_rxn (a_txn ^ flip_ab),
+      .ser_txp (b_txp),
+      .ser_txn (b_txn),
+      .ctrl    (ctrl_b),
+      .send    (send),
+      .check   (check)
   );
 
   task automatic flip_line(bit ab);
@@ -242,25 +242,25 @@ module phy_side
   end : _buf_err
 
   iclink_serdes_gm #(
-      .LINE_RATE(LINE_RATE)
+      .LINE_RATE (LINE_RATE)
   ) dut (
-      .clk_ref       (clk_ref),
-      .ser_rxp       (ser_rxp),
-      .ser_rxn       (ser_rxn),
-      .ser_txp       (ser_txp),
-      .ser_txn       (ser_txn),
-      .clk_reg       (clk_reg),
-      .arst_n        (arst_n),
-      .ctrl          (ctrl),
-      .clk_core      (clk_core),
-      .tx_ready      (tx_ready),
-      .tx            (tx),
-      .rx_ready      (rx_ready),
-      .rx_aligned    (rx_aligned),
-      .rx            (rx),
-      .rx_invalid    (rx_invalid),
-      .rx_buf_err    (rx_buf_err),
-      .rx_prbs_errors(rx_prbs_errors)
+      .clk_ref        (clk_ref),
+      .ser_rxp        (ser_rxp),
+      .ser_rxn        (ser_rxn),
+      .ser_txp        (ser_txp),
+      .ser_txn        (ser_txn),
+      .clk_reg        (clk_reg),
+      .arst_n         (arst_n),
+      .ctrl           (ctrl),
+      .clk_core       (clk_core),
+      .tx_ready       (tx_ready),
+      .tx             (tx),
+      .rx_ready       (rx_ready),
+      .rx_aligned     (rx_aligned),
+      .rx             (rx),
+      .rx_invalid     (rx_invalid),
+      .rx_buf_err     (rx_buf_err),
+      .rx_prbs_errors (rx_prbs_errors)
   );
 
   // word n of the stream with this seed: bytes n*8+b+seed, the top byte

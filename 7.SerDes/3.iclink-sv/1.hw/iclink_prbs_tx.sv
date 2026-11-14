@@ -30,34 +30,34 @@ module iclink_prbs_tx
   prbs_cfg_t config_meta, config_sync;
 
   iclink_prbs_gen #(
-      .WIDTH (WIDTH),
-      .NSTATE(7),
-      .TAP0  (5),
-      .TAP1  (6)
+      .WIDTH  (WIDTH),
+      .NSTATE (7),
+      .TAP0   (5),
+      .TAP1   (6)
   ) u_prbs7 (
       .clk,
       .arst_n,
-      .o(prbs7)
+      .o (prbs7)
   );
   iclink_prbs_gen #(
-      .WIDTH (WIDTH),
-      .NSTATE(15),
-      .TAP0  (13),
-      .TAP1  (14)
+      .WIDTH  (WIDTH),
+      .NSTATE (15),
+      .TAP0   (13),
+      .TAP1   (14)
   ) u_prbs15 (
       .clk,
       .arst_n,
-      .o(prbs15)
+      .o (prbs15)
   );
   iclink_prbs_gen #(
-      .WIDTH (WIDTH),
-      .NSTATE(31),
-      .TAP0  (27),
-      .TAP1  (30)
+      .WIDTH  (WIDTH),
+      .NSTATE (31),
+      .TAP0   (27),
+      .TAP1   (30)
   ) u_prbs31 (
       .clk,
       .arst_n,
-      .o(prbs31)
+      .o (prbs31)
   );
 
   always_ff @(negedge arst_n or posedge clk) begin : _sync

@@ -107,25 +107,25 @@ module top
   prbs_cfg_t                      NC_prbs_cfg;  // PRBS TX's choice: always PRBS7 here
 
   iclink_prbs_tx #(
-      .WIDTH(PRBS_W)
+      .WIDTH (PRBS_W)
   ) u_prbs_tx (
-      .clk     (clk),
-      .arst_n  (rst_n),
-      .config_i(PRBS_7),
-      .i       ('0),
-      .o       (prbs),
-      .config_o(NC_prbs_cfg)
+      .clk      (clk),
+      .arst_n   (rst_n),
+      .config_i (PRBS_7),
+      .i        ('0),
+      .o        (prbs),
+      .config_o (NC_prbs_cfg)
   );
 
   iclink_prbs_rx #(
-      .WIDTH(PRBS_W)
+      .WIDTH (PRBS_W)
   ) u_prbs_rx (
-      .clk     (clk),
-      .arst_n  (rst_n),
-      .config_i(PRBS_7),
-      .pause   (1'b0),
-      .i       (prbs),
-      .errors  (prbs_errors)
+      .clk      (clk),
+      .arst_n   (rst_n),
+      .config_i (PRBS_7),
+      .pause    (1'b0),
+      .i        (prbs),
+      .errors   (prbs_errors)
   );
 
   always_ff @(posedge clk or negedge rst_n) begin
@@ -176,32 +176,32 @@ module top
 
 `ifdef SYNTHESIS
   // CC_SERDES has its own serial pins and reference clock: no board pins here
-  logic clk_ref, ser_rxp, ser_rxn, ser_txp, ser_txn;
+  logic  clk_ref, ser_rxp, ser_rxn, ser_txp, ser_txn;
   assign {clk_ref, ser_rxp, ser_rxn} = '0;
-  logic NC_ser_tx;  // the serial outputs go nowhere on the chip
-  assign NC_ser_tx = ser_txp ^ ser_txn;
+  logic  NC_ser_tx;  // the serial outputs go nowhere on the chip
+  assign NC_ser_tx                   = ser_txp ^ ser_txn;
 `endif
 
   iclink_serdes_gm #(
-      .LINE_RATE(LINE_RATE)
+      .LINE_RATE (LINE_RATE)
   ) u_phy (
-      .clk_ref       (clk_ref),
-      .ser_rxp       (ser_rxp),
-      .ser_rxn       (ser_rxn),
-      .ser_txp       (ser_txp),
-      .ser_txn       (ser_txn),
-      .clk_reg       (clk),
-      .arst_n        (rst_n),
-      .ctrl          (link_ctrl),
-      .clk_core      (clk_core),
-      .tx_ready      (tx_ready),
-      .tx            (link_tx),
-      .rx_ready      (rx_ready),
-      .rx_aligned    (rx_aligned),
-      .rx            (link_rx),
-      .rx_invalid    (link_rx_invalid),
-      .rx_buf_err    (link_rx_buf_err),
-      .rx_prbs_errors(link_errors)
+      .clk_ref        (clk_ref),
+      .ser_rxp        (ser_rxp),
+      .ser_rxn        (ser_rxn),
+      .ser_txp        (ser_txp),
+      .ser_txn        (ser_txn),
+      .clk_reg        (clk),
+      .arst_n         (rst_n),
+      .ctrl           (link_ctrl),
+      .clk_core       (clk_core),
+      .tx_ready       (tx_ready),
+      .tx             (link_tx),
+      .rx_ready       (rx_ready),
+      .rx_aligned     (rx_aligned),
+      .rx             (link_rx),
+      .rx_invalid     (link_rx_invalid),
+      .rx_buf_err     (link_rx_buf_err),
+      .rx_prbs_errors (link_errors)
   );
 
   always_ff @(posedge clk_core or negedge tx_ready) begin
@@ -303,44 +303,44 @@ module top
   logic NC_remote_paused, NC_pause;  // flow control: on, but the reader never stops
 
   iclink_serwb_line #(
-      .W(PUMP_W)
+      .W (PUMP_W)
   ) u_line (
-      .clk            (clk_core),
-      .arst_n         (rx_ready),
-      .half_clk_strobe(half_clk_strobe),
-      .pump_tx        (pump_tx_pair),
-      .line_tx        (pump_tx),
-      .line_rx        (link_rx),
-      .line_err       (link_rx_invalid != '0 || link_rx_buf_err),
-      .pump_rx        (pump_rx_pair),
-      .pump_err       (pump_rx_err)
+      .clk             (clk_core),
+      .arst_n          (rx_ready),
+      .half_clk_strobe (half_clk_strobe),
+      .pump_tx         (pump_tx_pair),
+      .line_tx         (pump_tx),
+      .line_rx         (link_rx),
+      .line_err        (link_rx_invalid != '0 || link_rx_buf_err),
+      .pump_rx         (pump_rx_pair),
+      .pump_err        (pump_rx_err)
   );
 
   iclink_serwb_pump #(
-      .W    (PUMP_W),
-      .DEPTH(PUMP_DEPTH)
+      .W     (PUMP_W),
+      .DEPTH (PUMP_DEPTH)
   ) u_pump (
-      .clk            (clk_core),
-      .arst_n         (rx_ready),
-      .half_clk_strobe(half_clk_strobe),
-      .tx_push        (pump_start[PUMP_START_LOG2]),
-      .tx_data        (pump_wdata),
-      .tx_full        (pump_full),
-      .tx_used        (NC_tx_used),
-      .tx_hold        (1'b0),
-      .rx_pop         (pump_pop),
-      .rx_data        (pump_rdata),
-      .rx_empty       (pump_empty),
-      .rx_avail       (NC_rx_avail),
-      .tx_en          (pump_start[PUMP_START_LOG2]),
-      .phy_tx         (pump_tx_pair),
-      .rx_en          (pump_start[PUMP_START_LOG2]),
-      .phy_rx         (pump_rx_pair),
-      .remote_paused  (NC_remote_paused),
-      .pause          (NC_pause),
-      .crc_errors     (pump_crc),
-      .drops          (pump_drops),
-      .overflows      (pump_ovf)
+      .clk             (clk_core),
+      .arst_n          (rx_ready),
+      .half_clk_strobe (half_clk_strobe),
+      .tx_push         (pump_start[PUMP_START_LOG2]),
+      .tx_data         (pump_wdata),
+      .tx_full         (pump_full),
+      .tx_used         (NC_tx_used),
+      .tx_hold         (1'b0),
+      .rx_pop          (pump_pop),
+      .rx_data         (pump_rdata),
+      .rx_empty        (pump_empty),
+      .rx_avail        (NC_rx_avail),
+      .tx_en           (pump_start[PUMP_START_LOG2]),
+      .phy_tx          (pump_tx_pair),
+      .rx_en           (pump_start[PUMP_START_LOG2]),
+      .phy_rx          (pump_rx_pair),
+      .remote_paused   (NC_remote_paused),
+      .pause           (NC_pause),
+      .crc_errors      (pump_crc),
+      .drops           (pump_drops),
+      .overflows       (pump_ovf)
   );
 
   always_comb begin
