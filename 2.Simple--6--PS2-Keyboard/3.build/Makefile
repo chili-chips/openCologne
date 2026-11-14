@@ -57,11 +57,11 @@ TOOL_ROOT = /home/user/FPGA/tools
 #YOSYS = $(CC_TOOL)/bin/yosys/yosys$(EXE)
 PNR   = $(CC_TOOL)/bin/p_r/p_r$(EXE)
 #DONT_USE--| This OFL line does not work for me. If you have the same problem, update OFL to the newest 
-#DONT_USE--| version, next paragraph. Also see: https://github.com/chili-chips-ba/openCologne/issues/7
+#DONT_USE--| version, next paragraph. Also see: old openCologne issue 7
 #DONT_USE--| OFL = $(CC_TOOL)/bin/openFPGALoader/openFPGALoader$(EXE) 
 
 # Uncomment to use newer/other version of Yosys synthesizer
-# See: https://github.com/chili-chips-ba/openCologne/issues/13
+# See: old openCologne issue 13
 YOSYS = yosys
 YOSYS_QUIET = -q
 OFL = openFPGALoader$(EXE) 
@@ -87,12 +87,12 @@ PYTHON = python3
 #DONT_USE--| #       is not recommended as of now. Using the read -sv command that comes with yosys is 
 #DONT_USE--| #       very rudimentary and results in lots of errors. As of now, SystemVerilog support for 
 #DONT_USE--| #       yosys isn't the best for large projects. We will see how it goes. Also see:
-#DONT_USE--| #       https://github.com/chili-chips-ba/openCologne/issues/3
+#DONT_USE--| #       old openCologne issue 3
 #DONT_USE--| SYNLIG = $(<path-to-your-Synlig-install-directory>)/synlig
 #DONT_USE--| PLUGIN_PATH := $(SYNLIG)/build/release/systemverilog-plugin/systemverilog.so
 
 # GHDL Plugin Installation
-# See: https://github.com/chili-chips-ba/openCologne/issues/24
+# See: old openCologne issue 24
 
 # Step 1---| Install Yosys from source
 #    git clone https://github.com/YosysHQ/yosys.git

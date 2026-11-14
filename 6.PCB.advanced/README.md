@@ -2,7 +2,7 @@
 
 For more, please see:
 - [Extension_Boards_for_Olimex_GateMate repo](https://github.com/intergalaktik/ulx5m-gs)
-- [PCB Request Issues](https://github.com/chili-chips/openCologne/issues?q=label%3A%22PCB+request%22+)
+- [PCB Request Issues](https://github.com/chili-chips/openCologne/issues?q=label%3APCB)
 
 ### ---Conceptual Design---
 <div align="center">

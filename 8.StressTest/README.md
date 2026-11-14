@@ -97,7 +97,7 @@ Alleviating the imposed limits of L2T4 an L2T5 primitive is formed. With the cos
 
 Furthermore, combining the two independent L2T4 blocks with one more LUT2, we get an 8-input LUT tree. Our [analysis](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/6.sw_analysis) yielded **671848/2<sup>256</sup>** distinct functions of 8-inputs feasible to implement in this structure. We see that it's no good for real, 8-input independent variable logic functions, considering the cons of not being able to realize non-decomposable functions, which amplify in this case.
 
-This feature is still experimental, as the synthesis and PnR tools are not yet suited to accomodate this primitive, as discussed [here](https://github.com/chili-chips-ba/openCologne/issues/28).
+This feature is still experimental, as the synthesis and PnR tools are not yet suited to accomodate this primitive, as discussed here.
 
 ## Multiplexing
 The LUT trees enable 4-input multiplexing in a single CPE, something that is useful in many designs as CPUs, SOCs. A classic LUT4 can do only 2-input multiplexing, and in that sense multiplexing density per configuration bits is grater in the case of CPEs.
@@ -125,7 +125,7 @@ Points 1. and 2. are clear from the first 5 tests. Fine-grained locally containe
 
 The CPEs consisting of two L2T4 make this a quasi-41k LUT4 device, but the logic capacity is in reality around 24k LUT4s, using popular FPGA vendors (Intel, Lattice, Gowin) as reference. In conclusion, logic defficiency of LUT-trees degrades the device logic capacity, for most applications, providing a logic capacity of 24k LUT4s, at 28% more configuration bits. The most prominent features of the CCGM1A1 are its abundant DFFs relative to its equivalent logic capacity and the generous amount of BRAM provided.
 
-The maximum frequency of the chip is an area of dispute. Tool reports on STA laregly depend on the operating environment specified by the `-tm` option in `p_r`. It's unclear what results may be expected in terms of Fmax, since it's proven that at times, p_r produces a non-functioning configuration for `-tm 1`, see [issue61](https://github.com/chili-chips-ba/openCologne/issues/61).  **Maximum proven frequency at `-tm 3` of CCGM1A1 of 137 MHz** obtained [here](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/5.fpga_torture).
+The maximum frequency of the chip is an area of dispute. Tool reports on STA laregly depend on the operating environment specified by the `-tm` option in `p_r`. It's unclear what results may be expected in terms of Fmax, since it's proven that at times, p_r produces a non-functioning configuration for `-tm 1`, see issue61.  **Maximum proven frequency at `-tm 3` of CCGM1A1 of 137 MHz** obtained [here](https://github.com/chili-chips/openCologne/tree/main/8.StressTest/5.fpga_torture).
 
 
 ## PrjPeppercorn re-runs
@@ -134,13 +134,13 @@ October 2026, open flow: Yosys 0.69 (`synth_gatemate -luttree -nomx8`) and nextp
 
 | Test | Before | PrjPeppercorn, 2026-10 | Issue |
 |---|---|---|---|
-| LUTRAM_stress_test | fails to route at 24 instances | 24 to 96 route; 128 (89%) fails placement | [#52](https://github.com/chili-chips-ba/openCologne/issues/52) |
-| VeeRwolf, 1 core | 25184 / 20480 CPEs (123%), does not fit | 21852 / 20480 CPEs (107%), does not fit | [#66](https://github.com/chili-chips-ba/openCologne/issues/66) |
-| BetrustedSoC, fixed seed | (nextpnr, 2025) Fmax jumps with target clock, hangs at 30 MHz | 19.75 MHz at every target, no hangs, repeatable | [#73](https://github.com/chili-chips-ba/openCologne/issues/73) |
+| LUTRAM_stress_test | fails to route at 24 instances | 24 to 96 route; 128 (89%) fails placement | #52 |
+| VeeRwolf, 1 core | 25184 / 20480 CPEs (123%), does not fit | 21852 / 20480 CPEs (107%), does not fit | [#66](https://github.com/chili-chips/openCologne/issues/1) |
+| BetrustedSoC, fixed seed | (nextpnr, 2025) Fmax jumps with target clock, hangs at 30 MHz | 19.75 MHz at every target, no hangs, repeatable | #73 |
 
 nextpnr counts half-CPEs: `CPE_LT` and `CPE_FF` are out of 40960, two per CPE. We halve them to compare with `p_r`.
 
-### LUTRAM_stress_test ([#52](https://github.com/chili-chips-ba/openCologne/issues/52))
+### LUTRAM_stress_test (#52)
 
 Original design, wide read mux kept, `LUTRAM16X10` swept.
 
@@ -156,7 +156,7 @@ Original design, wide read mux kept, `LUTRAM16X10` swept.
 - The routing wall at 24 instances is gone. The limit is now logic, between 96 and 128.
 - LUTRAM still becomes CPE flip-flops in both flows: 160 per 16x10 instance. GateMate has no distributed RAM.
 
-### VeeRwolf, 1 core ([#66](https://github.com/chili-chips-ba/openCologne/issues/66))
+### VeeRwolf, 1 core ([#66](https://github.com/chili-chips/openCologne/issues/1))
 
 | Yosys cell | Count |
 |---|---|
@@ -194,7 +194,7 @@ Where nextpnr's 43703 half-CPEs go (`--pack-only`, packed netlist):
 - The two biggest items: FF-only halves, and adders not paired two per CPE.
 - Open question: why ~26.6k LUT-equivalents need more than 20480 CPEs. Good first issue.
 
-### BetrustedSoC, fixed seed ([#73](https://github.com/chili-chips-ba/openCologne/issues/73))
+### BetrustedSoC, fixed seed (#73)
 
 LiteX netlist from `9.BetrustedSOC`, re-synthesized. The clock comes from `CC_PLL`, so the target is the PLL `OUT_CLK`, not `--freq`.
 

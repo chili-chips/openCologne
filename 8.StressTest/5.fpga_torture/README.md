@@ -30,7 +30,7 @@ Another important observation from this test is the Fmax assessment. The design'
 | `-tm 1` (Timing)       | 280                    | 170                       |
 | `-tm 3` (Routability)  | 137                    | 121                       |
 
-CCGM1A1 as expected beats the older 55nm GW1NR-9C, reaching a substantial 280 MHz. But more interesting is the big increase when prioritizing timing for CCGM1A1, referenced in this [issue](https://github.com/chili-chips-ba/openCologne/issues/62).
+CCGM1A1 as expected beats the older 55nm GW1NR-9C, reaching a substantial 280 MHz. But more interesting is the big increase when prioritizing timing for CCGM1A1, referenced in this issue.
 
 
 ```

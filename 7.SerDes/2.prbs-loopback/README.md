@@ -142,7 +142,7 @@ A PRBS test (`python3 serdestool.py --tcprbs`):
 ```
 
 #### References
-- [Intergalaktik SerDes Loopback test](https://github.com/chili-chips-ba/openCologne/issues/76#issue-6170309059)
+- [Intergalaktik SerDes Loopback test](https://github.com/chili-chips/openCologne/issues/3)
 - [openCologne-PCIE SerDes Loopback test](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
 - Measuring Eye Diagrams on [Rigol MSO5000](https://www.youtube.com/watch?si=vo3GYcDNML9LsX7S&v=JcJbcKl5llo&feature=youtu.be)
   

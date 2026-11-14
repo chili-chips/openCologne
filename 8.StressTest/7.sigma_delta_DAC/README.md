@@ -9,7 +9,7 @@ We synthesized the RTL using vendor official toolchains, and extracted utilizati
 
 ## Sigma-Delta DAC and GateMate Architecture
 
-This test evaluates how GateMate handles mathematically intensive DSP applications — a key area of interest (also see [this](https://github.com/chili-chips-ba/openCologne/issues/58) discussion). 
+This test evaluates how GateMate handles mathematically intensive DSP applications — a key area of interest (also see this discussion). 
 
 Note that **CCGM1A1 does not feature dedicated Hard Macros for math functions, aka DSP HMs**, whereas Gowin and most other alternatives do. On the other hand, the CologneChip CPEs can be configured as:
 - `1 or 2-bit full adder`, expandable to any length in horizontal or vertical arrangements.

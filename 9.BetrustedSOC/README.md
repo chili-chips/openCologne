@@ -76,12 +76,12 @@ To build the hardware and the bios simply run:
 ```bash
 python3 betrusted_soc.py --toolchain=[peppercorn(default), colognechip] > build.log 2>&1
 ```
-Latest Colognechip toolchain(June 2025) fails in routing, a temporary fix is to use previous [versions](https://github.com/chili-chips-ba/openCologne/issues/70), or just stick to peppercorn. **Nextpnr unlike colognechip is timing driven, you can set timing constraints such as false paths.**
+Latest Colognechip toolchain(June 2025) fails in routing, a temporary fix is to use previous versions, or just stick to peppercorn. **Nextpnr unlike colognechip is timing driven, you can set timing constraints such as false paths.**
 
 ### Maximum frequency and nextpnr seeds
-`Colognechip`(January 2025) routes to a Fmax of 19 MHz (-tm 3 [proven](https://github.com/chili-chips-ba/openCologne/issues/62)).
+`Colognechip`(January 2025) routes to a Fmax of 19 MHz (-tm 3 proven).
 
-Nextpnr is a more complicated story, we've raised an [issue](https://github.com/chili-chips-ba/openCologne/issues/73) explaining it's unpredictable behavior regarding Fmax. However, we've reliably got the design running @ 25 MHz with the nextpnr toolchain.
+Nextpnr with a fixed seed reaches 19.75 MHz at every Fmax target, repeatably (8.StressTest, BetrustedSoC, fixed seed).
 
 ---
 

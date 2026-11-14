@@ -14,7 +14,7 @@ Graphs are indicating a melting lead of propriatary tools, especially percentage
 ### Takeaway - not so obvious
 Propriatary Gowin PnR topped out at 50 cores, utilizing only <td>11930 / 15750</td> of avaliable DFFs before reporting "fail to place 64 REGs". Taking this into account, yosys-based design would fail at 41 cores, or even earlier since the LUT usage is also increased. 
 
-Here we face a tough decision, **how to take yosys into account?** On one hand it's just 5% more LUTs and 18% more DFFs, but on the other hand it's prone to failing PnR with 20% less total logic instatiated. Since we're dealing with GateMate in our analysis, whose PnR isn't directly yosys netlist [compatible](https://github.com/chili-chips-ba/openCologne/issues/28#issuecomment-2353907213), from now on we use a 25% correction when assessing results. That would bring 41 yosys cores to 50 propriatary in Gowin.
+Here we face a tough decision, **how to take yosys into account?** On one hand it's just 5% more LUTs and 18% more DFFs, but on the other hand it's prone to failing PnR with 20% less total logic instatiated. Since we're dealing with GateMate in our analysis, whose PnR isn't directly yosys netlist compatible, from now on we use a 25% correction when assessing results. That would bring 41 yosys cores to 50 propriatary in Gowin.
 
 ![figure1](absutil.png)
 ![figure1](relutil.png)

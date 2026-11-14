@@ -19,7 +19,7 @@ A new `LINE_RATE` synthesizes again; a new `SEED` or `FREQ` places and routes ag
 
 ## From the legacy GateMate tools to Project Peppercorn
 
-The older openCologne examples build with Cologne Chip's own tools: their Yosys and the proprietary `p_r` place & route (`CC_TOOL`). We found `p_r` [unreliable](https://github.com/chili-chips-ba/openCologne/issues/30), with weak [timing reports](https://github.com/chili-chips-ba/openCologne/issues/35). 7.SerDes uses the fully open-source flow only:
+The older openCologne examples build with Cologne Chip's own tools: their Yosys and the proprietary `p_r` place & route (`CC_TOOL`). We found `p_r` unreliable, with weak timing reports. 7.SerDes uses the fully open-source flow only:
 
 | Step | Legacy | Now |
 |---|---|---|
@@ -85,7 +85,7 @@ LiteX picks `nextpnr-himbaechel-gatemate` from `PATH` when it exists, else `next
 
 ## Multicycle paths at 5 Gb/s
 
-At 5 Gb/s the FIFO pump moves 4 words on every other `clk_core`, enabled by `half_clk_strobe` (`iclink_serwb_line`), so its paths may take 2 clocks: 32 ns at 62.5 MHz. Upstream nextpnr for GateMate has no multicycle paths. `make LINE_RATE=5000` uses our fork's `set_multicycle_path` instead ([`chili-chips-ba/nextpnr`, branch `multicycle-sdc`](https://github.com/chili-chips-ba/nextpnr/tree/multicycle-sdc); `NEXTPNR_MCP`).
+At 5 Gb/s the FIFO pump moves 4 words on every other `clk_core`, enabled by `half_clk_strobe` (`iclink_serwb_line`), so its paths may take 2 clocks: 32 ns at 62.5 MHz. Upstream nextpnr for GateMate has no multicycle paths. `make LINE_RATE=5000` uses our fork's `set_multicycle_path` instead (branch `multicycle-sdc`, to be published again; `NEXTPNR_MCP`).
 
 **Which flops: proven, not named.** [`mcp_cells.py`](mcp_cells.py) reads the synthesized netlist. A flop on `clk_core` joins the 2-clock group only when, with `half_clk_strobe` low and every other input at any value:
 

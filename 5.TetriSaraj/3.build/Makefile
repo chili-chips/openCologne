@@ -57,11 +57,11 @@ TOOL_ROOT = /home/user/FPGA/tools
 #YOSYS = $(CC_TOOL)/bin/yosys/yosys$(EXE)
 PNR   = $(CC_TOOL)/bin/p_r/p_r$(EXE)
 #DONT_USE--| This OFL line does not work for me. If you have the same problem, update OFL to the newest 
-#DONT_USE--| version, next paragraph. Also see: https://github.com/chili-chips-ba/openCologne/issues/7
+#DONT_USE--| version, next paragraph. Also see: old openCologne issue 7
 #DONT_USE--| OFL = $(CC_TOOL)/bin/openFPGALoader/openFPGALoader$(EXE) 
 
 # Uncomment to use newer/other version of Yosys synthesizer
-# See: https://github.com/chili-chips-ba/openCologne/issues/13
+# See: old openCologne issue 13
 YOSYS = yosys
 YOSYS_QUIET = -q
 OFL = openFPGALoader$(EXE) 

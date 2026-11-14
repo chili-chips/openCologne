@@ -60,7 +60,7 @@ LiteICLink's PHY interface (8 bytes + 8 K flags per clock each way, PRBS, ready,
 
 A fabric decoder would also work: with the decoder off, bits 8 and 9 come out on `RX_CHAR_IS_K_O` and `RX_DISP_ERR_O` (DS1001 Figure 2.39).
 
-**Found in LiteX:** `PRBSRX`'s `pause` does nothing. `~with_errors_saturation` is plain Python, and `~False` is `-1`, which widens the Migen expression so that `~self.pause` is never 0. With `pause=1` it still counts every error. Our SV pauses ([litex#2686](https://github.com/enjoy-digital/litex/issues/2686)).
+**Found in LiteX:** `PRBSRX`'s `pause` does nothing. `~with_errors_saturation` is plain Python, and `~False` is `-1`, which widens the Migen expression so that `~self.pause` is never 0. With `pause=1` it still counts every error. Our SV pauses (litex#2686).
 
 ## Compared with LiteICLink
 

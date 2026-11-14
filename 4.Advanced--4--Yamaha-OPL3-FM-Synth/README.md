@@ -4,7 +4,7 @@
 
 This is a triple exciting port of @gtaylormb [project](https://github.com/gtaylormb/opl3_fpga) to _Yosys_ and _GateMate_ FPGA.
  - **Excitment#1**: Original design is super cool on its own, as it is about the heart of the uber-popular _SoundblasterPro_ audio card from the turbulent '90s.
- - **Excitment#2**: RTL is written in, for opensource, unusally rich  complement of _SystemVerilog_. The original project had vetted this RTL only with Xilinx-proprietary Vivado. These two circumstances make this codebase a formidable [challenge](https://github.com/chili-chips-ba/openCologne/issues/3) for opensource [Yosys](https://github.com/YosysHQ/yosys) synthesis. And yes, with every challenge comes an opportunity :blush:.
+ - **Excitment#2**: RTL is written in, for opensource, unusally rich  complement of _SystemVerilog_. The original project had vetted this RTL only with Xilinx-proprietary Vivado. These two circumstances make this codebase a formidable challenge for opensource [Yosys](https://github.com/YosysHQ/yosys) synthesis. And yes, with every challenge comes an opportunity :blush:.
  - **Excitment#3**: As of yet, there are no GateMate designs of this complexity. We are therefore buckled up for a fun, bumpy rollercoaster ride. 
 
 Regarding excitment/challenge#2, having tried [Synlig plugin](https://github.com/chipsalliance/synlig) and [Yosys-Slang](https://github.com/povik/yosys-slang), we ended up converging on @zachjs's [SV2V](https://github.com/zachjs/sv2v). This can also be viewed as an independant validation and confirmation of @pu-cc's advice on the opensource flow that works best for _SystemVerilog_.

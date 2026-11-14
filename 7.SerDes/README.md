@@ -137,27 +137,27 @@ A design instantiates `ccfpga_serdes`. The file list picks its body:
 
 | Tool / project | Issue | What | State |
 |---|---|---|---|
-| LiteX | [litex#2686](https://github.com/enjoy-digital/litex/issues/2686) (ours: [#75](https://github.com/chili-chips-ba/openCologne/issues/75)) | `PRBSRX`: `pause` and `with_errors_saturation` have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
-| Verilator | [verilator#8894](https://github.com/verilator/verilator/issues/8894) | no error for a (local)param used before its declaration | open |
-| Verilator | [verilator#8895](https://github.com/verilator/verilator/issues/8895) | a continuous-assign alias read through a function returns a later value | open |
-| Verilator | [verilator#8896](https://github.com/verilator/verilator/issues/8896) | `always @*` with an intra-assignment delay never finishes | open |
-| Verilator | [verilator#8897](https://github.com/verilator/verilator/issues/8897) | a dynamic array of events: the C++ does not compile | closed (fixed) |
-| Icarus Verilog | [iverilog#1643](https://github.com/steveicarus/iverilog/issues/1643) | an event control on a dynamic-array element never wakes | open |
-| Icarus Verilog | [iverilog#1645](https://github.com/steveicarus/iverilog/issues/1645) | queue of unpacked structs | open |
-| Icarus Verilog | [iverilog#1646](https://github.com/steveicarus/iverilog/issues/1646) | queue slice `q[1:$]` | open |
-| Icarus Verilog | [iverilog#1647](https://github.com/steveicarus/iverilog/issues/1647) | `name()` on an enum-typed parameter | open |
-| Icarus Verilog | [iverilog#1648](https://github.com/steveicarus/iverilog/issues/1648) | unpacked array of queues | open |
-| Icarus Verilog | [iverilog#1649](https://github.com/steveicarus/iverilog/issues/1649) | static array of events | open |
-| Icarus Verilog | [iverilog#1650](https://github.com/steveicarus/iverilog/issues/1650) | function `output` arguments | open |
-| Icarus Verilog | [iverilog#1651](https://github.com/steveicarus/iverilog/issues/1651) | typed assignment pattern `s_t'{a: ...}` | open |
-| Icarus Verilog | [iverilog#1652](https://github.com/steveicarus/iverilog/issues/1652) | field write to an element of an array of packed structs | closed (fixed on master) |
-| Icarus Verilog | [iverilog#1653](https://github.com/steveicarus/iverilog/issues/1653) | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
+| LiteX | litex#2686 | `PRBSRX`: `pause` and `with_errors_saturation` have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
+| Verilator | verilator#8894 | no error for a (local)param used before its declaration | closed (fixed: `USEBEFOREDECL`) |
+| Verilator | verilator#8895 | a continuous-assign alias read through a function returns a later value | open (hidden by default since 5f0d585da, fails with `-fno-coalesce`); to be filed again |
+| Verilator | verilator#8896 | `always @*` with an intra-assignment delay never finishes | open, now [verilator#9196](https://github.com/verilator/verilator/issues/9196) |
+| Verilator | verilator#8897 | a dynamic array of events: the C++ does not compile | closed (fixed) |
+| Icarus Verilog | iverilog#1643 | an event control on a dynamic-array element never wakes | open; to be filed again |
+| Icarus Verilog | iverilog#1645 | queue of unpacked structs | open, part of [iverilog#266](https://github.com/steveicarus/iverilog/issues/266) |
+| Icarus Verilog | iverilog#1646 | queue slice `q[1:$]` | open; to be filed again |
+| Icarus Verilog | iverilog#1647 | `name()` on an enum-typed parameter | open; to be filed again |
+| Icarus Verilog | iverilog#1648 | unpacked array of queues | open; a fix is proposed, [iverilog#1690](https://github.com/steveicarus/iverilog/pull/1690) |
+| Icarus Verilog | iverilog#1649 | static array of events | open; to be filed again |
+| Icarus Verilog | iverilog#1650 | function `output` arguments | open, as [iverilog#597](https://github.com/steveicarus/iverilog/issues/597) |
+| Icarus Verilog | iverilog#1651 | typed assignment pattern `s_t'{a: ...}` | open; to be filed again |
+| Icarus Verilog | iverilog#1652 | field write to an element of an array of packed structs | closed (fixed on master) |
+| Icarus Verilog | iverilog#1653 | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
 | Icarus Verilog | [iverilog#438](https://github.com/steveicarus/iverilog/issues/438#issuecomment-6390247886) (comment) | `wait` on a function call: internal error | open |
 | Verible | [verible#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration | open |
-| Project Peppercorn | [prjpeppercorn#33](https://github.com/YosysHQ/prjpeppercorn/issues/33) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open |
-| Project Peppercorn | [prjpeppercorn#34](https://github.com/YosysHQ/prjpeppercorn/issues/34) | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's [`multicycle-sdc`](https://github.com/chili-chips-ba/nextpnr/tree/multicycle-sdc) has cell-level `-to`; the pump is the test case | open |
+| Project Peppercorn | prjpeppercorn#33 | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open; to be filed again |
+| Project Peppercorn | prjpeppercorn#34 | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's `multicycle-sdc` branch (to be published again) has cell-level `-to`; the pump is the test case | open |
 
-State as of 2026-10-26.
+State as of 2026-11-13, retested on the latest tools. Numbers without a link were filed from an account that is no longer available.
 
 ## References
 - Cologne Chip latest [datasheet](https://colognechip.com/docs/ds1001-gatemate1-datasheet-latest.pdf)
