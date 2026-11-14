@@ -249,6 +249,7 @@ module iclink_serwb_pump
   // flow control requests: on a change of pause, and every REFRESH_CLKS
   logic pause_d, pending, send_ctrl;
   logic      [$clog2(REFRESH_CLKS)-1:0] refresh_cnt;
+  logic                                 refresh_full;  // refresh_cnt == '1, a flop: keeps pending's logic small
   phy_word_t [                  NP-1:0] line;  // into phy_tx
   word_t     [                   W-1:0] ln_word;
   logic      [                   W-1:0] ln_k;
@@ -291,26 +292,30 @@ module iclink_serwb_pump
   always_ff @(posedge clk or negedge arst_n) begin
     if (!arst_n) begin
       pause_d     <= 1'b0;
-      pending     <= 1'b0;
-      refresh_cnt <= '0;
-      phy_tx      <= '0;
+      pending      <= 1'b0;
+      refresh_cnt  <= '0;
+      refresh_full <= 1'b0;
+      phy_tx       <= '0;
     end
     else if (half_clk_strobe) begin
       pause_d <= pause;
 
       if (!tx_en) begin
-        pending     <= 1'b0;
-        refresh_cnt <= '0;
+        pending      <= 1'b0;
+        refresh_cnt  <= '0;
+        refresh_full <= 1'b0;
       end
-      else if (pause != pause_d || refresh_cnt == '1) begin
-        pending     <= 1'b1;
-        refresh_cnt <= '0;
+      else if (pause != pause_d || refresh_full) begin
+        pending      <= 1'b1;
+        refresh_cnt  <= '0;
+        refresh_full <= 1'b0;
       end
       else if (send_ctrl) begin
         pending <= 1'b0;
       end
       else begin
-        refresh_cnt <= refresh_cnt + 1'b1;
+        refresh_cnt  <= refresh_cnt + 1'b1;
+        refresh_full <= &(refresh_cnt + 1'b1);
       end
 
       phy_tx <= line;

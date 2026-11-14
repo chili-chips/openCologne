@@ -9,6 +9,7 @@
 [![LiteX:YES](https://badgen.net/badge/LiteX/YES/green)](7.SerDes/3.iclink-sv/4.litex)
 [![eduBOS5:YES](https://badgen.net/badge/eduBOS5/YES/green)](https://github.com/chili-chips/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md)
 [![PeakRDL:YES](https://badgen.net/badge/PeakRDL/YES/green)](7.SerDes)
+[![JanusHDL:WIP](https://badgen.net/badge/JanusHDL/WIP/orange)](https://que.no/janushdl/)
 
 [Click here](https://github.com/chili-chips/openCologne-PCIE) if interested in our new CologneChip project, which is about designing the first fully open-source **PCIE EndPoint**.
 
@@ -248,6 +249,7 @@ This project was funded through the NGI0 Entrust Fund, a fund established by NLn
   <a href="https://github.com/trabucayre/openFPGALoader"><img width="20%" alt="openFPGALoader logo" src="0.doc/artwork/openFPGAloader.logo.png"></a>
   <a href="https://www.veripool.org/verilator"><img width="20%" alt="Verilator logo" src="0.doc/artwork/Verilator.logo.png"></a>
   <a href="https://github.com/steveicarus/iverilog"><img width="20%" alt="Icarus Verilog logo" src="0.doc/artwork/Icarus-Verilog.logo.png"></a>
+  <a href="https://que.no/janushdl/"><img width="20%" alt="JanusHDL logo" src="0.doc/artwork/JanusHDL.logo.png"></a>
 </div>
 
 <div align="center">

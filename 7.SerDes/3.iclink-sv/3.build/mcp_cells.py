@@ -25,7 +25,7 @@ The proven flops are both launch and capture cells of the 2-clock group:
   set_multicycle_path 2 -setup -from [get_cells {...}] -to [get_cells {...}]
 Paths into them from anything else (the strobe flop, the every-clock
 logic, the RAMs) keep 1 clock. Needs nextpnr with set_multicycle_path in
---sdc (chili-chips-ba/nextpnr, branch multicycle-sdc).
+--sdc (chili-chips/nextpnr, branch multicycle-sdc).
 
 usage: mcp_cells.py top.json STROBE_NET CLOCK_NET out.sdc
 """

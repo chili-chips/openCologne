@@ -31,10 +31,33 @@
 #   LINE_RATE=1250|2500|5000  Mb/s, PHY tests (default 2500)
 #   WAVES=1       also write an FST waveform, PHY tests, named by the options (WAVE_TAG)
 #   SERWB_W=2|4   SerWB words a clock, SerWB tests (default 2)
+#   SIM=verilator|janushdl  the simulator (default verilator). janushdl: JanusHDL (jhdl 0.17
+#                 or later), which compiles at each run; WAVES=1 is its --fst; no SEED;
+#                 sim_modes and sim_icarus stay on Verilator and Icarus
 
 # a simulator that fails in a pipe (| tee) fails the target
 SHELL       := /bin/bash
 .SHELLFLAGS := -o pipefail -ec
+
+SIM  ?= verilator
+JHDL ?= jhdl
+ifeq ($(filter verilator janushdl,$(SIM)),)
+  $(error SIM must be verilator or janushdl (got "$(SIM)"))
+endif
+VLT := verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL
+
+# $(call sim,TOP,OBJ_DIR,OPTIONS,SOURCES,RUN_ARGS,LOG): build TOP, run it into LOG.
+# JanusHDL: one jhdl run; of OPTIONS it takes -G (as -g) and +define+, no .vlt
+ifeq ($(SIM),verilator)
+define sim
+$(VLT) --top-module $1 -Mdir $2 $3 $4
+./$2/V$1 $5 | tee $6
+endef
+else
+define sim
+$(JHDL) --top $1 $(patsubst -G%,-g%,$(filter -G% +define+%,$3)) $(filter-out %.vlt,$4) $5 | tee $6
+endef
+endif
 
 HW  := ../1.hw
 BFM := ../../1.sim-model/ccfpga_serdes_pkg.sv ../../1.sim-model/ccfpga_serdes.BFM.sv
@@ -51,24 +74,25 @@ SEED  ?=
 # the FST name carries the run options: phy_oneway.<CDR_MODEL>.<LINE_RATE>.s<SEED>[.rp<RANDOM_PHASE>].fst
 # (s-: no SEED, Verilator's fixed default; s0: a new seed each run)
 WAVE_TAG  = $(or $(CDR_MODEL),NONE).$(LINE_RATE).s$(or $(SEED),-)$(if $(RANDOM_PHASE),.rp$(RANDOM_PHASE))
+ifeq ($(SIM),verilator)
 PLUS   = $(if $(filter 1,$(WAVES)),+waves=$(WAVE_TAG),) $(if $(SEED),+verilator+seed+$(SEED))
+else
+# $dumpfile would write a VCD: JanusHDL's --fst records every signal
+PLUS   = $(if $(filter 1,$(WAVES)),$(if $(filter sim_phy_%,$@),--fst $(@:sim_%=%).$(WAVE_TAG).fst))
+endif
 
 .PHONY: all sim_8b10b sim_prbs sim_phy_oneway sim_phy_twoway sim_phy_rates sim_serwb_tx sim_serwb_rx sim_serwb_pump sim_serwb_w4 sim_top sim_link_ppm sim_modes sim_icarus vectors clean
 
 all: sim_icarus sim_8b10b sim_prbs sim_phy_oneway sim_phy_twoway sim_serwb_tx sim_serwb_rx sim_serwb_pump sim_serwb_w4 sim_top sim_link_ppm sim_modes
 
 sim_8b10b:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_8b10b -Mdir $(OUT) \
-	  $(HW)/iclink_pkg.sv iclink_8b10b_pkg.sv iclink_8b10b_enc.sv iclink_8b10b_dec.sv tb_8b10b.sv
-	./$(OUT)/Vtb_8b10b | tee sim_8b10b.log
+	$(call sim,tb_8b10b,$(OUT),, \
+	  $(HW)/iclink_pkg.sv iclink_8b10b_pkg.sv iclink_8b10b_enc.sv iclink_8b10b_dec.sv tb_8b10b.sv,,sim_8b10b.log)
 	@grep -q "TB_8B10B: PASS" sim_8b10b.log
 
 sim_prbs:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_prbs -Mdir obj_prbs \
-	  $(HW)/iclink_pkg.sv $(HW)/iclink_prbs_gen.sv $(HW)/iclink_prbs_chk.sv $(HW)/iclink_prbs_tx.sv $(HW)/iclink_prbs_rx.sv tb_prbs.sv
-	./obj_prbs/Vtb_prbs | tee sim_prbs.log
+	$(call sim,tb_prbs,obj_prbs,, \
+	  $(HW)/iclink_pkg.sv $(HW)/iclink_prbs_gen.sv $(HW)/iclink_prbs_chk.sv $(HW)/iclink_prbs_tx.sv $(HW)/iclink_prbs_rx.sv tb_prbs.sv,,sim_prbs.log)
 	@grep -q "TB_PRBS: PASS" sim_prbs.log
 
 # line rate in Mb/s (1250, 2500, 5000)
@@ -84,37 +108,29 @@ sim_phy_rates:
 	done | tee sim_phy_rates.log
 
 sim_phy_oneway:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_phy_oneway -Mdir obj_phy $(TRACE) $(RATE_G) $(BFM_DEF) sim-model.vlt rtl.vlt \
+	$(call sim,tb_phy_oneway,obj_phy,$(TRACE) $(RATE_G) $(BFM_DEF),sim-model.vlt rtl.vlt \
 	  $(HW)/iclink_pkg.sv $(HW)/iclink_phy_pkg.sv \
 	  $(HW)/iclink_prbs_gen.sv $(HW)/iclink_prbs_chk.sv $(HW)/iclink_prbs_tx.sv $(HW)/iclink_prbs_rx.sv \
 	  $(HW)/iclink_serdes_gm.sv $(BFM) \
-	  tb_phy_oneway.sv
-	./obj_phy/Vtb_phy_oneway $(PLUS) | tee sim_phy_oneway.log
+	  tb_phy_oneway.sv,$(PLUS),sim_phy_oneway.log)
 	@grep -q "TB_PHY_ONEWAY: PASS" sim_phy_oneway.log
 
 sim_phy_twoway:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_phy_twoway -Mdir obj_phy2 $(TRACE) $(RATE_G) $(BFM_DEF) sim-model.vlt rtl.vlt \
+	$(call sim,tb_phy_twoway,obj_phy2,$(TRACE) $(RATE_G) $(BFM_DEF),sim-model.vlt rtl.vlt \
 	  $(HW)/iclink_pkg.sv $(HW)/iclink_phy_pkg.sv \
 	  $(HW)/iclink_prbs_gen.sv $(HW)/iclink_prbs_chk.sv $(HW)/iclink_prbs_tx.sv $(HW)/iclink_prbs_rx.sv \
 	  $(HW)/iclink_serdes_gm.sv $(BFM) \
-	  tb_phy_twoway.sv
-	./obj_phy2/Vtb_phy_twoway $(PLUS) | tee sim_phy_twoway.log
+	  tb_phy_twoway.sv,$(PLUS),sim_phy_twoway.log)
 	@grep -q "TB_PHY_TWOWAY: PASS" sim_phy_twoway.log
 
 sim_serwb_tx:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_serwb_tx -GW=$(SERWB_W) -Mdir obj_serwb_tx_w$(SERWB_W) \
-	  rtl.vlt $(HW)/iclink_serwb_pkg.sv $(HW)/iclink_serwb_tx.sv tb_serwb_tx.sv
-	./obj_serwb_tx_w$(SERWB_W)/Vtb_serwb_tx | tee sim_serwb_tx.log
+	$(call sim,tb_serwb_tx,obj_serwb_tx_w$(SERWB_W),-GW=$(SERWB_W), \
+	  rtl.vlt $(HW)/iclink_serwb_pkg.sv $(HW)/iclink_serwb_tx.sv tb_serwb_tx.sv,,sim_serwb_tx.log)
 	@grep -q "TB_SERWB_TX: PASS" sim_serwb_tx.log
 
 sim_serwb_rx:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_serwb_rx -GW=$(SERWB_W) -Mdir obj_serwb_rx_w$(SERWB_W) \
-	  rtl.vlt $(HW)/iclink_serwb_pkg.sv $(HW)/iclink_serwb_rx.sv tb_serwb_rx.sv
-	./obj_serwb_rx_w$(SERWB_W)/Vtb_serwb_rx | tee sim_serwb_rx.log
+	$(call sim,tb_serwb_rx,obj_serwb_rx_w$(SERWB_W),-GW=$(SERWB_W), \
+	  rtl.vlt $(HW)/iclink_serwb_pkg.sv $(HW)/iclink_serwb_rx.sv tb_serwb_rx.sv,,sim_serwb_rx.log)
 	@grep -q "TB_SERWB_RX: PASS" sim_serwb_rx.log
 
 PUMP_SRC := rtl.vlt $(HW)/iclink_pkg.sv $(HW)/iclink_phy_pkg.sv $(HW)/iclink_serwb_pkg.sv \
@@ -122,9 +138,8 @@ PUMP_SRC := rtl.vlt $(HW)/iclink_pkg.sv $(HW)/iclink_phy_pkg.sv $(HW)/iclink_ser
   $(HW)/iclink_serwb_rx.sv $(HW)/iclink_serwb_line.sv $(HW)/iclink_serwb_pump.sv
 
 sim_serwb_pump:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL -Wno-UNUSEDPARAM \
-	  --top-module tb_serwb_pump -GW=$(SERWB_W) -Mdir obj_serwb_pump_w$(SERWB_W) $(PUMP_SRC) tb_serwb_pump.sv
-	./obj_serwb_pump_w$(SERWB_W)/Vtb_serwb_pump | tee sim_serwb_pump.log
+	$(call sim,tb_serwb_pump,obj_serwb_pump_w$(SERWB_W),-Wno-UNUSEDPARAM -GW=$(SERWB_W), \
+	  $(PUMP_SRC) tb_serwb_pump.sv,,sim_serwb_pump.log)
 	@grep -q "TB_SERWB_PUMP: PASS" sim_serwb_pump.log
 
 sim_serwb_w4:
@@ -138,23 +153,18 @@ LINK_SRC := sim-model.vlt rtl.vlt $(HW)/iclink_pkg.sv $(HW)/iclink_phy_pkg.sv $(
   $(HW)/iclink_prbs_gen.sv $(HW)/iclink_prbs_chk.sv $(HW)/iclink_prbs_tx.sv $(HW)/iclink_prbs_rx.sv \
   $(HW)/iclink_serdes_gm.sv $(HW)/iclink_serwb_fifo.sv $(HW)/iclink_serwb_tx.sv $(HW)/iclink_serwb_rx.sv \
   $(HW)/iclink_serwb_line.sv $(HW)/iclink_serwb_pump.sv $(BFM) tb_link_ppm.sv
-LINK_VLT := verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-  -Wno-UNUSEDPARAM --top-module tb_link_ppm -GPPM=$(PPM) $(RATE_G) $(BFM_DEF)
+LINK_OPT := -Wno-UNUSEDPARAM -GPPM=$(PPM) $(RATE_G) $(BFM_DEF)
 
 sim_link_ppm:
-	$(LINK_VLT) -Mdir obj_link $(LINK_SRC)
-	./obj_link/Vtb_link_ppm | tee sim_link_ppm.log
+	$(call sim,tb_link_ppm,obj_link,$(LINK_OPT),$(LINK_SRC),,sim_link_ppm.log)
 	@grep -q "TB_LINK_PPM: PASS" sim_link_ppm.log
-	$(LINK_VLT) -Mdir obj_link_neg +define+NO_CLKCOR $(LINK_SRC)
-	./obj_link_neg/Vtb_link_ppm | tee sim_link_ppm_neg.log
+	$(call sim,tb_link_ppm,obj_link_neg,$(LINK_OPT) +define+NO_CLKCOR=1,$(LINK_SRC),,sim_link_ppm_neg.log)
 	@grep -q "TB_LINK_PPM: FAIL" sim_link_ppm_neg.log && echo "NO_CLKCOR: FAIL, as it must"
 
 sim_top:
-	verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL \
-	  --top-module tb_top -Mdir obj_top $(RATE_G) $(BFM_DEF) sim-model.vlt rtl.vlt \
+	$(call sim,tb_top,obj_top,$(RATE_G) $(BFM_DEF),sim-model.vlt rtl.vlt \
 	  $$(sed -e "s|\$${HW_SRC}|$(HW)|" -e "/^#/d" -e "/^$$/d" $(HW)/top.filelist) \
-	  $(BFM) tb_top.sv
-	./obj_top/Vtb_top $(PLUS) | tee sim_top.log
+	  $(BFM) tb_top.sv,$(PLUS),sim_top.log)
 	@grep -q "TB_TOP: PASS" sim_top.log
 
 # The SerDes BFM's own tests live with it, in ../../1.sim-model; its logs

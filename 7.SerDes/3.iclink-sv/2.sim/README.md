@@ -57,6 +57,7 @@ Set them on the `make` line, e.g. `make -C 7.SerDes/3.iclink-sv/2.sim sim_phy_on
 | `WAVES` | `0` | PHY | `1`: write an FST waveform, for WaveCrux, named by the options above ([waves](#waves)) |
 | `SERWB_W` | `2` | SerWB | SerWB words per clock: `2` or `4` |
 | `PPM` | `200` | `sim_link_ppm` | How far apart the two references are |
+| `SIM` | `verilator` | all but `sim_modes`, `sim_icarus` | `janushdl`: [JanusHDL](https://que.no/janushdl/) (`jhdl` 0.17 or later), which compiles at each run. `WAVES=1` is its `--fst`, every signal; `SEED` is Verilator's. Most tests do not elaborate yet: [side by side](#verilator-icarus-and-janushdl-side-by-side) |
 | `MODES_TOL_NS` | `1.6` | `sim_modes` | How far a mode's latency may be from ACCURATE's (a setting of the `1.sim-model` Makefile) |
 
 The BFM's `ALIGN_COMMA_WORD` is `CC_SERDES`'s `RX_ALIGN_COMMA_WORD`. A "byte lane" is one byte of the datapath word: lanes 0 to 7 at 64 bits.
@@ -66,6 +67,25 @@ The BFM's `ALIGN_COMMA_WORD` is `CC_SERDES`'s `RX_ALIGN_COMMA_WORD`. A "byte lan
 **BFM settings.** `CDR_MODEL` picks one of three levels of line and receiver model; the `BHV_*` settings tune the BFM. All of them, every SerDes parameter it models, and its speed: [model README](../../1.sim-model/README.md).
 
 Verilator is the reference simulator. The BFM also runs in Icarus Verilog, and `sim_icarus` keeps it so. Testbenches may use SystemVerilog that Icarus lacks, such as arrays of queues and queues of structs. Icarus can fly on, but shouldn't clip our wings.
+
+## Verilator, Icarus and JanusHDL, side by side
+
+Every test on the three simulators, as they are, no workarounds. Wall time on WSL2: Verilator build and run (ccache warm), Icarus `iverilog` + `vvp`, JanusHDL one `jhdl` run (`make SIM=janushdl`). Where a test does not build, the first error:
+
+| Test | Verilator | Icarus | JanusHDL |
+|---|---|---|---|
+| `sim_8b10b` | PASS, 3.8 s | no: `sorry: "inside" expressions not supported yet`, `iclink_8b10b_dec.sv:62` | PASS, 5.4 s |
+| `sim_prbs` | PASS, 2.8 s | PASS, 0.8 s | no: `this type is not evaluated in constant functions yet`, `iclink_prbs_gen.sv:34` |
+| `sim_phy_oneway` | PASS, 29 s | no: `inside`, `iclink_serdes_gm.sv:101` | no: `an assignment pattern as a constant ... is not supported yet`, `iclink_phy_pkg.sv:54` |
+| `sim_phy_twoway` | PASS, 38 s | no: the same | no: the same |
+| `sim_serwb_tx`, W=2 and 4 | PASS, 0.5 s | no: `inside`, `iclink_serwb_tx.sv:58` | no: constant function type, `iclink_serwb_pkg.sv:109` |
+| `sim_serwb_rx`, W=2 and 4 | PASS, 0.5 s | no: `inside`, `iclink_serwb_rx.sv:67` | no: the same, `iclink_serwb_pkg.sv:126`; also a queue of queues, `tb_serwb_rx.sv:48`, and `W'(3)`, `iclink_serwb_rx.sv:80` |
+| `sim_serwb_pump`, W=2 and 4 | PASS, 3.7 and 3.9 s | no: `inside`, `iclink_serwb_fifo.sv:69` | no: assignment pattern, `iclink_phy_pkg.sv:54` |
+| `sim_top` | PASS, 4.9 s | no: `inside`, `iclink_serdes_gm.sv:101` | no: assignment pattern, `iclink_phy_pkg.sv:54` |
+| `sim_link_ppm`, and its `NO_CLKCOR` FAIL | PASS, 23 s | no: `inside`, `iclink_serdes_gm.sv:101` | no: assignment pattern, `iclink_phy_pkg.sv:54` |
+| `sim_modes`, `sim_icarus` (the BFM) | PASS, 38 + 6 runs, 566 s | PASS, 15 + 6 runs, 33 s | `tb_modes` no: `a bit-select of the real`, an element of a `realtime` queue, `tb_modes.sv:294`. `tb_rules` stops at time 0: `a select of a select of this kind as a target is not supported at run time yet`, `ccfpga_serdes.BFM.sv:438` |
+
+Verilator 5.055 devel (v5.054-260-gb9f22851), Icarus Verilog 14.0 devel (7025c6613), JanusHDL 0.17.0; 2026-11-14. Before its fix, `tb_serwb_tx` failed in Verilator only: Verilator splits the `always_ff` and calls `$urandom` once per copy. The pattern itself is legal.
 
 ## Negative tests
 

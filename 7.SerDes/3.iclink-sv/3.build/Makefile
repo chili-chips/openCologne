@@ -18,7 +18,7 @@
 #                   setup budget: mcp_cells.py proves on the netlist which
 #                   flops move only with the strobe and writes build/mcp.sdc
 #                   (set_multicycle_path), which needs NEXTPNR_MCP, a nextpnr
-#                   with it (chili-chips-ba/nextpnr, branch multicycle-sdc)
+#                   with it (chili-chips/nextpnr, branch multicycle-sdc)
 #
 # Sources: ../1.hw/top.filelist (sources.sh). Pins: GateMateA1-EVB.ccf.
 #==========================================================================

@@ -93,6 +93,16 @@ module tb_serwb_rx;
   // driver: each slot takes the next word, or a gap, at random
   int sent;
 
+  // a slot may carry a word: random, in its own flop; in _drive, Verilator
+  // may split the block per signal and call $urandom in each copy (#5, verilator#9228)
+  logic [W-1:0] go;
+
+  always_ff @(posedge clk) begin : _go
+    for (int s = 0; s < W; s++) begin
+      go[s] <= ($urandom % 4) != 0;
+    end
+  end : _go
+
   always_ff @(posedge clk or negedge arst_n) begin : _drive
     int n;
     if (!arst_n) begin
@@ -104,7 +114,7 @@ module tb_serwb_rx;
       n = sent;
       for (int s = 0; s < W; s++) begin
         i_valid[s] <= 1'b0;
-        if (n < stream.size() && ($urandom % 4) != 0) begin
+        if (n < stream.size() && go[s]) begin
           i_word[s]  <= stream[n];
           i_valid[s] <= 1'b1;
           n++;

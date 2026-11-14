@@ -88,7 +88,14 @@ module tb_serwb_tx;
   end : _window
 
   // driver, clocked: one header per packet, with random gaps between them
-  int p;  // packet
+  int   p;  // packet
+  // a header may go: random, in its own flop; in _drive, Verilator splits
+  // the block per signal and calls $urandom in each copy (#5, verilator#9228)
+  logic go;
+
+  always_ff @(posedge clk) begin : _go
+    go <= ($urandom % 4) != 0;
+  end : _go
 
   always_ff @(posedge clk or negedge arst_n) begin : _drive
     if (!arst_n) begin
@@ -104,7 +111,7 @@ module tb_serwb_tx;
         hdr_valid <= 1'b0;
         p         <= p + 1;
       end
-      else if (!hdr_valid && p < n_packets && ($urandom % 4) != 0) begin
+      else if (!hdr_valid && p < n_packets && go) begin
         hdr_valid <= 1'b1;
         hdr_port  <= pk_port[p];
         hdr_words <= 14'(pk_words[p]);

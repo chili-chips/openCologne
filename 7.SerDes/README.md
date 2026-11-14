@@ -139,23 +139,25 @@ A design instantiates `ccfpga_serdes`. The file list picks its body:
 |---|---|---|---|
 | LiteX | litex#2686 | `PRBSRX`: `pause` and `with_errors_saturation` have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
 | Verilator | verilator#8894 | no error for a (local)param used before its declaration | closed (fixed: `USEBEFOREDECL`) |
-| Verilator | verilator#8895 | a continuous-assign alias read through a function returns a later value | open (hidden by default since 5f0d585da, fails with `-fno-coalesce`); to be filed again |
+| Verilator | [verilator#9228](https://github.com/verilator/verilator/issues/9228) | splitting an `always_ff` calls `$urandom` once per copy: signals set under one random condition diverge (`TB_SERWB_TX`; workaround in `tb_serwb_tx.sv`, `tb_serwb_rx.sv`) | open |
+| Verilator | [verilator#9226](https://github.com/verilator/verilator/issues/9226) | a continuous-assign alias read through a function returns a later value | open (hidden by default since 5f0d585da, fails with `-fno-coalesce`) |
 | Verilator | verilator#8896 | `always @*` with an intra-assignment delay never finishes | open, now [verilator#9196](https://github.com/verilator/verilator/issues/9196) |
 | Verilator | verilator#8897 | a dynamic array of events: the C++ does not compile | closed (fixed) |
-| Icarus Verilog | iverilog#1643 | an event control on a dynamic-array element never wakes | open; to be filed again |
+| Icarus Verilog | [iverilog#1783](https://github.com/steveicarus/iverilog/issues/1783) | an event control on a dynamic-array element never wakes | open |
 | Icarus Verilog | iverilog#1645 | queue of unpacked structs | open, part of [iverilog#266](https://github.com/steveicarus/iverilog/issues/266) |
-| Icarus Verilog | iverilog#1646 | queue slice `q[1:$]` | open; to be filed again |
-| Icarus Verilog | iverilog#1647 | `name()` on an enum-typed parameter | open; to be filed again |
+| Icarus Verilog | [iverilog#1781](https://github.com/steveicarus/iverilog/issues/1781) | queue slice `q[1:$]` | open |
+| Icarus Verilog | [iverilog#1782](https://github.com/steveicarus/iverilog/issues/1782) | `name()` on an enum-typed parameter | open |
 | Icarus Verilog | iverilog#1648 | unpacked array of queues | open; a fix is proposed, [iverilog#1690](https://github.com/steveicarus/iverilog/pull/1690) |
-| Icarus Verilog | iverilog#1649 | static array of events | open; to be filed again |
+| Icarus Verilog | [iverilog#1779](https://github.com/steveicarus/iverilog/issues/1779) | static array of events | open |
 | Icarus Verilog | iverilog#1650 | function `output` arguments | open, as [iverilog#597](https://github.com/steveicarus/iverilog/issues/597) |
-| Icarus Verilog | iverilog#1651 | typed assignment pattern `s_t'{a: ...}` | open; to be filed again |
+| Icarus Verilog | [iverilog#1780](https://github.com/steveicarus/iverilog/issues/1780) | typed assignment pattern `s_t'{a: ...}` | open |
 | Icarus Verilog | iverilog#1652 | field write to an element of an array of packed structs | closed (fixed on master) |
 | Icarus Verilog | iverilog#1653 | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
 | Icarus Verilog | [iverilog#438](https://github.com/steveicarus/iverilog/issues/438#issuecomment-6390247886) (comment) | `wait` on a function call: internal error | open |
 | Verible | [verible#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration | open |
-| Project Peppercorn | prjpeppercorn#33 | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open; to be filed again |
-| Project Peppercorn | prjpeppercorn#34 | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's `multicycle-sdc` branch (to be published again) has cell-level `-to`; the pump is the test case | open |
+| Project Peppercorn | [prjpeppercorn#37](https://github.com/YosysHQ/prjpeppercorn/issues/37) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open |
+| Project Peppercorn | [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36) | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's [`multicycle-sdc`](https://github.com/chili-chips/nextpnr/tree/multicycle-sdc) branch has cell-level `-to`; the pump is the test case | open |
+| nextpnr | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908) | GateMate delay estimate (100 ps + 100 ps a tile) about 5x below routed delays on short hops: the placer optimizes against delays it underestimates | open |
 
 State as of 2026-11-13, retested on the latest tools. Numbers without a link were filed from an account that is no longer available.
 

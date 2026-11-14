@@ -78,14 +78,14 @@ LiteX picks `nextpnr-himbaechel-gatemate` from `PATH` when it exists, else `next
 | the same, before clock correction | 2.5 Gb/s | 31.25 MHz | 38.2 to 41.4 MHz (seeds 1 to 4) |
 | the same, with the fabric 8b/10b encoder | 2.5 Gb/s | 31.25 MHz | 32.4 to 35.3 MHz |
 | board top without the pump (before `half_clk_strobe`) | 5 Gb/s | 62.5 MHz | 67.7 MHz (seed 1) |
-| board top: the pump at W = 4 on `half_clk_strobe`, 2-clock group ([below](#multicycle-paths-at-5-gbs)) | 5 Gb/s | 62.5 MHz | 33.84 MHz (seed 1): fails, a block RAM's read address |
+| board top: the pump at W = 4 on `half_clk_strobe`, 2-clock group ([below](#multicycle-paths-at-5-gbs)) | 5 Gb/s | 62.5 MHz | 33.74 MHz (seed 1): fails, a 1-clock path into the pump's `line` |
 | LiteX demo SoC, PHY only ([4.litex](../4.litex/README.md#demo-build)) | 2.5 Gb/s | 31.25 MHz | 61.3 MHz (seed 1) |
 
 1.25 Gb/s runs `clk_core` at 15.625 MHz, half the 2.5 Gb/s clock: the 2.5 Gb/s builds cover it.
 
 ## Multicycle paths at 5 Gb/s
 
-At 5 Gb/s the FIFO pump moves 4 words on every other `clk_core`, enabled by `half_clk_strobe` (`iclink_serwb_line`), so its paths may take 2 clocks: 32 ns at 62.5 MHz. Upstream nextpnr for GateMate has no multicycle paths. `make LINE_RATE=5000` uses our fork's `set_multicycle_path` instead (branch `multicycle-sdc`, to be published again; `NEXTPNR_MCP`).
+At 5 Gb/s the FIFO pump moves 4 words on every other `clk_core`, enabled by `half_clk_strobe` (`iclink_serwb_line`), so its paths may take 2 clocks: 32 ns at 62.5 MHz. Upstream nextpnr for GateMate has no multicycle paths. `make LINE_RATE=5000` uses our fork's `set_multicycle_path` instead ([`chili-chips/nextpnr`, branch `multicycle-sdc`](https://github.com/chili-chips/nextpnr/tree/multicycle-sdc); `NEXTPNR_MCP`).
 
 **Which flops: proven, not named.** [`mcp_cells.py`](mcp_cells.py) reads the synthesized netlist. A flop on `clk_core` joins the 2-clock group only when, with `half_clk_strobe` low and every other input at any value:
 
@@ -96,7 +96,7 @@ It expands the cone of the enable (or of D) through LUTs and muxes, up to 4 cell
 
 The proven flops are the launch and the capture cells of the group (`build/mcp.sdc`). Paths into them from anything else keep 1 clock, the strobe's own net among them.
 
-**Result** (seed 1): 2603 flops proven; 1044 others keep 1 clock, among them the 328 RAM write-enable flops and the 67 line flops, which do load every clock. `clk_core` reaches 33.84 MHz. The critical path, 29.6 ns, is the TX FIFO's read address into its block RAM. A RAM cannot join the group as a whole, since its write side does run every clock, and `-to` takes cells, not pins. With `-to` on the read-address pins that path would get 2 clocks: asked of Project Peppercorn ([issues](../../README.md)).
+**Result** (seed 1): 2603 flops proven; 1044 others keep 1 clock, among them the 328 RAM write-enable flops and the 67 line flops, which do load every clock. `clk_core` reaches 33.74 MHz (2026-11-14: Yosys 0.70+385, the fork on nextpnr-0.11.1-94; 33.84 MHz before). The critical path, 29.6 ns, 27.2 of them routing, runs from `pending` (outside the group, so 1 clock) into the pump's `line` register. Earlier it was the TX FIFO's read address into its block RAM. A RAM cannot join the group as a whole, since its write side does run every clock, and `-to` takes cells, not pins. With `-to` on the read-address pins that path would get 2 clocks: not in the fork yet ([#4](https://github.com/chili-chips/openCologne/issues/4)).
 
 Below 5 Gb/s the strobe is 1, every path is a 1-clock path, and the build needs neither the script nor the fork.
 

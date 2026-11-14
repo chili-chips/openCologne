@@ -268,6 +268,7 @@ path = [
   "0.doc/artwork/kicad_logo.png",
   "0.doc/artwork/Icarus-Verilog.logo.png",
   "0.doc/artwork/Verilator.logo.png",
+  "0.doc/artwork/JanusHDL.logo.png",
   "0.doc/artwork/Yosys.logo.png",
   "0.doc/artwork/slang.logo.png",
   "0.doc/artwork/WaveCrux.logo.png",
