@@ -815,7 +815,10 @@ module ccfpga_serdes
             if (tx_reset_i | tx_pma_reset_i) begin
               first = 0;
             end
-            @(tx_reset_i or tx_pma_reset_i or tx_pcs_reset_i);
+            // the release, or a full reset over a PCS-only one; a level wait,
+            // not @(...): Vivado XSIM 2026.1 dies on that event control here
+            wait (!(tx_reset_i | tx_pma_reset_i | tx_pcs_reset_i) ||
+                  ((tx_reset_i | tx_pma_reset_i) && (first != 0)));
           end
           rst_clks(3 + extra);
           for (int s = first; s < 2; s++) begin
