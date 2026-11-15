@@ -1,5 +1,5 @@
-[![8b10b-Formal:Pass](https://badgen.net/badge/8b10b%20Formal/Pass/green)](1.sim-model/formal_8b10b)
-[![BFM-Sim:Pass](https://badgen.net/badge/BFM%20Sim/Pass/green)](1.sim-model)
+[![8b10b-Formal:Pass](https://badgen.net/badge/8b10b%20Formal/Pass/green)](https://github.com/chili-chips/openSERDES_BFM/tree/main/1.gatemate/2.formal)
+[![BFM-Sim:Pass](https://badgen.net/badge/BFM%20Sim/Pass/green)](https://github.com/chili-chips/openSERDES_BFM#self-test)
 [![IC-Link-Sim:Pass](https://badgen.net/badge/IC%20Link%20Sim/Pass/green)](3.iclink-sv/2.sim)
 [![Timing:Met](https://badgen.net/badge/Timing/Met/green)](3.iclink-sv/3.build/README.md#timing-results)
 [![Board-1.25Gbps:WIP](https://badgen.net/badge/Board%201.25Gbps/WIP/orange)](0.doc/test-setups.md)
@@ -46,12 +46,12 @@ Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, w
 | 2 | two ULX5M-GS boards | two way, at 1.25, 2.5 and 5 Gb/s |
 | 3 | ULX5M-GS (GateMate) and ULX4M-LD (Lattice ECP5) | two way, GateMate to LiteICLink on ECP5, at 2.5 Gb/s |
 
-Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [`1.sim-model`](1.sim-model/README.md). It was developed here, then ported to [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE); it runs with open tools only.
+Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [openSERDES_BFM](https://github.com/chili-chips/openSERDES_BFM), a submodule in `1.openSERDES_BFM` (clone with `--recurse-submodules`). It was developed here and now has its own repository, shared with [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE); it runs with open tools only.
 
 | Folder | What | Status |
 |---|---|---|
 | [0.doc](0.doc) | diagrams, and the design notes below | |
-| [1.sim-model](1.sim-model/README.md) | the SerDes for simulation (BFM) and for the chip (`CC_SERDES` wrapper), one module: [below](#one-serdes-module-chip-and-simulation); shared with openCologne-PCIE | done |
+| [1.openSERDES_BFM](https://github.com/chili-chips/openSERDES_BFM) | submodule: the SerDes for simulation (BFM) and for the chip (`CC_SERDES` wrapper), one module: [below](#one-serdes-module-chip-and-simulation) | done |
 | [2.prbs-loopback](2.prbs-loopback) | standalone SerDes loopback test | works |
 | [3.iclink-sv](3.iclink-sv/README.md) | the IC Link in SystemVerilog: our reference example, with the full QA flow | WIP |
 | [9.liteiclink-migen](9.liteiclink-migen/README.md) | the earlier LiteICLink port in Python (Migen): GateMate PHY `serdes_gm.py`, LiteX target, demo firmware | archived prototype, does not build |
@@ -117,16 +117,7 @@ One GateMate. Solid boxes are done; dashed ones, tagged NEXT, come next.
 ---
 # One SerDes module, chip and simulation
 
-A design instantiates `ccfpga_serdes`. The file list picks its body:
-
-| File (in [1.sim-model](1.sim-model/README.md)) | For | What |
-|---|---|---|
-| `ccfpga_serdes.SYNTH.sv` | synthesis | `CC_SERDES`, the hard macro, behind `ccfpga_serdes` ports and parameters; names only, no logic |
-| `ccfpga_serdes.BFM.sv` | simulation | our open-source BFM, a drop-in for Cologne Chip's simulation model `ccfpga_serdes` |
-
-- **Why:** `CC_SERDES` and the vendor simulation model have other port names and parameter sets, so a design used to carry both behind an `` `ifdef ``, and the chip's settings went untested in simulation.
-- **Bring-up:** the same in both: parameters (`SERDES_ENABLE`, `PLL_EN_ADPLL_CTRL`, ...), regfile writes, or both.
-- **Users:** [3.iclink-sv](3.iclink-sv/README.md) here and openCologne-PCIE's `phy_top`.
+A design instantiates `ccfpga_serdes`. The file list picks its body: `ccfpga_serdes.SYNTH.sv` (`CC_SERDES`, the hard macro) for the chip, `ccfpga_serdes.BFM.sv` (our BFM) for simulation. Both are in `1.openSERDES_BFM/1.gatemate/1.model`; why, and how to bring it up: [openSERDES_BFM, Target 1](https://github.com/chili-chips/openSERDES_BFM/blob/main/1.gatemate/README.md). Users: [3.iclink-sv](3.iclink-sv/README.md) here and openCologne-PCIE's `phy_top`.
 
 ---
 ## Community Outreach
@@ -149,18 +140,19 @@ A design instantiates `ccfpga_serdes`. The file list picks its body:
 | Icarus Verilog | [iverilog#1783](https://github.com/steveicarus/iverilog/issues/1783) | an event control on a dynamic-array element never wakes | open |
 | Icarus Verilog | iverilog#1645 | queue of unpacked structs | open, part of [iverilog#266](https://github.com/steveicarus/iverilog/issues/266) |
 | Icarus Verilog | [iverilog#1781](https://github.com/steveicarus/iverilog/issues/1781) | queue slice `q[1:$]` | open |
-| Icarus Verilog | [iverilog#1782](https://github.com/steveicarus/iverilog/issues/1782) | `name()` on an enum-typed parameter | open |
+| Icarus Verilog | [iverilog#1782](https://github.com/steveicarus/iverilog/issues/1782) | `name()` on an enum-typed parameter | closed (fixed on master) |
 | Icarus Verilog | iverilog#1648 | unpacked array of queues | open; a fix is proposed, [iverilog#1690](https://github.com/steveicarus/iverilog/pull/1690) |
 | Icarus Verilog | [iverilog#1779](https://github.com/steveicarus/iverilog/issues/1779) | static array of events | open |
 | Icarus Verilog | iverilog#1650 | function `output` arguments | open, as [iverilog#597](https://github.com/steveicarus/iverilog/issues/597) |
 | Icarus Verilog | [iverilog#1780](https://github.com/steveicarus/iverilog/issues/1780) | typed assignment pattern `s_t'{a: ...}` | open |
 | Icarus Verilog | iverilog#1652 | field write to an element of an array of packed structs | closed (fixed on master) |
 | Icarus Verilog | iverilog#1653 | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
-| Icarus Verilog | [iverilog#438](https://github.com/steveicarus/iverilog/issues/438#issuecomment-6390247886) (comment) | `wait` on a function call: internal error | open |
-| Verible | [verible#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration | open |
+| Icarus Verilog | iverilog#438 (comment) | `wait` on a function call: internal error | open |
+| Verible | verible#217 (comment) | lint: a parameter used before its declaration | open |
 | Project Peppercorn | [prjpeppercorn#37](https://github.com/YosysHQ/prjpeppercorn/issues/37) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open |
 | Project Peppercorn | [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36) | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's [`multicycle-sdc`](https://github.com/chili-chips/nextpnr/tree/multicycle-sdc) branch has cell-level `-to`; the pump is the test case | open |
 | nextpnr | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908) | GateMate delay estimate (100 ps + 100 ps a tile) about 5x below routed delays on short hops: the placer optimizes against delays it underestimates | open |
+| nextpnr | [nextpnr#1793](https://github.com/YosysHQ/nextpnr/pull/1793) (comment) | Fmax of opposite-edge paths: our GateMate data and fork for that open fix | open |
 | Vivado XSIM | [AMD forum](https://adaptivesupport.amd.com/s/question/0D5Pd000026YeziKAC/xsim-20261-simulation-engine-not-responding-at-an-event-control-in-a-forked-process-of-a-behavioral-model) | 2026.1: "Simulation engine not responding" at an event control in a forked process of the SerDes BFM (`tb_rules`, 64 bits); workaround in `ccfpga_serdes.BFM.sv` | open |
 
 State as of 2026-11-13, retested on the latest tools. Numbers without a link were filed from an account that is no longer available. JanusHDL has no public tracker (it is closed source, so it can read encrypted IP): its issues are in our repos, under the [`JanusHDL` label](https://github.com/issues?q=org%3Achili-chips+label%3AJanusHDL).
@@ -175,7 +167,7 @@ State as of 2026-11-13, retested on the latest tools. Numbers without a link wer
 - LiteX [IC Link](https://github.com/enjoy-digital/liteiclink)
 - [MesaBusProtocol](https://github.com/blackmesalabs/MesaBusProtocol)
 - T. Ibrahimović, N. Osmić, [eduBOS5: A Case Study in Structured SystemVerilog and PPA Optimization for Resource-Constrained RISC-V FPGA Cores](https://doi.org/10.1109/Austrochip67945.2025.11183711), Austrochip 2025, IEEE. The CPU in our SoC.
-- The [SerDes BFM](1.sim-model/README.md), shared with openCologne-PCIE; openCologne-PCIE [SerDes loopback tests](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
+- [openSERDES_BFM](https://github.com/chili-chips/openSERDES_BFM), our SerDes BFM, shared with openCologne-PCIE; openCologne-PCIE [SerDes loopback tests](https://github.com/chili-chips/openCologne-PCIE/tree/main/2.rtl/1.phy/1.serdes-test.STANDALONE)
 - [Transputer](http://www.bitsavers.org/components/inmos/transputer/C011_Link_Adaptor.pdf)
 - [LiteX 1000basex](https://github.com/pu-cc/liteeth/tree/gatemate1000basex)
 - [Sending Data Structures from chip to chip](https://www.reddit.com/r/FPGA/comments/1m8gl5o/how_to_send_a_struct_from_one_dev_board_to_another)

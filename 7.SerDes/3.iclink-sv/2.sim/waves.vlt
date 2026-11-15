@@ -6,6 +6,6 @@
 // stay small. Off: the SerDes BFM's insides (its pins stay, as the PHY's
 // ports) and the PRBS generators and checkers below PRBS TX / RX
 `verilator_config
-tracing_off -file "*1.sim-model/*"
+tracing_off -file "*1.openSERDES_BFM/*"
 tracing_off -file "*iclink_prbs_gen.sv"
 tracing_off -file "*iclink_prbs_chk.sv"

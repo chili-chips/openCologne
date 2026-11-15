@@ -16,11 +16,12 @@
 #   ref_rtl <2.sim>     the simulation-only reference RTL, the LiteX 8b/10b
 #                       port: linted and formatted like our own, not in top
 #   serdes_synth        the SerDes for the chip, ccfpga_serdes.SYNTH.sv
-#                       (CC_SERDES behind the BFM's ports, in 1.sim-model):
+#                       (CC_SERDES behind the BFM's ports, in the
+#                       submodule 1.openSERDES_BFM):
 #                       with design_rtl for synthesis, lint and LEQ; the
 #                       simulation takes the BFM instead
 
-SERDES_SYNTH_SV=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../1.sim-model" && pwd)/ccfpga_serdes.SYNTH.sv
+SERDES_SYNTH_SV=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../1.openSERDES_BFM/1.gatemate/1.model" && pwd)/ccfpga_serdes.SYNTH.sv
 
 filelist_rtl() {  # <1.hw> <filelist>
   sed -e 's/\r$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' "$1/$2" |

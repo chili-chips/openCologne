@@ -19,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: SerDes model (submodule 7.SerDes/1.openSERDES_BFM only)
+        run: git submodule update --init 7.SerDes/1.openSERDES_BFM
+
       - name: Install OSS CAD Suite (Yosys + yosys-slang, Verilator)
         uses: YosysHQ/setup-oss-cad-suite@v4
         with:

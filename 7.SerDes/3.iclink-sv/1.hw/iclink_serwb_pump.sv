@@ -249,7 +249,7 @@ module iclink_serwb_pump
   // flow control requests: on a change of pause, and every REFRESH_CLKS
   logic pause_d, pending, send_ctrl;
   logic      [$clog2(REFRESH_CLKS)-1:0] refresh_cnt;
-  logic                                 refresh_full;  // refresh_cnt == '1, a flop: keeps pending's logic small
+  logic                                 refresh_full;  // refresh_cnt == '1, as a flop
   phy_word_t [                  NP-1:0] line;  // into phy_tx
   word_t     [                   W-1:0] ln_word;
   logic      [                   W-1:0] ln_k;

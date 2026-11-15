@@ -10,7 +10,7 @@ Two boards have two oscillators, and they never quite agree on the time. On ULX5
 
 ## Three limits
 
-DS1001 leaves open how a sequence is matched and what an insertion repeats. The SerDes BFM fills that in, to be checked on silicon ([model README, RX buffer and clock correction](../1.sim-model/README.md#rx-buffer-and-clock-correction)). If the silicon works as modelled, three limits follow:
+DS1001 leaves open how a sequence is matched and what an insertion repeats. The SerDes BFM fills that in, to be checked on silicon ([model README, RX buffer and clock correction](https://github.com/chili-chips/openSERDES_BFM/blob/main/1.gatemate/README.md#rx-buffer-and-clock-correction)). If the silicon works as modelled, three limits follow:
 
 1. A single sequence word is never removed. It takes two in a row.
 2. An insertion repeats the word before the sequence. It is safe only when that word is harmless to repeat.

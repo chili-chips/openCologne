@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Unit tests of the IC Link RTL, Verilator; the BFM's own tests (Icarus too) via ../../1.sim-model.
+# Unit tests of the IC Link RTL, Verilator; the BFM's own tests (Icarus too) in the
+# submodule ../../1.openSERDES_BFM (openSERDES_BFM).
 #   make            all unit tests
 #   make sim_8b10b  the reference 8b/10b (simulation only) against LiteX's vectors
 #                   (vectors/*.hex, committed)
@@ -20,7 +21,7 @@
 #   make sim_top    the board top: self-test, SerDes link and FIFO pump, clean and with errors
 #   make sim_link_ppm  two sides PPM apart (default 200): clock correction keeps every word;
 #                      without its bursts (NO_CLKCOR) the same test must fail
-#   make sim_modes, sim_icarus  the SerDes BFM's own tests, in ../../1.sim-model (its Makefile)
+#   make sim_modes, sim_icarus  the SerDes BFM's own tests, in its submodule (its Makefile)
 #   make vectors    regenerate vectors/*.hex from LiteX (needs LiteX in python3)
 #   make clean
 # Settings (make ... NAME=VALUE):
@@ -60,7 +61,8 @@ endef
 endif
 
 HW  := ../1.hw
-BFM := ../../1.sim-model/ccfpga_serdes_pkg.sv ../../1.sim-model/ccfpga_serdes.BFM.sv
+BFM_DIR := ../../1.openSERDES_BFM/1.gatemate
+BFM     := $(BFM_DIR)/1.model/ccfpga_serdes_pkg.sv $(BFM_DIR)/1.model/ccfpga_serdes.BFM.sv
 CDR_MODEL    ?=
 RANDOM_PHASE ?=
 BFM_DEF := $(if $(CDR_MODEL),+define+CDR_MODEL=$(CDR_MODEL)) \
@@ -167,10 +169,10 @@ sim_top:
 	  $(BFM) tb_top.sv,$(PLUS),sim_top.log)
 	@grep -q "TB_TOP: PASS" sim_top.log
 
-# The SerDes BFM's own tests live with it, in ../../1.sim-model; its logs
+# The SerDes BFM's own tests live with it, in its submodule; its logs
 # stay there
 sim_modes sim_icarus:
-	$(MAKE) -C ../../1.sim-model $@
+	$(MAKE) -C $(BFM_DIR)/3.sim-regression $@
 
 vectors:
 	mkdir -p vectors && python3 gen_8b10b_vectors.py vectors && python3 gen_prbs_vectors.py vectors && python3 gen_serwb_vectors.py vectors && python3 gen_serwb_rx_vectors.py vectors

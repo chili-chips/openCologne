@@ -180,7 +180,7 @@ Our flagship: two GateMate chips talk over their SerDes, as one memory-mapped sy
   <img width="100%" alt="Two GateMates, each with eduBOS5, PeakRDL CSRs, Serial Wishbone, the SerDes PHY and the SerDes BFM in front of the CC_SERDES hard macro, linked over a 2.5 Gb/s SerDes link" src="7.SerDes/0.doc/iclink-flagship.drawio.png">
 </div>
 
-- **Full end-to-end sim with open tools.** In sim, our [SerDes BFM](7.SerDes/1.sim-model/README.md) (shared with [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE)) stands in for the wire and the `CC_SERDES` hard macro. No VProc: the RTL runs as built.
+- **Full end-to-end sim with open tools.** In sim, our [SerDes BFM](https://github.com/chili-chips/openSERDES_BFM) (shared with [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE)) stands in for the wire and the `CC_SERDES` hard macro. No VProc: the RTL runs as built.
 - **The SerDes hard macro, used to the full.** `CC_SERDES` does the 8b/10b encoding and decoding, the comma alignment, the RX clock crossing and the clock correction between two boards; the fabric keeps only PRBS, a lane aligner and flops. The Lattice reference, LiteICLink on ECP5, encodes and decodes 8b/10b in the FPGA fabric.
 - **Bit-exact with LiteX.** Every fabric block is checked against LiteX's own Python model, clock for clock.
 - **Done:** PRBS7/15/31, the `CC_SERDES` PHY with its hard 8b/10b, the Serial Wishbone packet layer (bit-exact with LiteICLink) and a FIFO pump between two CPUs, all on one clock, with clock correction for two boards; one-way, two-way and 200 ppm link sims; a bitstream with the open Peppercorn flow; the eduBOS5 CPU RTL, from openPCIE.
@@ -273,18 +273,22 @@ This project was funded through the NGI0 Entrust Fund, a fund established by NLn
 - [LED 64x64](https://www.linkedin.com/posts/ahmed-imamovic_etfpga-fpga-rtl-activity-7242253055411331073-E36f?utm_source=share&utm_medium=member_desktop)
 - [LCD](https://www.linkedin.com/posts/chili-chips_gatemate-spi-lcd-activity-7233383297500733441-F4PM?utm_source=share&utm_medium=member_desktop)
 
-**Issues filed upstream**, still open, from the [7.SerDes](7.SerDes/README.md#community-outreach) work (full table there):
+**Issues filed upstream** from this project, open and closed. Details of the open ones: [7.SerDes](7.SerDes/README.md#community-outreach).
 
-| Tool / project | Issues | What |
-|---|---|---|
-| nextpnr, Project Peppercorn | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908), [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36), [#37](https://github.com/YosysHQ/prjpeppercorn/issues/37), [#38](https://github.com/YosysHQ/prjpeppercorn/issues/38), [#39](https://github.com/YosysHQ/prjpeppercorn/issues/39) | GateMate: delay estimate far below routed delays; multicycle paths; smaller bitstreams; modular P&R; VeeRwolf packed to 107% |
-| Verilator | [#9228](https://github.com/verilator/verilator/issues/9228), [#9226](https://github.com/verilator/verilator/issues/9226), [#9196](https://github.com/verilator/verilator/issues/9196) | `$urandom` in a split `always_ff`; an alias read through a function; `always @*` with a delay |
-| Icarus Verilog | [#1779](https://github.com/steveicarus/iverilog/issues/1779) to [#1783](https://github.com/steveicarus/iverilog/issues/1783), [#266](https://github.com/steveicarus/iverilog/issues/266), [#597](https://github.com/steveicarus/iverilog/issues/597) | SystemVerilog our test benches use: event arrays, queues, typed patterns, enum `name()`, `output` arguments |
-| Verible | [#217](https://github.com/chipsalliance/verible/issues/217#issuecomment-6390248086) (comment) | lint: a parameter used before its declaration |
-| Vivado XSIM | [AMD forum](https://adaptivesupport.amd.com/s/question/0D5Pd000026YeziKAC/xsim-20261-simulation-engine-not-responding-at-an-event-control-in-a-forked-process-of-a-behavioral-model) | 2026.1: the engine dies at an event control in the SerDes BFM (worked around) |
-| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0: 2 wrong results, 6 constructs not supported yet |
+| Tool / project | Issues | What | State |
+|---|---|---|---|
+| nextpnr, Project Peppercorn | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908), [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36), [#37](https://github.com/YosysHQ/prjpeppercorn/issues/37), [#38](https://github.com/YosysHQ/prjpeppercorn/issues/38), [#39](https://github.com/YosysHQ/prjpeppercorn/issues/39) | GateMate: delay estimate far below routed delays; multicycle paths; smaller bitstreams; modular P&R; VeeRwolf packed to 107% | open |
+| nextpnr | [nextpnr#1793](https://github.com/YosysHQ/nextpnr/pull/1793) (comment) | Fmax of opposite-edge paths: GateMate data for that fix | open |
+| Verilator | [#9228](https://github.com/verilator/verilator/issues/9228), [#9226](https://github.com/verilator/verilator/issues/9226), [#9196](https://github.com/verilator/verilator/issues/9196) | `$urandom` in a split `always_ff`; an alias read through a function; `always @*` with a delay | open |
+| Verilator | #8894, #8897 | a parameter used before its declaration; a dynamic array of events | closed (fixed) |
+| Icarus Verilog | [#1779](https://github.com/steveicarus/iverilog/issues/1779) to [#1781](https://github.com/steveicarus/iverilog/issues/1781), [#1783](https://github.com/steveicarus/iverilog/issues/1783), [#266](https://github.com/steveicarus/iverilog/issues/266), [#597](https://github.com/steveicarus/iverilog/issues/597), #438 (comment) | SystemVerilog our test benches use: event arrays, queues, typed patterns, `output` arguments, `wait` on a function | open |
+| Icarus Verilog | [#1782](https://github.com/steveicarus/iverilog/issues/1782), #1652, #1653 | enum `name()` on a parameter; a field write to an array of packed structs; `?:` with `$sformatf()` | closed (fixed on master) |
+| Verible | #217 (comment) | lint: a parameter used before its declaration | open |
+| LiteX | litex#2686 | `PRBSRX`: `pause` and error saturation have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
+| Vivado XSIM | [AMD forum](https://adaptivesupport.amd.com/s/question/0D5Pd000026YeziKAC/xsim-20261-simulation-engine-not-responding-at-an-event-control-in-a-forked-process-of-a-behavioral-model) | 2026.1: the engine dies at an event control in the SerDes BFM (worked around) | open |
+| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0: 2 wrong results, 6 constructs not supported yet | open |
 
-JanusHDL has no public tracker (closed source, so it can read encrypted IP): its issues are in our repos, under the [`JanusHDL` label](https://github.com/issues?q=org%3Achili-chips+label%3AJanusHDL).
+Numbers without a link were filed from an account that is no longer available. JanusHDL has no public tracker (closed source, so it can read encrypted IP): its issues are in our repos, under the [`JanusHDL` label](https://github.com/issues?q=org%3Achili-chips+label%3AJanusHDL).
 
 ## Community Involvement
 

@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: SerDes model (submodule 7.SerDes/1.openSERDES_BFM only)
+        run: git submodule update --init 7.SerDes/1.openSERDES_BFM
+
       - name: Install Verible ${{ env.VERIBLE_VERSION }}
         run: |
           curl -sSfL "https://github.com/chipsalliance/verible/releases/download/${VERIBLE_VERSION}/verible-${VERIBLE_VERSION}-linux-static-x86_64.tar.gz" | tar -xz -C "$RUNNER_TEMP"
