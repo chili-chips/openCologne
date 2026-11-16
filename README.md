@@ -174,6 +174,10 @@ Click [here](https://github.com/intergalaktik/Extension_Boards_for_Olimex_GateMa
 
 ## GateMate SerDes as InterChip Link
 
+<div align="center">
+  <img width="100%" alt="GateMate evaluation board with its SerDes TX and RX looped back over SMA cables" src="7.SerDes/0.doc/SerDes-Loopback.jpg">
+</div>
+
 Our flagship: two GateMate chips talk over their SerDes, as one memory-mapped system. One CPU reads and writes the other chip's registers and memory as if they were its own. It is LiteX's [LiteICLink](https://github.com/enjoy-digital/liteiclink), hand-ported to SystemVerilog, so it can be linted, simulated with open tools, and dropped into LiteX as an SV core.
 
 <div align="center">

@@ -39,9 +39,20 @@ module tb_link_ppm
     forever #5 clk_ref_a = ~clk_ref_a;  // 100 MHz
   end : _clk_ref_a
 
+  // Edge k at k half periods from time 0: each edge rounds to the time
+  // precision on its own, so the PPM offset builds up at any precision (a
+  // fixed #(5.0 * (1 + PPM * 1e-6)) rounds to #5 at 10 ps)
+  localparam real CLK_REF_B_HALF_NS = 5.0 * (1.0 + PPM * 1.0e-6);
+
   initial begin : _clk_ref_b
+    longint k;
     clk_ref_b = 1'b0;
-    forever #(5.0 * (1.0 + PPM * 1.0e-6)) clk_ref_b = ~clk_ref_b;
+    for (k = 1; ; k++) begin
+      /* verilator lint_off ZERODLY */  // never 0: k grows each edge
+      #((k * CLK_REF_B_HALF_NS) * 1ns - $realtime);
+      /* verilator lint_on ZERODLY */
+      clk_ref_b = ~clk_ref_b;
+    end
   end : _clk_ref_b
 
   initial begin : _clk_reg

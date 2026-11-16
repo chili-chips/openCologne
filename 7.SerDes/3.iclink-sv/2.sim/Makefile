@@ -45,7 +45,7 @@ JHDL ?= jhdl
 ifeq ($(filter verilator janushdl,$(SIM)),)
   $(error SIM must be verilator or janushdl (got "$(SIM)"))
 endif
-VLT := verilator --binary --assert --timing --timescale 1ns/1ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL
+VLT := verilator --binary --assert --timing --timescale 1ns/10ps -Wall -Wno-DECLFILENAME -Wno-UNUSEDSIGNAL
 
 # $(call sim,TOP,OBJ_DIR,OPTIONS,SOURCES,RUN_ARGS,LOG): build TOP, run it into LOG.
 # JanusHDL: one jhdl run; of OPTIONS it takes -G (as -g) and +define+, no .vlt

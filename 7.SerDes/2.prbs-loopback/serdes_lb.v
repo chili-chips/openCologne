@@ -1,6 +1,3 @@
-`timescale 1ns / 1ps
-
-
 // #  serdestool -- GateMate FPGA SerDes Toolkit
 // #
 // #  Permission to use, copy, modify, and/or distribute this software for any
