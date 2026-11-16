@@ -291,7 +291,7 @@ module iclink_serwb_pump
 
   always_ff @(posedge clk or negedge arst_n) begin
     if (!arst_n) begin
-      pause_d     <= 1'b0;
+      pause_d      <= 1'b0;
       pending      <= 1'b0;
       refresh_cnt  <= '0;
       refresh_full <= 1'b0;
