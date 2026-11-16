@@ -20,7 +20,7 @@
 ----
 Currently there are few FPGA vendors in Europe. One of these vendors, CologneChip. Their GateMate device has a somewhat unique feature set for the 20K class, most notably the high-speed SerDes. It is also one of the rare families designed around 2-input LUT trees and muxes, vs. the mainstream microRAM-based LUTs with 4, 5 or 6 address inputs. 
 <div align="center">
-   <img width=250 src="0.doc/artwork/opencologne.logo.svg">
+   <img width=250 alt="openCologne logo" src="0.doc/artwork/openCologne.hex.NGI.png">
 </div>
 Given recent appearances of affordable boards, GateMate challenge at the moment is to get hold of, and grow roots in the open hardware dev community... which is also an opportunity. We are firmly set to help GateMate achieve this goal. 
 

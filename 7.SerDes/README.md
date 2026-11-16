@@ -48,6 +48,10 @@ Then go to [3.iclink-sv](3.iclink-sv/README.md): the IC Link in SystemVerilog, w
 
 Simulation: [2.sim](3.iclink-sv/2.sim/README.md), on our SerDes BFM, [openSERDES_BFM](https://github.com/chili-chips/openSERDES_BFM), a submodule in `1.openSERDES_BFM` (clone with `--recurse-submodules`). It was developed here and now has its own repository, shared with [openCologne-PCIE](https://github.com/chili-chips/openCologne-PCIE); it runs with open tools only.
 
+<div align="center">
+  <a href="https://github.com/chili-chips/openSERDES_BFM"><img width="13%" alt="openSERDES_BFM logo" src="../0.doc/artwork/openSERDES_BFM.hex.png"></a>
+</div>
+
 | Folder | What | Status |
 |---|---|---|
 | [0.doc](0.doc) | diagrams, and the design notes below | |
