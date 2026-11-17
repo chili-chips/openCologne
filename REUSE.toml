@@ -59,12 +59,6 @@ precedence = "closest"
 SPDX-FileCopyrightText = ["2015-2017 Claire Xenia Wolf (formerly Clifford Wolf)", "2023-2024 Chili.CHIPS (modifications)"]
 SPDX-License-Identifier = "ISC"
 
-[[annotations]]
-path = ["10.Bonus--5--eduSOC/1.hw/ip.cpu/cpu.PICORV32/picorv32.ORIG.sv"]
-precedence = "closest"
-SPDX-FileCopyrightText = "2015 Claire Xenia Wolf (formerly Clifford Wolf)"
-SPDX-License-Identifier = "ISC"
-
 # riscv-tests, https://github.com/riscv-software-src/riscv-tests (via PicoRV32)
 [[annotations]]
 path = ["10.Bonus--5--eduSOC/2.sw/tests/rv32mi/**", "10.Bonus--5--eduSOC/2.sw/tests/rv32ui/**"]

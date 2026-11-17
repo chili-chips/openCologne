@@ -143,8 +143,7 @@ module soc_cpu #(
        .PROGADDR_IRQ         (32'h 0000_0010),
 
        .CATCH_MISALIGN       (1),
-       .CATCH_ILLINSN        (1),
-       .REGS_INIT_ZERO       (0)
+       .CATCH_ILLINSN        (1)
     ) 
     u_cpu (
        .clk          (bus.clk),     //i
