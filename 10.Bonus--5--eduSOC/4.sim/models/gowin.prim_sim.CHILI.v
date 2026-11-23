@@ -9,7 +9,6 @@
 
 // verilator lint_off WIDTH
 
-`timescale 1ps / 1ps
 // PLL models needs 1ps resolution
 
 
@@ -160,7 +159,7 @@ always @(posedge CLKIN or negedge resetn) begin
         end
     
         if (clkin_cycle[0] > 0) begin
-            if(((clkin_cycle[0] - clkin_period1 < 0.01) && (clkin_cycle[0] - clkin_period1 > -0.01)) &&(!div_dyn_change)) begin
+            if(((clkin_cycle[0] - clkin_period1 < 0.01ns) && (clkin_cycle[0] - clkin_period1 > -0.01ns)) &&(!div_dyn_change)) begin
                 clk_effect <= 1'b1;
                 clkin_period <= clkin_period1;
             end else begin
@@ -218,10 +217,10 @@ always @(posedge CLKIN or negedge resetn) begin
     if (resetn == 1'b0) begin
         max_tlock <= 0.0;
     end else begin
-        if((clkin_cycle[0] >= 2) && (clkin_cycle[0] <= 40)) begin
-            max_tlock <= 50000;
-        end else if ((clkin_cycle[0] > 40) && (clkin_cycle[0] <= 500)) begin
-            max_tlock <= 200000;
+        if((clkin_cycle[0] >= 2ns) && (clkin_cycle[0] <= 40ns)) begin
+            max_tlock <= 50us;  // time literals: the same under any timescale
+        end else if ((clkin_cycle[0] > 40ns) && (clkin_cycle[0] <= 500ns)) begin
+            max_tlock <= 200us;
         end
     end
 end
@@ -372,19 +371,19 @@ always @(FDLY) begin
         if(DEVICE == "GW1N-1" || DEVICE == "GW1N-1S")begin
             case(FDLY)
                 4'b0000  : f_dly = 0.000;
-                4'b0001  : f_dly = 0.125;
-                4'b0010  : f_dly = 0.250;
-                4'b0100  : f_dly = 0.500;
-                4'b1000  : f_dly = 1.000;
+                4'b0001  : f_dly = 0.125ns;
+                4'b0010  : f_dly = 0.250ns;
+                4'b0100  : f_dly = 0.500ns;
+                4'b1000  : f_dly = 1.000ns;
                 default : f_dly = 0.000;
             endcase
         end else begin
             case(FDLY)
                 4'b1111  : f_dly = 0.000;
-                4'b1110  : f_dly = 0.125;
-                4'b1101  : f_dly = 0.250;
-                4'b1011  : f_dly = 0.500;
-                4'b0111  : f_dly = 1.000;
+                4'b1110  : f_dly = 0.125ns;
+                4'b1101  : f_dly = 0.250ns;
+                4'b1011  : f_dly = 0.500ns;
+                4'b0111  : f_dly = 1.000ns;
                 default : f_dly = 0.000;
             endcase
         end
@@ -413,15 +412,15 @@ always @(tclkout_half or clkout_duty) begin
         tclkp_duty <= clkout_duty;
     end else begin
         if (CLKOUT_FT_DIR == 1'b1) begin
-            tclkout_half_new <= tclkout_half - (0.05 * CLKOUT_DLY_STEP);
+            tclkout_half_new <= tclkout_half - (0.05ns * CLKOUT_DLY_STEP);
         end else begin
-            tclkout_half_new <= tclkout_half + (0.05 * CLKOUT_DLY_STEP);
+            tclkout_half_new <= tclkout_half + (0.05ns * CLKOUT_DLY_STEP);
         end
 
         if (CLKOUTP_FT_DIR == 1'b1) begin
-            tclkp_duty <= clkout_duty - (0.05 * CLKOUTP_DLY_STEP);
+            tclkp_duty <= clkout_duty - (0.05ns * CLKOUTP_DLY_STEP);
             end else begin
-            tclkp_duty <= clkout_duty + (0.05 * CLKOUTP_DLY_STEP);
+            tclkp_duty <= clkout_duty + (0.05ns * CLKOUTP_DLY_STEP);
         end
         end
 end

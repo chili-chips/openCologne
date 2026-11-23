@@ -25,7 +25,6 @@
  *   2022-06-01 - Initial version.
  */
 
-`timescale 1 ps / 1 ps
 
 `define USE_PLL
 `define xUSE_RAM

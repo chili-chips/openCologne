@@ -9,7 +9,6 @@
 //                                                              2-5 byte: <24 bit Address>
 //                                                Write case:   6-7 byte: <16 bit Data>
 //==========================================================================
-`timescale 1ps/1ps
 module tb #(
    parameter int RUN_SIM_US = 1_000_0
 )();

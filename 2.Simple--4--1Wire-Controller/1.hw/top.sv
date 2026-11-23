@@ -38,7 +38,6 @@
 //========================================================================
 
 /* verilator lint_off PINMISSING */
-`timescale 1ns/1ps
 
 module top 
    import csr_pkg::*;

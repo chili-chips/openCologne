@@ -246,7 +246,7 @@ module BUFR #(
             end
       default : begin 
               $display("Attribute Syntax Error : The attribute BUFR_DIVIDE on BUFR instance %m is set to %s.  Legal values for this attribute are BYPASS, 1, 2, 3, 4, 5, 6, 7 or 8.", BUFR_DIVIDE);
-                    #1 $finish;
+                    #1ns $finish;
       end
      endcase // case(BUFR_DIVIDE)
 
@@ -257,7 +257,7 @@ module BUFR #(
         "7SERIES" : ;
         default : begin 
            $display("Attribute Syntax Error : The attribute SIM_DEVICE on BUFR instance %m is set to %s.  Legal values for this attribute are VIRTEX4 or VIRTEX5 or VIRTEX6 or 7SERIES.", SIM_DEVICE);
-                 #1 $finish;
+                 #1ns $finish;
         end
      endcase 
   end // initial begin
@@ -594,14 +594,14 @@ module IDELAYE2 #(
             "TRUE", "FALSE" : ;
             default : begin
                $display("Attribute Syntax Error : The attribute CINVCTRL_SEL on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are TRUE or FALSE.",  CINVCTRL_SEL);
-               #1 $finish;
+               #1ns $finish;
             end
         endcase
 
         //-------- DELAY_SRC check
         if (DELAY_SRC != "DATAIN" && DELAY_SRC != "IDATAIN") begin
             $display("Attribute Syntax Error : The attribute DELAY_SRC on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are DATAIN or IDATAIN", DELAY_SRC);
-            #1 $finish;
+            #1ns $finish;
         end
 
         //-------- HIGH_PERFORMANCE_MODE check
@@ -609,7 +609,7 @@ module IDELAYE2 #(
             "TRUE", "FALSE" : ;
             default : begin
                $display("Attribute Syntax Error : The attribute HIGH_PERFORMANCE_MODE on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are TRUE or FALSE.",  HIGH_PERFORMANCE_MODE);
-               #1 $finish;
+               #1ns $finish;
             end
         endcase
 
@@ -619,7 +619,7 @@ module IDELAYE2 #(
         if (IDELAY_TYPE != "FIXED" && IDELAY_TYPE != "VARIABLE" && IDELAY_TYPE != "VAR_LOAD" && IDELAY_TYPE != "VAR_LOAD_PIPE") begin
 
             $display("Attribute Syntax Error : The attribute IDELAY_TYPE on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are FIXED, VARIABLE, VAR_LOAD or VAR_LOAD_PIPE", IDELAY_TYPE);
-            #1 $finish;
+            #1ns $finish;
 
         end
 
@@ -628,7 +628,7 @@ module IDELAYE2 #(
 
         if (IDELAY_VALUE < MIN_DELAY_COUNT || IDELAY_VALUE > MAX_DELAY_COUNT) begin
             $display("Attribute Syntax Error : The attribute IDELAY_VALUE on IDELAYE2 instance %m is set to %d.  Legal values for this attribute are 0, 1, 2, 3, .... or 31", IDELAY_VALUE);
-            #1 $finish;
+            #1ns $finish;
 
         end
 
@@ -638,7 +638,7 @@ module IDELAYE2 #(
             "TRUE", "FALSE" : ;
             default : begin
                $display("Attribute Syntax Error : The attribute PIPE_SEL on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are TRUE or FALSE.",  PIPE_SEL);
-               #1 $finish;
+               #1ns $finish;
             end
         endcase
 
@@ -651,7 +651,7 @@ module IDELAYE2 #(
               /*    */;
         else begin
             $display("Attribute Syntax Error : The attribute REFCLK_FREQUENCY on IDELAYE2 instance %m is set to %f.  Legal values for this attribute are either between 190.0 and 210.0, or between 290.0 and 310.0 or between 390.0 and 410.0", REFCLK_FREQUENCY);
-            #1 $finish;
+            #1ns $finish;
         end
 
         //-------- SIGNAL_PATTERN check
@@ -660,7 +660,7 @@ module IDELAYE2 #(
             "CLOCK", "DATA" : ;
             default : begin
                $display("Attribute Syntax Error : The attribute SIGNAL_PATTERN on IDELAYE2 instance %m is set to %s.  Legal values for this attribute are DATA or CLOCK.",  SIGNAL_PATTERN);
-               #1 $finish;
+               #1ns $finish;
             end
         endcase
 

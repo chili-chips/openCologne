@@ -5,7 +5,6 @@
 //--------------------------------------------------------------------------
 // Description: Simulation testbench for the LUTRAM arrays
 //==========================================================================
-`timescale 1ps/1ps
 module tb #(
    parameter int RUN_SIM_US = 1_000_0
 )();
