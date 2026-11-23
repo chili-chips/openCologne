@@ -608,11 +608,11 @@
             )),
         ],
         viewport: (
-            curr_left: 44878101.89364182,
-            curr_right: 44997424.61706643,
+            curr_left: 4487810.189364182,
+            curr_right: 4499742.461706643,
         ),
         num_timestamps: (1, [
-            1000000000,
+            100000000,
         ]),
         variable_format: {
             (
@@ -661,12 +661,12 @@
             ): "Hexadecimal",
         },
         cursor: Some((1, [
-            713187000,
+            71318700,
         ])),
         right_cursor: None,
         markers: {
             0: (1, [
-                698094000,
+                69809400,
             ]),
         },
         focused_item: Some(4),

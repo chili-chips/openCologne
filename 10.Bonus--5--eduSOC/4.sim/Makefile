@@ -64,7 +64,7 @@ compile:
 		--timing \
 		--trace-fst \
 		--trace-structs \
-		--timescale-override 1ps/1ps \
+		--timescale-override 1ns/10ps \
 		--exe versimSV.cpp \
 		--Mdir ./output \
 		\
@@ -136,7 +136,7 @@ xml2stems:
 		--timing \
 		-xml-only \
 		-xml-output tb.xml \
-		--timescale 1ps/1ps \
+		--timescale 1ns/10ps \
 		-f ${HW_SRC}/top.filelist \
 		models/gowin.prim_sim.CHILI.v \
 		models/sdr_sdram/sdr.CHILI.sv \
