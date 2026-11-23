@@ -57,7 +57,7 @@ compile:
 		--timing \
 		--trace-fst \
 		--trace-structs \
-		--timescale-override 1ps/1ps \
+		--timescale-override 1ns/10ps \
 		--exe versimSV.cpp \
 		--Mdir ./output \
 		-Wno-fatal \
@@ -78,7 +78,7 @@ compile_impl:
 		--timing \
 		--trace-fst \
 		--trace-structs \
-		--timescale-override 1ps/1ps \
+		--timescale-override 1ns/10ps \
 		--exe versimSV.cpp \
 		--Mdir ./output \
 		-Wno-fatal \
@@ -97,7 +97,7 @@ compile_synth:
 		--timing \
 		--trace-fst \
 		--trace-structs \
-		--timescale-override 1ps/1ps \
+		--timescale-override 1ns/10ps \
 		--exe versimSV.cpp \
 		--Mdir ./output \
 		-Wno-fatal \
@@ -161,7 +161,7 @@ xml2stems:
 		-xml-only \
 		-xml-output tb.xml \
 		-Wno-fatal \
-		--timescale 1ps/1ps \
+		--timescale 1ns/10ps \
 		-f ${HW_SRC}/rtl.filelist \
 		${SIM_MODELS} \
 		${TB_NAME}.sv \
