@@ -43,7 +43,7 @@ module tb #(
 
       fork 
          forever begin: clock_gen
-            #(HALF_PERIOD_PS * 1ps) clk_10 = ~clk_10;
+            #(HALF_PERIOD_PS / 1000.0 * 1ns) clk_10 = ~clk_10;
          end
 
          begin: run_sim

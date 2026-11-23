@@ -27,7 +27,7 @@ module tb #(
       
       fork 
          forever begin: clock_gen
-            #(HALF_PERIOD_PS * 1ps) clk_27 = ~clk_27;
+            #(HALF_PERIOD_PS / 1000.0 * 1ns) clk_27 = ~clk_27;
          end
 
          begin: run_sim
@@ -65,9 +65,9 @@ module tb #(
    logic        dac_pwd;
    logic [9:0]  dac_data;
 
-   always @(adc_clk)    #(DLY_PCB_PAD_PS * 1ps) adc_clk_dly    = adc_clk;
-   always @(adc_dout_p) #(DLY_PCB_PAD_PS * 1ps) adc_dout_p_dly = adc_dout_p;
-   always @(adc_dout_n) #(DLY_PCB_PAD_PS * 1ps) adc_dout_n_dly = adc_dout_n;
+   always @(adc_clk)    #(DLY_PCB_PAD_PS / 1000.0 * 1ns) adc_clk_dly    = adc_clk;
+   always @(adc_dout_p) #(DLY_PCB_PAD_PS / 1000.0 * 1ns) adc_dout_p_dly = adc_dout_p;
+   always @(adc_dout_n) #(DLY_PCB_PAD_PS / 1000.0 * 1ns) adc_dout_n_dly = adc_dout_n;
    
       
    top dut (

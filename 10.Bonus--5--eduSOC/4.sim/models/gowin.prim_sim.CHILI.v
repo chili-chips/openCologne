@@ -218,7 +218,7 @@ always @(posedge CLKIN or negedge resetn) begin
         max_tlock <= 0.0;
     end else begin
         if((clkin_cycle[0] >= 2ns) && (clkin_cycle[0] <= 40ns)) begin
-            max_tlock <= 50us;  // time literals: the same under any timescale
+            max_tlock <= 50us;  // 50 us under any timescale
         end else if ((clkin_cycle[0] > 40ns) && (clkin_cycle[0] <= 500ns)) begin
             max_tlock <= 200us;
         end

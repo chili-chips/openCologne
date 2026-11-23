@@ -188,7 +188,9 @@ rtlbrowse: xml2stems
 
 
 vlog_sim.vvp:
+	printf '+timescale+1ns/10ps\n' > $(SIM_SRC)/icarus.cmd
 	iverilog \
+		-c $(SIM_SRC)/icarus.cmd \
 		-Winfloop \
 		-g2012 \
 		-gspecify \
@@ -201,7 +203,9 @@ vlog_sim.vvp:
 
 # Run make vlog_synth   first in 3.build
 synth_sim.vvp: clean_iverilog
+	printf '+timescale+1ns/10ps\n' > $(SIM_SRC)/icarus.cmd
 	iverilog \
+		-c $(SIM_SRC)/icarus.cmd \
 		-Winfloop \
 		-g2012 \
 		-gspecify \
@@ -214,7 +218,9 @@ synth_sim.vvp: clean_iverilog
 
 # Run make vlog_synth \ make impl  first in 3.build
 impl_sim.vvp: clean_iverilog
+	printf '+timescale+1ns/10ps\n' > $(SIM_SRC)/icarus.cmd
 	iverilog \
+		-c $(SIM_SRC)/icarus.cmd \
 		-Winfloop \
 		-g2012 \
 		-gspecify \
@@ -242,6 +248,7 @@ wave_iverilog:
 clean_iverilog:
 	$(RM) $(SIM_SRC)/*.vcd
 	$(RM) $(SIM_SRC)/*.vvp
+	$(RM) $(SIM_SRC)/icarus.cmd
 	$(RM) $(SIM_SRC)/*.gtkw
 	test ! -d log || rmdir log
 	test ! -d net || rmdir net

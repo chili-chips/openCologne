@@ -74,22 +74,22 @@ module glbl ();
     initial begin
         GSR_int = 1'b1;
         PRLD_int = 1'b1;
-        #(ROC_WIDTH)
+        #(ROC_WIDTH / 1000.0 * 1ns)
         GSR_int = 1'b0;
         PRLD_int = 1'b0;
     end
 
     initial begin
         GTS_int = 1'b1;
-        #(TOC_WIDTH)
+        #(TOC_WIDTH / 1000.0 * 1ns)
         GTS_int = 1'b0;
     end
 
     initial begin 
         GRESTORE_int = 1'b0;
-        #(GRES_START);
+        #(GRES_START / 1000.0 * 1ns);
         GRESTORE_int = 1'b1;
-        #(GRES_WIDTH);
+        #(GRES_WIDTH / 1000.0 * 1ns);
         GRESTORE_int = 1'b0;
     end
 endmodule: glbl
@@ -197,7 +197,7 @@ module BUFR #(
     bit GSR;
     initial begin
        GSR = 1'b1;
-       #1
+       #1ns
        GSR = 1'b0;
     end
 
@@ -448,7 +448,7 @@ module IDELAYE2 #(
     bit GSR;
     initial begin
         GSR = 1'b1;
-        #1
+        #1ns
         GSR = 1'b0;
     end
 
@@ -514,7 +514,7 @@ module IDELAYE2 #(
 // CR 587496
 //    assign #INIT_DELAY DATAOUT = tap_out;
     always @(tap_out)
-       DATAOUT_reg <= #INIT_DELAY tap_out;
+       DATAOUT_reg <= #(INIT_DELAY / 1000.0 * 1ns) tap_out;
 
     assign DATAOUT = DATAOUT_reg;
 
@@ -833,38 +833,38 @@ module IDELAYE2 #(
 //*********************************************************
 //*** DELAY IDATA signal
 //*********************************************************
-    assign #(DELAY_D)     delay_chain_0  = data_mux;
-    assign #CALC_TAPDELAY delay_chain_1  = delay_chain_0;
-    assign #CALC_TAPDELAY delay_chain_2  = delay_chain_1;
-    assign #CALC_TAPDELAY delay_chain_3  = delay_chain_2;
-    assign #CALC_TAPDELAY delay_chain_4  = delay_chain_3;
-    assign #CALC_TAPDELAY delay_chain_5  = delay_chain_4;
-    assign #CALC_TAPDELAY delay_chain_6  = delay_chain_5;
-    assign #CALC_TAPDELAY delay_chain_7  = delay_chain_6;
-    assign #CALC_TAPDELAY delay_chain_8  = delay_chain_7;
-    assign #CALC_TAPDELAY delay_chain_9  = delay_chain_8;
-    assign #CALC_TAPDELAY delay_chain_10 = delay_chain_9;
-    assign #CALC_TAPDELAY delay_chain_11 = delay_chain_10;
-    assign #CALC_TAPDELAY delay_chain_12 = delay_chain_11;
-    assign #CALC_TAPDELAY delay_chain_13 = delay_chain_12;
-    assign #CALC_TAPDELAY delay_chain_14 = delay_chain_13;
-    assign #CALC_TAPDELAY delay_chain_15 = delay_chain_14;
-    assign #CALC_TAPDELAY delay_chain_16 = delay_chain_15;
-    assign #CALC_TAPDELAY delay_chain_17 = delay_chain_16;
-    assign #CALC_TAPDELAY delay_chain_18 = delay_chain_17;
-    assign #CALC_TAPDELAY delay_chain_19 = delay_chain_18;
-    assign #CALC_TAPDELAY delay_chain_20 = delay_chain_19;
-    assign #CALC_TAPDELAY delay_chain_21 = delay_chain_20;
-    assign #CALC_TAPDELAY delay_chain_22 = delay_chain_21;
-    assign #CALC_TAPDELAY delay_chain_23 = delay_chain_22;
-    assign #CALC_TAPDELAY delay_chain_24 = delay_chain_23;
-    assign #CALC_TAPDELAY delay_chain_25 = delay_chain_24;
-    assign #CALC_TAPDELAY delay_chain_26 = delay_chain_25;
-    assign #CALC_TAPDELAY delay_chain_27 = delay_chain_26;
-    assign #CALC_TAPDELAY delay_chain_28 = delay_chain_27;
-    assign #CALC_TAPDELAY delay_chain_29 = delay_chain_28;
-    assign #CALC_TAPDELAY delay_chain_30 = delay_chain_29;
-    assign #CALC_TAPDELAY delay_chain_31 = delay_chain_30;
+    assign #(DELAY_D / 1000.0 * 1ns)     delay_chain_0  = data_mux;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_1  = delay_chain_0;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_2  = delay_chain_1;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_3  = delay_chain_2;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_4  = delay_chain_3;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_5  = delay_chain_4;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_6  = delay_chain_5;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_7  = delay_chain_6;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_8  = delay_chain_7;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_9  = delay_chain_8;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_10 = delay_chain_9;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_11 = delay_chain_10;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_12 = delay_chain_11;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_13 = delay_chain_12;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_14 = delay_chain_13;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_15 = delay_chain_14;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_16 = delay_chain_15;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_17 = delay_chain_16;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_18 = delay_chain_17;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_19 = delay_chain_18;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_20 = delay_chain_19;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_21 = delay_chain_20;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_22 = delay_chain_21;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_23 = delay_chain_22;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_24 = delay_chain_23;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_25 = delay_chain_24;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_26 = delay_chain_25;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_27 = delay_chain_26;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_28 = delay_chain_27;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_29 = delay_chain_28;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_30 = delay_chain_29;
+    assign #(CALC_TAPDELAY / 1000.0 * 1ns) delay_chain_31 = delay_chain_30;
 
 //*********************************************************
 //*** assign delay
