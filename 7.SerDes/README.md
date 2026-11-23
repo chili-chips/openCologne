@@ -135,25 +135,25 @@ A design instantiates `ccfpga_serdes`. The file list picks its body: `ccfpga_ser
 |---|---|---|---|
 | LiteX | litex#2686 | `PRBSRX`: `pause` and `with_errors_saturation` have no effect | closed (fixed, [litex#2712](https://github.com/enjoy-digital/litex/pull/2712)) |
 | Verilator | verilator#8894 | no error for a (local)param used before its declaration | closed (fixed: `USEBEFOREDECL`) |
-| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6), [#7](https://github.com/chili-chips/openCologne/issues/7) | 0.17.0, wrong results: an element of a packed array of packed structs is written as 1 bit; element writes in a constant function land as 1-bit writes | open |
-| JanusHDL | [#8](https://github.com/chili-chips/openCologne/issues/8) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0, not supported yet: typedef return of a constant function, packed struct pattern as a localparam, `W'(x)`, queue of queues, queue of `realtime`, write to a struct member element ([side by side](3.iclink-sv/2.sim/README.md)) | open |
-| Verilator | [verilator#9228](https://github.com/verilator/verilator/issues/9228) | splitting an `always_ff` calls `$urandom` once per copy: signals set under one random condition diverge (`TB_SERWB_TX`; workaround in `tb_serwb_tx.sv`, `tb_serwb_rx.sv`) | open |
+| JanusHDL | [#6](https://github.com/chili-chips/openCologne/issues/6), [#7](https://github.com/chili-chips/openCologne/issues/7) | 0.17.0, wrong results: an element of a packed array of packed structs is written as 1 bit; element writes in a constant function land as 1-bit writes | closed (fixed in 0.21.0) |
+| JanusHDL | [#8](https://github.com/chili-chips/openCologne/issues/8) to [#13](https://github.com/chili-chips/openCologne/issues/13) | 0.17.0, not supported yet: typedef return of a constant function, packed struct pattern as a localparam, `W'(x)`, queue of queues, queue of `realtime`, write to a struct member element ([side by side](3.iclink-sv/2.sim/README.md)) | closed (fixed in 0.21.0) |
+| Verilator | [verilator#9228](https://github.com/verilator/verilator/issues/9228) | splitting an `always_ff` calls `$urandom` once per copy: signals set under one random condition diverge (`TB_SERWB_TX`; workaround in `tb_serwb_tx.sv`, `tb_serwb_rx.sv`) | closed (fixed on master) |
 | Verilator | [verilator#9226](https://github.com/verilator/verilator/issues/9226) | a continuous-assign alias read through a function returns a later value | open (hidden by default since 5f0d585da, fails with `-fno-coalesce`) |
 | Verilator | verilator#8896 | `always @*` with an intra-assignment delay never finishes | open, now [verilator#9196](https://github.com/verilator/verilator/issues/9196) |
 | Verilator | verilator#8897 | a dynamic array of events: the C++ does not compile | closed (fixed) |
 | Icarus Verilog | [iverilog#1783](https://github.com/steveicarus/iverilog/issues/1783) | an event control on a dynamic-array element never wakes | open |
 | Icarus Verilog | iverilog#1645 | queue of unpacked structs | open, part of [iverilog#266](https://github.com/steveicarus/iverilog/issues/266) |
-| Icarus Verilog | [iverilog#1781](https://github.com/steveicarus/iverilog/issues/1781) | queue slice `q[1:$]` | open |
+| Icarus Verilog | [iverilog#1781](https://github.com/steveicarus/iverilog/issues/1781) | queue slice `q[1:$]` | closed (fixed on master) |
 | Icarus Verilog | [iverilog#1782](https://github.com/steveicarus/iverilog/issues/1782) | `name()` on an enum-typed parameter | closed (fixed on master) |
 | Icarus Verilog | iverilog#1648 | unpacked array of queues | open; a fix is proposed, [iverilog#1690](https://github.com/steveicarus/iverilog/pull/1690) |
 | Icarus Verilog | [iverilog#1779](https://github.com/steveicarus/iverilog/issues/1779) | static array of events | open |
 | Icarus Verilog | iverilog#1650 | function `output` arguments | open, as [iverilog#597](https://github.com/steveicarus/iverilog/issues/597) |
-| Icarus Verilog | [iverilog#1780](https://github.com/steveicarus/iverilog/issues/1780) | typed assignment pattern `s_t'{a: ...}` | open |
+| Icarus Verilog | [iverilog#1780](https://github.com/steveicarus/iverilog/issues/1780) | typed assignment pattern `s_t'{a: ...}` | closed (fixed on master) |
 | Icarus Verilog | iverilog#1652 | field write to an element of an array of packed structs | closed (fixed on master) |
 | Icarus Verilog | iverilog#1653 | `?:` with `$sformatf()` and a string literal crashes `ivl` | closed (fixed on master) |
 | Icarus Verilog | iverilog#438 (comment) | `wait` on a function call: internal error | open |
 | Verible | verible#217 (comment) | lint: a parameter used before its declaration | open |
-| Project Peppercorn | [prjpeppercorn#37](https://github.com/YosysHQ/prjpeppercorn/issues/37) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | open |
+| Project Peppercorn | [prjpeppercorn#37](https://github.com/YosysHQ/prjpeppercorn/issues/37) | `gmpack`: smaller bitstreams (pattern addressing for repeated tiles, compression) | closed: 10-26% smaller with 68a0abb; no compression (no decompressor) |
 | Project Peppercorn | [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36) | nextpnr for GateMate (upstream 0.11.1) has no multicycle paths: `--sdc` takes only `create_clock`, and `set_false_path` does nothing. The 5 Gb/s pump needs `set_multicycle_path 2 -setup -from -to` (clock-enabled logic, `half_clk_strobe`), with `-to` on pins: a block RAM's read address may take 2 clocks while its write side takes 1. Our fork's [`multicycle-sdc`](https://github.com/chili-chips/nextpnr/tree/multicycle-sdc) branch has cell-level `-to`; the pump is the test case | open |
 | nextpnr | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908) | GateMate delay estimate (100 ps + 100 ps a tile) about 5x below routed delays on short hops: the placer optimizes against delays it underestimates | open |
 | nextpnr | [nextpnr#1793](https://github.com/YosysHQ/nextpnr/pull/1793) (comment) | Fmax of opposite-edge paths: our GateMate data and fork for that open fix | open |
