@@ -183,15 +183,16 @@ Where nextpnr's 43703 half-CPEs go (`--pack-only`, packed netlist):
 |---|---|---|
 | LUT / MX logic | 27761 | 27761 |
 | L2T5 upper halves | 5023 | 5023 |
-| Adders: 2733 CPEs, only 322 of 3055 ADDFs paired | 5466 | 3056 |
+| Adders: 1441 ADDF2 + 173 ADDF CPEs, one single per odd-length chain | 3228 | 3228 |
+| MX4 (777) and multiplier (342) CPEs | 2238 | 2238 |
 | FF-only route-throughs (`$lt`) | 3556 | 0 |
 | LUT driving FF + logic (`$lower`) | 862 | 0 |
 | BRAM port halves | 741 | 0 |
 | Carry-chain in / out | 294 | 0 |
-| **Total** | **43703 (107%)** | **35840 (87.5%)** |
+| **Total** | **43703 (107%)** | **38250 (93.4%)** |
 
-- On paper the core fits at 87.5%. Packing overhead (7863 half-CPEs) pushes it to 107%.
-- The two biggest items: FF-only halves, and adders not paired two per CPE.
+- On paper the core fits at 93.4%. Packing overhead (5453 half-CPEs) pushes it to 107%.
+- The biggest item: FF-only halves. The adders are already paired as far as the chains allow ([nextpnr#1911](https://github.com/YosysHQ/nextpnr/issues/1911)).
 - Open question: why ~26.6k LUT-equivalents need more than 20480 CPEs. Good first issue.
 
 ### BetrustedSoC, fixed seed (#73)

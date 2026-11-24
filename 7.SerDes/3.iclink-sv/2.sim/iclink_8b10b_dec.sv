@@ -58,16 +58,15 @@ module iclink_8b10b_dec
       end
       else begin
         // D.x.A7 / K.x.7: the alternative x.7 is a K unless the 6b allows it
-        k <= (code4b == 4'b0111 || code4b == 4'b1000) &&
-             !(code6b inside {6'b100011, 6'b010011, 6'b001011,
-                              6'b110100, 6'b101100, 6'b011100});
+        k <= ((code4b == 4'b0111) | (code4b == 4'b1000))
+          & ~(code6b inside {6'b100011, 6'b010011, 6'b001011, 6'b110100, 6'b101100, 6'b011100});
         code3b <= dec_4b3b(code4b);
       end
     end
   end : _decode
 
   assign d       = {code3b, code5b};
-  assign invalid = !(ones inside {4'd4, 4'd5, 4'd6});
+  assign invalid = ~(ones inside {4'd4, 4'd5, 4'd6});
 
 endmodule : iclink_8b10b_dec
 

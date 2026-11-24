@@ -225,13 +225,13 @@ module iclink_serdes_gm
   //-----------------------------------------------------------------------
   // the RX datapath out of CC_SERDES, read only by the rx_ser flops
   typedef struct packed {
-    byte_t [PHY_NWORDS-1:0] d;
-    logic [PHY_NWORDS-1:0]  k;
-    logic [PHY_NWORDS-1:0]  not_in_table;
-    logic [PHY_NWORDS-1:0]  disp_err;
-    logic                   aligned;
-    logic                   buf_err;
-    logic                   resetdone;
+    byte_t [PHY_NWORDS-1:0] d;             // [90:27]
+    logic [PHY_NWORDS-1:0]  k;             // [26:19]
+    logic [PHY_NWORDS-1:0]  not_in_table;  // [18:11]
+    logic [PHY_NWORDS-1:0]  disp_err;      // [10:3]
+    logic                   aligned;       // [2]
+    logic                   buf_err;       // [1]
+    logic                   resetdone;     // [0]
   } rx_ser_t;
   rx_ser_t                  rx_hm;  // hard-macro outputs
   rx_ser_t                  rx_ser;  // the same, registered first
@@ -281,8 +281,8 @@ module iclink_serdes_gm
   logic comma_at0, comma_at4;
 
   always_comb begin
-    comma_at0 = rx_ser.k[0] && (rx_ser.d[0] == PHY_COMMA);
-    comma_at4 = rx_ser.k[HALF] && (rx_ser.d[HALF] == PHY_COMMA);
+    comma_at0 = rx_ser.k[0] & (rx_ser.d[0] == PHY_COMMA);
+    comma_at4 = rx_ser.k[HALF] & (rx_ser.d[HALF] == PHY_COMMA);
   end
 
   always_ff @(posedge clk_core or negedge rx_ready) begin
@@ -299,7 +299,7 @@ module iclink_serdes_gm
       last_k   <= rx_ser.k[PHY_NWORDS-1:HALF];
       last_bad <= rx_ser.not_in_table[PHY_NWORDS-1:HALF] | rx_ser.disp_err[PHY_NWORDS-1:HALF];
       if (rx_align && (comma_at0 || comma_at4)) begin
-        rx_lane4 <= comma_at4 && !comma_at0;
+        rx_lane4 <= comma_at4 & ~comma_at0;
       end
       if (rx_lane4) begin
         rx.d       <= {rx_ser.d[HALF-1:0], last_d};

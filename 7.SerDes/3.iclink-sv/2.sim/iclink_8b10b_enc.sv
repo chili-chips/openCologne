@@ -82,10 +82,10 @@ module iclink_8b10b_enc
         code4b_unbalanced[w] <= unbalanced_4b(enc_3b4b(code3b));
         code4b_flip[w] <= k[w] | flip_3b4b(code3b);
 
-        alt7_rd0[w] <= (code3b == 3'd7) &&
-                       (k[w] || code5b == 5'd17 || code5b == 5'd18 || code5b == 5'd20);
-        alt7_rd1[w] <= (code3b == 3'd7) &&
-                       (k[w] || code5b == 5'd11 || code5b == 5'd13 || code5b == 5'd14);
+        alt7_rd0[w] <= (code3b         == 3'd7)
+                    & (k[w] | (code5b == 5'd17) | (code5b == 5'd18) | (code5b == 5'd20));
+        alt7_rd1[w] <= (code3b         == 3'd7)
+                    & (k[w] | (code5b == 5'd11) | (code5b == 5'd13) | (code5b == 5'd14));
       end
     end : _stage1
 
@@ -98,19 +98,19 @@ module iclink_8b10b_enc
 
     always_comb begin : _stage2
       disp_inter[w] = disp_in[w] ^ code6b_unbalanced[w];
-      out6b[w]      = (!disp_in[w] && code6b_flip[w]) ? ~code6b[w] : code6b[w];
+      out6b[w]      = (~disp_in[w] & code6b_flip[w]) ? ~code6b[w] : code6b[w];
 
       if (!disp_inter[w] && alt7_rd0[w]) begin
-        disp_out[w] = !disp_inter[w];
+        disp_out[w] = ~disp_inter[w];
         out4b[w]    = 4'b0111;
       end
       else if (disp_inter[w] && alt7_rd1[w]) begin
-        disp_out[w] = !disp_inter[w];
+        disp_out[w] = ~disp_inter[w];
         out4b[w]    = 4'b1000;
       end
       else begin
         disp_out[w] = disp_inter[w] ^ code4b_unbalanced[w];
-        out4b[w]    = (!disp_inter[w] && code4b_flip[w]) ? ~code4b[w] : code4b[w];
+        out4b[w]    = (~disp_inter[w] & code4b_flip[w]) ? ~code4b[w] : code4b[w];
       end
 
       msb_first[w] = {out6b[w], out4b[w]};

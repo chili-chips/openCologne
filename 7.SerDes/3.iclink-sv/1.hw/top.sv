@@ -105,13 +105,14 @@ module top
   logic      [PRBS_WARMUP_LOG2:0] prbs_warm;  // top bit set: warm-up over
   logic                           prbs_error;
   prbs_cfg_t                      NC_prbs_cfg;  // PRBS TX's choice: always PRBS7 here
+  localparam prbs_cfg_t PRBS_CFG = PRBS_7;  // both PRBS ends: PRBS7
 
   iclink_prbs_tx #(
       .WIDTH (PRBS_W)
   ) u_prbs_tx (
       .clk      (clk),
       .arst_n   (rst_n),
-      .config_i (PRBS_7),
+      .config_i (PRBS_CFG),
       .i        ('0),
       .o        (prbs),
       .config_o (NC_prbs_cfg)
@@ -122,7 +123,7 @@ module top
   ) u_prbs_rx (
       .clk      (clk),
       .arst_n   (rst_n),
-      .config_i (PRBS_7),
+      .config_i (PRBS_CFG),
       .pause    (1'b0),
       .i        (prbs),
       .errors   (prbs_errors)
@@ -217,10 +218,10 @@ module top
   always_comb begin
     link_tx = prbs_run[PRBS_RUN_LOG2] ? pump_tx : PHY_COMMA_WORD;
     link_ctrl = '{
-        tx_prbs: (link_idle[LINK_IDLE_LOG2] && !prbs_run[PRBS_RUN_LOG2]) ? PRBS_7 : PRBS_OFF,
+        tx_prbs: (link_idle[LINK_IDLE_LOG2] & ~prbs_run[PRBS_RUN_LOG2]) ? PRBS_7 : PRBS_OFF,
         rx_prbs: PRBS_7,
         rx_prbs_pause: 1'b0,
-        rx_align: !align_cnt[ALIGN_COMMAS_LOG2]  // off once aligned; on again after rx_ready
+        rx_align: ~align_cnt[ALIGN_COMMAS_LOG2]  // off once aligned; on again after rx_ready
     };
   end
 
@@ -256,16 +257,16 @@ module top
       prbs_run     <= '0;
     end
     else begin
-      link_d_k     <= rx_aligned && link_rx.k == '0;
-      link_kx      <= link_rx.k != '0 || link_rx_invalid != '0 || link_rx_buf_err;
+      link_d_k     <= rx_aligned & (link_rx.k == '0);
+      link_kx      <= (link_rx.k != '0) | (link_rx_invalid != '0) | link_rx_buf_err;
       link_z[1]    <= link_rx.d[PHY_NWORDS-1:PHY_NWORDS/2] == '0;
       link_z[0]    <= link_rx.d[PHY_NWORDS/2-1:0] == '0;
-      link_d_bad   <= link_kx || (&link_z);
+      link_d_bad   <= link_kx | (&link_z);
       link_d_moved <= link_errors != link_base;
       if (!link_warm[LINK_WARMUP_LOG2]) begin
         // a K-free word that is not all zero: the RX buffer hands out zero
         // words for a while after alignment, before the commas come through
-        link_warm <= (link_d_k && !(&link_z)) ? link_warm + 1'b1 : '0;
+        link_warm <= (link_d_k & ~(&link_z)) ? link_warm + 1'b1 : '0;
         link_base <= link_errors;
       end
       else if (!prbs_run[PRBS_RUN_LOG2]) begin
@@ -302,6 +303,9 @@ module top
   logic [$clog2(PUMP_DEPTH):0] NC_tx_used, NC_rx_avail;  // unused: the checker pops what comes
   logic NC_remote_paused, NC_pause;  // flow control: on, but the reader never stops
 
+  logic  link_line_err;  // an invalid symbol, or the RX buffer over- or underran
+  assign link_line_err = (link_rx_invalid != '0) | link_rx_buf_err;
+
   iclink_serwb_line #(
       .W (PUMP_W)
   ) u_line (
@@ -311,7 +315,7 @@ module top
       .pump_tx         (pump_tx_pair),
       .line_tx         (pump_tx),
       .line_rx         (link_rx),
-      .line_err        (link_rx_invalid != '0 || link_rx_buf_err),
+      .line_err        (link_line_err),
       .pump_rx         (pump_rx_pair),
       .pump_err        (pump_rx_err)
   );
@@ -344,7 +348,7 @@ module top
   );
 
   always_comb begin
-    pump_pop = !pump_empty;
+    pump_pop = ~pump_empty;
     pump_up  = pump_good[PUMP_UP_LOG2];
   end
 
@@ -380,8 +384,8 @@ module top
           pump_good <= pump_good + 1'b1;
         end
       end
-      pump_bad <= (pump_pop && pump_rdata != pump_expect)
-        || (pump_start[PUMP_START_LOG2] && pump_rx_err);
+      pump_bad <= (pump_pop & (pump_rdata != pump_expect))
+               | (pump_start[PUMP_START_LOG2] & pump_rx_err);
       if (pump_bad || pump_crc != '0 || pump_drops != '0 || pump_ovf != '0) begin
         pump_error <= 1'b1;
       end
@@ -401,12 +405,12 @@ module top
       link_error_sync <= {link_error_sync[0], link_error | pump_error};
       pump_up_sync    <= {pump_up_sync[0], pump_up};
       link_was_up     <= link_was_up | link_up_sync[1];
-      failed          <= failed | link_error_sync[1] | (link_was_up & !link_up_sync[1]);
+      failed          <= failed | link_error_sync[1] | (link_was_up & ~link_up_sync[1]);
     end
   end
 
   always_comb begin
-    led = heartbeat[HEARTBEAT_W-1] & !prbs_error & link_up_sync[1] & pump_up_sync[1] & !failed;
+    led = heartbeat[HEARTBEAT_W-1] & ~prbs_error & link_up_sync[1] & pump_up_sync[1] & ~failed;
   end
 
 endmodule : top

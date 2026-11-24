@@ -30,6 +30,8 @@ The older openCologne examples build with Cologne Chip's own tools: their Yosys 
 
 Our versions (a blinky and a `CC_SERDES` design pack to bitstreams): Yosys 0.69, nextpnr main `6b438a1c` (built with `-DHIMBAECHEL_UARCH=gatemate`, installed as `nextpnr-himbaechel-gatemate`) and Project Peppercorn v1.14. No vendor tools.
 
+The GateMate delay model fix ([nextpnr#1912](https://github.com/YosysHQ/nextpnr/pull/1912), for [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908)) is on nextpnr main since `6db0c517` (0.11.1-94, 2026-11-16), in no release yet. Tested with it (2026-11-19, 2.5 Gb/s, place and route, 4 seeds): nextpnr main `c22d0709` (0.11.1-111), Project Peppercorn `5c6a768` (v1.14-5), Yosys 0.70+385.
+
 The core builds two ways, so it is usable with or without LiteX.
 
 ## Standalone, without LiteX

@@ -144,6 +144,9 @@ module iclink_serwb_pump
   logic  [TW-1:0] txf_take;
   logic  [  AW:0] txf_avail;
 
+  logic  txf_push;  // a word from the user, when the FIFO has room
+  assign txf_push = tx_push & ~tx_full;
+
   iclink_serwb_fifo #(
       .DEPTH  (DEPTH),
       .W      (W),
@@ -154,7 +157,7 @@ module iclink_serwb_pump
       .arst_n          (arst_n),
       .half_clk_strobe (half_clk_strobe),
       .w_word          (tx_data),
-      .w_valid         (tx_push & !tx_full),
+      .w_valid         (txf_push),
       .w_commit        (1'b0),
       .w_rewind        (1'b0),
       .w_used          (tx_used),
@@ -194,8 +197,8 @@ module iclink_serwb_pump
       flush_cnt <= '0;
     end
     else if (half_clk_strobe) begin
-      pend <= pend + ((tx_state == T_HDR && hdr_ready) ? (AW + 1)'(tx_words) : '0) -
-          (AW + 1)'(txf_take);
+      pend <= pend
+           + (((tx_state == T_HDR) & hdr_ready) ? (AW + 1)'(tx_words) : '0) - (AW + 1)'(txf_take);
 
       unique case (tx_state)
         T_WAIT: begin
@@ -229,13 +232,16 @@ module iclink_serwb_pump
     end
   end
 
+  logic  tx_hdr;  // the scheduler sends a header
+  assign tx_hdr = (tx_state == T_HDR);
+
   iclink_serwb_tx #(
       .W (W)
   ) u_packetizer (
       .clk             (clk),
       .arst_n          (arst_n),
       .half_clk_strobe (half_clk_strobe),
-      .hdr_valid       (tx_state == T_HDR),
+      .hdr_valid       (tx_hdr),
       .hdr_port        (PORT),
       .hdr_words       (tx_words),
       .hdr_ready       (hdr_ready),
@@ -260,8 +266,8 @@ module iclink_serwb_pump
   logic      [     $clog2(CC_CLKS)-1:0] cc_idx;  // its clock
 
   always_comb begin
-    send_ctrl = tx_en & pending & !cc_on;
-    pk_ready  = tx_en & !pending & !cc_on & !remote_paused;
+    send_ctrl = tx_en & pending & ~cc_on;
+    pk_ready  = tx_en & ~pending & ~cc_on & ~remote_paused;
   end
 
   always_ff @(posedge clk or negedge arst_n) begin
@@ -381,9 +387,9 @@ module iclink_serwb_pump
       for (int b = 0; b < 4; b++) begin
         rx_word[s][8*b+:8] = phy_rx[s/2].d[4*(s%2)+b];
       end
-      rx_valid[s] = rx_en && (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0000);
-      is_xoff[s]  = rx_en && (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0001) && (rx_word[s] == SERWB_XOFF);
-      is_xon[s]   = rx_en && (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0001) && (rx_word[s] == SERWB_XON);
+      rx_valid[s] = rx_en & (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0000);
+      is_xoff[s]  = rx_en & (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0001) & (rx_word[s] == SERWB_XOFF);
+      is_xon[s]   = rx_en & (phy_rx[s/2].k[4*(s%2)+:4] == 4'b0001) & (rx_word[s] == SERWB_XON);
       if (is_xoff[s] || is_xon[s]) begin  // the later slot wins
         ctrl_seen = 1'b1;
         ctrl_xoff = is_xoff[s];
@@ -414,10 +420,15 @@ module iclink_serwb_pump
   // a packet that finds no room writes nothing more and is rewound at its end
   always_comb begin
     room      = rxf_used <= (AW + 1)'(DEPTH - W);  // a flop and a compare: off the write path
-    ovf       = ovf_pkt | (dp_valid != '0 && !room);
+    ovf       = ovf_pkt | ((dp_valid != '0) & ~room);
     rxf_valid = ovf ? '0 : dp_valid;
-    keep      = dp_commit && !ovf && dp_port == PORT;
+    keep      = dp_commit & ~ovf & (dp_port == PORT);
   end
+
+  logic          rxf_rewind;  // drop the packet: not ours, or a bad CRC
+  logic [TW-1:0] rxf_take;
+  assign         rxf_rewind = (dp_commit & ~keep) | dp_rewind;
+  assign         rxf_take   = TW'(rx_pop & ~rx_empty);
 
   iclink_serwb_fifo #(
       .DEPTH  (DEPTH),
@@ -431,10 +442,10 @@ module iclink_serwb_pump
       .w_word          (dp_word),
       .w_valid         (rxf_valid),
       .w_commit        (keep),
-      .w_rewind        ((dp_commit && !keep) || dp_rewind),
+      .w_rewind        (rxf_rewind),
       .w_used          (rxf_used),
       .r_word          (rx_data),
-      .r_take          (TW'(rx_pop & !rx_empty)),
+      .r_take          (rxf_take),
       .r_avail         (rx_avail)
   );
 
@@ -450,7 +461,7 @@ module iclink_serwb_pump
       overflows     <= '0;
     end
     else if (half_clk_strobe) begin
-      ovf_pkt <= ovf && !(dp_commit || dp_rewind);
+      ovf_pkt <= ovf & ~(dp_commit | dp_rewind);
 
       if (rxf_used >= (AW + 1)'(XOFF_LEVEL)) begin
         pause <= 1'b1;
@@ -467,8 +478,8 @@ module iclink_serwb_pump
       end
 
       crc_errors <= serwb_count(crc_errors, 2'(dp_crc_error));
-      drops      <= serwb_count(drops, 2'(dp_drop) + 2'(dp_commit && !keep));
-      overflows  <= serwb_count(overflows, 2'(dp_commit && ovf));
+      drops      <= serwb_count(drops, 2'(dp_drop) + 2'(dp_commit & ~keep));
+      overflows  <= serwb_count(overflows, 2'(dp_commit & ovf));
     end
   end
 

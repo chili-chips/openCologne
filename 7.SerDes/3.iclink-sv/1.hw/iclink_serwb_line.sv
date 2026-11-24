@@ -70,7 +70,7 @@ module iclink_serwb_line
         pump_err        <= 1'b0;
       end
       else begin
-        half_clk_strobe <= !half_clk_strobe;
+        half_clk_strobe <= ~half_clk_strobe;
         // pump_tx is new from a strobe clock on: [0] while the strobe is
         // low, [1] while it is high again
         line_tx         <= half_clk_strobe ? pump_tx[1] : pump_tx[0];
@@ -78,7 +78,7 @@ module iclink_serwb_line
         err_prev        <= line_err;
         if (half_clk_strobe) begin
           pump_rx  <= {line_rx, rx_prev};
-          pump_err <= line_err || err_prev;
+          pump_err <= line_err | err_prev;
         end
       end
     end

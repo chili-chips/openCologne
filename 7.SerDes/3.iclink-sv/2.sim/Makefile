@@ -32,7 +32,7 @@
 #   LINE_RATE=1250|2500|5000  Mb/s, PHY tests (default 2500)
 #   WAVES=1       also write an FST waveform, PHY tests, named by the options (WAVE_TAG)
 #   SERWB_W=2|4   SerWB words a clock, SerWB tests (default 2)
-#   SIM=verilator|janushdl  the simulator (default verilator). janushdl: JanusHDL (jhdl 0.17
+#   SIM=verilator|janushdl  the simulator (default verilator). janushdl: JanusHDL (jhdl 0.22
 #                 or later), which compiles at each run; WAVES=1 is its --fst; no SEED;
 #                 sim_modes and sim_icarus stay on Verilator and Icarus
 
@@ -79,7 +79,7 @@ WAVE_TAG  = $(or $(CDR_MODEL),NONE).$(LINE_RATE).s$(or $(SEED),-)$(if $(RANDOM_P
 ifeq ($(SIM),verilator)
 PLUS   = $(if $(filter 1,$(WAVES)),+waves=$(WAVE_TAG),) $(if $(SEED),+verilator+seed+$(SEED))
 else
-# $dumpfile would write a VCD: JanusHDL's --fst records every signal
+# JanusHDL's --fst records every signal
 PLUS   = $(if $(filter 1,$(WAVES)),$(if $(filter sim_phy_%,$@),--fst $(@:sim_%=%).$(WAVE_TAG).fst))
 endif
 

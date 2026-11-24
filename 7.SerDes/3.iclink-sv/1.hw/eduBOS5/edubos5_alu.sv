@@ -16,6 +16,7 @@ module edubos5_alu
     parameter bit SHIFT_PRE_REG = 1'b0
 ) (
     input  logic              clk,
+    input  logic              arst_n,          // resets funct3_alu_reg (the result select)
     input  logic              reset,           // DSP reset, GOWIN_FAST_OP only
     input  logic              ce,              // load enable for all ALU registers
 
@@ -64,10 +65,17 @@ module edubos5_alu
       alu_and_reg    <= alu_and;
       alu_xor_reg    <= alu_xor;
       alu_or_reg     <= alu_or;
-
-      funct3_alu_reg <= funct3;
     end
   end : _alu_pipe
+
+  always_ff @(negedge arst_n or posedge clk) begin : _alu_funct3
+    if (arst_n == LO) begin
+      funct3_alu_reg <= funct3_alu_t'(0);
+    end
+    else if (ce) begin
+      funct3_alu_reg <= funct3;
+    end
+  end : _alu_funct3
 
   //----------------------------------------------------------------------
   // Addition / subtraction, registered: alu_minus_reg[32] is the borrow
@@ -163,6 +171,7 @@ module edubos5_alu
   // ALU output mux
   //---------------
   always_comb begin : _alu_output_mux
+    alu_out = alu_plus_reg;
     unique case (funct3_alu_reg)
       ADD_SUB: begin
         if (aluimm_dec | (funct7_5 == 1'b0) | jalr_dec) begin
@@ -181,9 +190,10 @@ module edubos5_alu
       SRL_SRA: alu_out = shifter;
 
       //logic operations
-      XOR: alu_out = alu_xor_reg;
-      OR:  alu_out = alu_or_reg;
-      AND: alu_out = alu_and_reg;
+      XOR:     alu_out = alu_xor_reg;
+      OR:      alu_out = alu_or_reg;
+      AND:     alu_out = alu_and_reg;
+      default: ;
     endcase
   end : _alu_output_mux
 endmodule : edubos5_alu

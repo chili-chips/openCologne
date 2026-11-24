@@ -65,7 +65,7 @@ package iclink_8b10b_pkg;
 
   // D.7 is balanced but has a complement too
   function automatic logic flip_5b6b(input logic [4:0] x);
-    return unbalanced_6b(enc_5b6b(x)) || x == 5'd7;
+    return unbalanced_6b(enc_5b6b(x)) | (x == 5'd7);
   endfunction
 
   // 3b/4b ------------------------------------------------------------------
@@ -88,7 +88,7 @@ package iclink_8b10b_pkg;
 
   // D.x.3 is balanced but has a complement too
   function automatic logic flip_3b4b(input logic [2:0] x);
-    return unbalanced_4b(enc_3b4b(x)) || x == 3'd3;
+    return unbalanced_4b(enc_3b4b(x)) | (x == 3'd3);
   endfunction
 
   // decode -----------------------------------------------------------------

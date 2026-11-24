@@ -88,9 +88,9 @@ module iclink_serwb_rx
   } state_t;
 
   typedef struct packed {
-    state_t     state;
-    serwb_len_t left;   // data words still to come
-    logic [7:0] port;
+    state_t     state;  // [23:22]
+    serwb_len_t left;   // [21:8] data words still to come
+    logic [7:0] port;   // [7:0]
   } ctx_t;
 
   // what a stage carries for one beat. Packet A: the one open at the start
@@ -241,8 +241,9 @@ module iclink_serwb_rx
       end
     end
     // as LiteICLink, the timer drops in DATA and CHECK only, never in HEADER
-    timeout = (r_valid == '0) && (ctx.state inside {S_DATA, S_CHECK}) &&
-        (timer == $bits(timer)'(TIMEOUT_CLKS - 1));
+    timeout = (r_valid == '0)
+            & (ctx.state inside {S_DATA, S_CHECK})
+            & (timer == $bits(timer)'(TIMEOUT_CLKS - 1));
     ctx_next = c;
     if (timeout) begin
       ctx_next.state = S_PREAMBLE;
@@ -386,8 +387,8 @@ module iclink_serwb_rx
 
   always_comb begin
     good = (g_rcvd == g_crc);
-    bad  = (g.chk != '0) && !good;
-    ends = (g.chk != '0) || g.tmo;
+    bad  = (g.chk != '0) & ~good;
+    ends = (g.chk != '0) | g.tmo;
     q    = '0;
     nq   = '0;
     for (int i = 0; i < CWD; i++) begin
@@ -427,12 +428,12 @@ module iclink_serwb_rx
     else if (half_clk_strobe) begin
       o_word <= q[W-1:0];
       for (int i = 0; i < W; i++) begin
-        o_valid[i] <= !g.tmo && 4'(i) < 4'(nq);
+        o_valid[i] <= ~g.tmo & (4'(i) < 4'(nq));
       end
       o_port      <= g.port;
-      o_commit    <= (g.chk != '0) && good;
+      o_commit    <= (g.chk != '0) & good;
       o_crc_error <= bad;
-      o_rewind    <= bad || g.tmo;
+      o_rewind    <= bad | g.tmo;
       o_drop      <= g.drops + DW'(bad);
       if (CARRY) begin
         if (ends) begin

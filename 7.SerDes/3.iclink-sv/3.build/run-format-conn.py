@@ -62,3 +62,8 @@ for f in sys.argv[1 + check:]:
             print(f)
         else:
             open(f, 'w').write(n)
+
+# -----------------------------------------------------------------------------
+# Project:     openCologne
+# Description: NLnet-sponsored open-source design ware for GateMate
+# -----------------------------------------------------------------------------

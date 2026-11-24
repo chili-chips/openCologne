@@ -18,16 +18,16 @@ package iclink_phy_pkg;
 
   // one clock of the data stream, as LiteICLink's PHY sink/source: data + ctrl (K)
   typedef struct packed {
-    byte_t [PHY_NWORDS-1:0] d;
-    logic [PHY_NWORDS-1:0]  k;
+    byte_t [PHY_NWORDS-1:0] d;  // [71:8]
+    logic [PHY_NWORDS-1:0]  k;  // [7:0]
   } phy_word_t;
 
   // PHY controls; any clock, synchronized in the PHY
   typedef struct packed {
-    prbs_cfg_t tx_prbs;        // PRBS instead of the data stream
-    prbs_cfg_t rx_prbs;        // PRBS to check; PRBS_OFF clears the count
-    logic      rx_prbs_pause;  // hold the error count
-    logic      rx_align;       // comma alignment on; acquires at the first comma
+    prbs_cfg_t tx_prbs;        // [5:4] PRBS instead of the data stream
+    prbs_cfg_t rx_prbs;        // [3:2] PRBS to check; PRBS_OFF clears the count
+    logic      rx_prbs_pause;  // [1]   hold the error count
+    logic      rx_align;       // [0]   comma alignment on; acquires at the first comma
   } phy_ctrl_t;
 
   // SerDes bring-up: regfile writes, those of Cologne Chip's PRBS loopback
@@ -41,8 +41,8 @@ package iclink_phy_pkg;
   localparam int CFG_WAIT_W = 6;
 
   typedef struct packed {
-    logic [7:0]  addr;
-    logic [15:0] data;
+    logic [7:0]  addr;  // [23:16]
+    logic [15:0] data;  // [15:0]
   } cfg_write_t;
 
   localparam logic [7:0] SERDES_CFG_ADDR = 8'h5C;  // SerDes enable

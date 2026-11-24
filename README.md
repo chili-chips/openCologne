@@ -9,7 +9,7 @@
 [![LiteX:YES](https://badgen.net/badge/LiteX/YES/green)](7.SerDes/3.iclink-sv/4.litex)
 [![eduBOS5:YES](https://badgen.net/badge/eduBOS5/YES/green)](https://github.com/chili-chips/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md)
 [![PeakRDL:YES](https://badgen.net/badge/PeakRDL/YES/green)](7.SerDes)
-[![JanusHDL:WIP](https://badgen.net/badge/JanusHDL/WIP/orange)](https://que.no/janushdl/)
+[![JanusHDL:YES](https://badgen.net/badge/JanusHDL/YES/green)](https://que.no/janushdl/)
 
 [Click here](https://github.com/chili-chips/openCologne-PCIE) if interested in our new CologneChip project, which is about designing the first fully open-source **PCIE EndPoint**.
 
@@ -281,7 +281,7 @@ This project was funded through the NGI0 Entrust Fund, a fund established by NLn
 
 | Tool / project | Issues | What | State |
 |---|---|---|---|
-| nextpnr, Project Peppercorn | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908), [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36), [#37](https://github.com/YosysHQ/prjpeppercorn/issues/37), [#38](https://github.com/YosysHQ/prjpeppercorn/issues/38), [#39](https://github.com/YosysHQ/prjpeppercorn/issues/39) | GateMate: delay estimate far below routed delays; multicycle paths; smaller bitstreams; modular P&R; VeeRwolf packed to 107% | open; #37 closed (fixed) |
+| nextpnr, Project Peppercorn | [nextpnr#1908](https://github.com/YosysHQ/nextpnr/issues/1908), [prjpeppercorn#36](https://github.com/YosysHQ/prjpeppercorn/issues/36), [#37](https://github.com/YosysHQ/prjpeppercorn/issues/37), [#38](https://github.com/YosysHQ/prjpeppercorn/issues/38), [#39](https://github.com/YosysHQ/prjpeppercorn/issues/39) | GateMate: delay estimate far below routed delays; multicycle paths; smaller bitstreams; modular P&R; VeeRwolf packed to 107% | open; #1908 closed (fixed in nextpnr main `6db0c517`), #37 closed (fixed) |
 | nextpnr | [nextpnr#1793](https://github.com/YosysHQ/nextpnr/pull/1793) (comment) | Fmax of opposite-edge paths: GateMate data for that fix | open |
 | Verilator | [#9226](https://github.com/verilator/verilator/issues/9226), [#9196](https://github.com/verilator/verilator/issues/9196) | an alias read through a function; `always @*` with a delay | open |
 | Verilator | #8894, #8897, [#9228](https://github.com/verilator/verilator/issues/9228) | a parameter used before its declaration; a dynamic array of events; `$urandom` in a split `always_ff` | closed (fixed) |

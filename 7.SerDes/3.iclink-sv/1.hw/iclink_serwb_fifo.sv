@@ -138,7 +138,7 @@ module iclink_serwb_fifo
         com_ptr <= wr_ptr_next;
       end
       // the words read this clock are free from the next one
-      w_used <= ((COMMIT && w_rewind) ? com_ptr : wr_ptr_next) - rd_ptr_next;
+      w_used <= ((COMMIT & w_rewind) ? com_ptr : wr_ptr_next) - rd_ptr_next;
     end
   end
 
