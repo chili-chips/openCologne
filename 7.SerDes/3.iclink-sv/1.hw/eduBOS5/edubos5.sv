@@ -897,9 +897,9 @@ module edubos5
       always_ff @(posedge clk) begin : _div
         if (div_ce) begin
           if (md_cnt == 6'd1) begin  // setup
-            quo   <= n_sx ? -rs1_reg : rs1_reg;
-            dvs   <= d_sx ? -rs2_reg : rs2_reg;
-            rem   <= '0;
+            quo <= n_sx ? -rs1_reg : rs1_reg;
+            dvs <= d_sx ? -rs2_reg : rs2_reg;
+            rem <= '0;
           end
           else if (md_cnt == 6'(DIV_END)) begin  // the signs
             quo <= md_f3[1] ? (r_neg ? -rem : rem) : (q_neg ? -quo : quo);
