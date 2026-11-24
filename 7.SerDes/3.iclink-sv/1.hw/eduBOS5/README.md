@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 # eduBOS5
 
-The CPU of our SoC: Chili.CHIPS' compact RV32I core. These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `54c5409` (2026-10-25). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
+The CPU of our SoC: Chili.CHIPS' compact RV32I core (RV32M and Zicntr optional, off by default). These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `ab4acbf` (2026-11-23). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
 
 | File | What |
 |---|---|
