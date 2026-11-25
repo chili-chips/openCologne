@@ -23,6 +23,10 @@
 #                             change that moves logic between modules, e.g.
 #                             's|^u_phy\.u_x\.|u_phy.|'
 #
+# GOLD_SOURCES=<sources.sh> lists the gold tree with an older sources.sh, for a
+# change that moves or renames files (default: this one, for both), e.g.
+#   git show HEAD:7.SerDes/3.iclink-sv/3.build/sources.sh > /tmp/gold-sources.sh
+#
 # The GateMate primitives (CC_SERDES, CC_PLL, CC_USR_RSTN, CC_BUFG) are black
 # boxes turned into ports (expose -evert): their inputs are compared, their
 # outputs are shared free inputs. equiv_induct starts from any state, so logic
@@ -54,16 +58,17 @@ W=$(mktemp -d); cd "$W"
   printf '(* blackbox *)\nmodule CC_BUFG (input I, output O);\nendmodule\n'
 } > bb.v
 
-files() {  # $1 = 1.hw dir
-  echo bb.v $(design_rtl "$1" | tr '\n' ' ') $(serdes_synth)
+files() {  # $1 = 1.hw dir, $2 = the sources.sh that lists it
+  echo bb.v $(. "$2"; design_rtl "$1" | tr '\n' ' ') $(serdes_synth)
 }
+GOLD_SRC=${GOLD_SOURCES:-$HERE/sources.sh}
 BB="t:CC_SERDES t:CC_PLL t:CC_USR_RSTN t:CC_BUFG"
 PREP="hierarchy -top $TOP; proc; flatten; memory; async2sync"
 
 REN=""
 if [ -n "$MAP" ]; then   # rename gold objects to their gate names (skip names the gold already has)
   cat > names.ys <<EOF
-read_slang -D SYNTHESIS --top $TOP $(files $GOLD)
+read_slang -D SYNTHESIS --top $TOP $(files $GOLD $GOLD_SRC)
 $PREP
 tee -q -o names.txt select -list $TOP/w:* $TOP/c:*
 EOF
@@ -79,11 +84,11 @@ EXTRA=""
 [ -n "${LEQ_EXTRA:-}" ] && EXTRA="script $(cd "$(dirname "$LEQ_EXTRA")" && pwd)/$(basename "$LEQ_EXTRA")"
 
 cat > eq.ys <<EOF
-read_slang -D SYNTHESIS --top $TOP $(files $GOLD)
+read_slang -D SYNTHESIS --top $TOP $(files $GOLD $GOLD_SRC)
 $PREP
 $REN
 expose -evert $BB; opt_clean; rename $TOP gold; design -stash gold
-read_slang -D SYNTHESIS --top $TOP $(files $GATE)
+read_slang -D SYNTHESIS --top $TOP $(files $GATE $HERE/sources.sh)
 $PREP
 expose -evert $BB; opt_clean; rename $TOP gate; design -stash gate
 design -copy-from gold -as gold gold

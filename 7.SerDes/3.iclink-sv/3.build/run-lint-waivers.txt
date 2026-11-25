@@ -25,10 +25,12 @@ verilator ^%Warning-UNUSEDPARAM: 1\.hw/iclink_[a-z_]*pkg\.sv:
 # the SerWB modules size their casts for any W; at W = 2 some are 1 bit already
 slang ^1\.hw/iclink_serwb_(fifo|rx)\.sv:[0-9]+:[0-9]+: warning: useless cast
 
-# a unique case that lists only the legal values of a wider selector (CRC
-# term counts 0 .. 4, the three line rates) ends in an empty default, as our
-# rules ask; slang calls that default redundant, Verilator wants it
-slang ^1\.hw/iclink_(serwb|phy)_pkg\.sv:[0-9]+:[0-9]+: warning: 'case' marked 'unique' has 'default' label
+# every unique case has a default, as our rules ask (tags checks it), also
+# one that lists every value (an enum, the 8b/10b tables) or only the legal
+# values of a wider selector (CRC term counts 0 .. 4, the three line rates):
+# unique checks that the items never overlap, the default that no value goes
+# unhandled. slang calls that default redundant, Verilator wants it
+slang ^(1\.hw|2\.sim)/[^ ]+\.sv:[0-9]+:[0-9]+: warning: 'case' marked 'unique' has 'default' label
 
 # NC_ signals are no-connects by name: driven by an unused output, never read
 verilator ^%Warning-UNUSEDSIGNAL: .*'NC_[A-Za-z0-9_]+'
@@ -36,3 +38,10 @@ verilator ^%Warning-UNUSEDSIGNAL: .*'NC_[A-Za-z0-9_]+'
 # iclink_serwb_line at W = 2 (its default, as lint takes it on its own) is a
 # pass-through with no flop: clk and arst_n run only the W = 4 conversion
 verilator ^%Warning-UNUSEDSIGNAL: 1\.hw/iclink_serwb_line\.sv:[0-9]+:[0-9]+: Signal is not used: '(clk|arst_n)'
+
+# reset: data and address flops need no reset (our rule: control flops and
+# flags do). eduBOS5 checked alone (USE_HW_MUL=1, EN_COUNTERS=1), as on
+# openPCIE: its operands, load/store offset, data address, ALU operand signs
+# and the RV32M divider's data path reach a select through a compare
+reset '(rs1_reg|rs2_reg|ls_offset_reg|dmem_addr|g_md\.(div_res|dvs|r_sh))'
+reset 'u_alu\.(alu_minus_reg|aluin_[12]_31_reg)'

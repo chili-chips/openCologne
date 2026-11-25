@@ -166,6 +166,8 @@ module iclink_serdes_gm
         CFG_DONE: begin
           serdes_reset <= 1'b0;
         end
+        default: begin  // values 5 .. 7 are no state: never
+        end
       endcase
     end
   end

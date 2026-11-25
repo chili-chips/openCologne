@@ -111,9 +111,16 @@ module iclink_serwb_rx
   } beat_t;
 
   // one word through the state machine
-  function automatic void step(input ctx_t c, input word_t w, output ctx_t n, output logic data,
-                               output logic crcd, output logic chk, output logic init,
-                               output logic drop);
+  function automatic void step(
+      input  ctx_t  c,
+      input  word_t w,
+      output ctx_t  n,
+      output logic  data,
+      output logic  crcd,
+      output logic  chk,
+      output logic  init,
+      output logic  drop
+  );
     n    = c;
     data = 1'b0;
     crcd = 1'b0;
@@ -153,6 +160,8 @@ module iclink_serwb_rx
       S_CHECK: begin
         n.state = S_PREAMBLE;
         chk     = 1'b1;
+      end
+      default: begin  // all four values listed: never
       end
     endcase
   endfunction

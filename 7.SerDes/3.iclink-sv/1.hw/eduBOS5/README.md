@@ -6,17 +6,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 # eduBOS5
 
-The CPU of our SoC: Chili.CHIPS' compact RV32I core (RV32M and Zicntr optional, off by default). These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `ab4acbf` (2026-11-23). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
+The CPU of our SoC: Chili.CHIPS' compact RV32I core (RV32M and Zicntr optional, off by default). These files are copied unchanged from [openPCIE `2.rtl/0.common.opensource/src/CPU.eduBOS5`](https://github.com/chili-chips/openPCIE/tree/main/2.rtl/0.common.opensource/src/CPU.eduBOS5), commit `ab4acbf` (2026-11-23); `edubos5.sv` and `edubos5_rf.sv` from openPCIE of 2026-11-24 (RV32M product reuse, `RF_SYNC_READ`). The RTL and the constraints only: the docs, tests and formal proofs stay in openPCIE.
 
 | File | What |
 |---|---|
 | `edubos5.sv` | the core: control FSM, decode, load and store |
 | `edubos5_alu.sv` | ALU, registered output |
-| `edubos5_rf.sv` | register file: 2 asynchronous read ports, 1 synchronous write port |
+| `edubos5_rf.sv` | register file: 2 read ports, asynchronous (LUT RAM) or registered (block RAM, `RF_SYNC_READ`), 1 synchronous write port |
 | `edubos5_pkg.sv` | common types and opcodes |
-| `edubos5.3STG-ONLY.mcp.xdc` | multicycle paths of the 3-stage pipeline (`EN_WAIT4REGS=1`), for Vivado and openPCIE's SoC hierarchy. A reference for a GateMate version; nextpnr does not read XDC |
+| `edubos5.3STG-ONLY.mcp.xdc` | multicycle paths of the 3-stage pipeline (`EN_WAIT4REGS=1`), for Vivado and openPCIE's SoC hierarchy. A reference for a GateMate version; nextpnr does not read XDC. Asynchronous register file only: with `RF_SYNC_READ=1` use openPCIE's Tcl version |
 
-Not yet in the 7.SerDes top or its QA flow: that comes with the SoC.
+Not yet in the 7.SerDes top or its QA flow: that comes with the SoC. GateMate has no LUT RAM: the SoC should build the 3-stage core with its register file in block RAM (`EN_WAIT4REGS=1`, `RF_SYNC_READ=1`), as openCologne-PCIE does. Otherwise the register file takes 1,024 flip-flops and two 32-bit 32:1 read muxes.
 
 For the parameters, the pipelines and their cycles per instruction, the validation (riscv-formal, the multicycle proof) and the WaveCrux views, see the [eduBOS5 README in openPCIE](https://github.com/chili-chips/openPCIE/blob/main/2.rtl/0.common.opensource/src/CPU.eduBOS5/README.md).
 

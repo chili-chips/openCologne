@@ -24,38 +24,39 @@ package iclink_8b10b_pkg;
   // 5b/6b ------------------------------------------------------------------
   function automatic logic [5:0] enc_5b6b(input logic [4:0] x);
     unique case (x)
-      5'd0:  return 6'b011000;
-      5'd1:  return 6'b100010;
-      5'd2:  return 6'b010010;
-      5'd3:  return 6'b110001;
-      5'd4:  return 6'b001010;
-      5'd5:  return 6'b101001;
-      5'd6:  return 6'b011001;
-      5'd7:  return 6'b000111;
-      5'd8:  return 6'b000110;
-      5'd9:  return 6'b100101;
-      5'd10: return 6'b010101;
-      5'd11: return 6'b110100;
-      5'd12: return 6'b001101;
-      5'd13: return 6'b101100;
-      5'd14: return 6'b011100;
-      5'd15: return 6'b101000;
-      5'd16: return 6'b100100;
-      5'd17: return 6'b100011;
-      5'd18: return 6'b010011;
-      5'd19: return 6'b110010;
-      5'd20: return 6'b001011;
-      5'd21: return 6'b101010;
-      5'd22: return 6'b011010;
-      5'd23: return 6'b000101;
-      5'd24: return 6'b001100;
-      5'd25: return 6'b100110;
-      5'd26: return 6'b010110;
-      5'd27: return 6'b001001;
-      5'd28: return 6'b001110;
-      5'd29: return 6'b010001;
-      5'd30: return 6'b100001;
-      5'd31: return 6'b010100;
+      5'd0:    return 6'b011000;
+      5'd1:    return 6'b100010;
+      5'd2:    return 6'b010010;
+      5'd3:    return 6'b110001;
+      5'd4:    return 6'b001010;
+      5'd5:    return 6'b101001;
+      5'd6:    return 6'b011001;
+      5'd7:    return 6'b000111;
+      5'd8:    return 6'b000110;
+      5'd9:    return 6'b100101;
+      5'd10:   return 6'b010101;
+      5'd11:   return 6'b110100;
+      5'd12:   return 6'b001101;
+      5'd13:   return 6'b101100;
+      5'd14:   return 6'b011100;
+      5'd15:   return 6'b101000;
+      5'd16:   return 6'b100100;
+      5'd17:   return 6'b100011;
+      5'd18:   return 6'b010011;
+      5'd19:   return 6'b110010;
+      5'd20:   return 6'b001011;
+      5'd21:   return 6'b101010;
+      5'd22:   return 6'b011010;
+      5'd23:   return 6'b000101;
+      5'd24:   return 6'b001100;
+      5'd25:   return 6'b100110;
+      5'd26:   return 6'b010110;
+      5'd27:   return 6'b001001;
+      5'd28:   return 6'b001110;
+      5'd29:   return 6'b010001;
+      5'd30:   return 6'b100001;
+      5'd31:   return 6'b010100;
+      default: return '0;  // all 32 values listed: never
     endcase
   endfunction
 
@@ -71,14 +72,15 @@ package iclink_8b10b_pkg;
   // 3b/4b ------------------------------------------------------------------
   function automatic logic [3:0] enc_3b4b(input logic [2:0] x);
     unique case (x)
-      3'd0: return 4'b0100;
-      3'd1: return 4'b1001;
-      3'd2: return 4'b0101;
-      3'd3: return 4'b0011;
-      3'd4: return 4'b0010;
-      3'd5: return 4'b1010;
-      3'd6: return 4'b0110;
-      3'd7: return 4'b0001;  // primary D.x.7
+      3'd0:    return 4'b0100;
+      3'd1:    return 4'b1001;
+      3'd2:    return 4'b0101;
+      3'd3:    return 4'b0011;
+      3'd4:    return 4'b0010;
+      3'd5:    return 4'b1010;
+      3'd6:    return 4'b0110;
+      3'd7:    return 4'b0001;  // primary D.x.7
+      default: return '0;  // all eight values listed: never
     endcase
   endfunction
 

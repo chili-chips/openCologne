@@ -9,13 +9,16 @@
 # reference (2.sim, ref_rtl; tops iclink_8b10b_enc and _dec): syntax and
 # limited semantic checks with a set of opensource tools, run in this order:
 #
-#   tags       every /*LINT:OK*/ sits on an output port (no tool needed)
+#   tags       every /*LINT:OK*/ sits on an output port, and every unique and
+#              priority case of our RTL has a default (no tool needed)
 #   verilator  Verilator --lint-only -Wall: unused/undriven signals, widths,
 #              implicit nets, multiple drivers, blocking vs non-blocking, case
 #   yosys      Yosys check on the read_slang netlist: combinational loops,
 #              conflicting drivers, used-but-undriven wires, latches
 #   reset      Yosys netlist and run-lint-reset.py: a control flop or flag with
-#              no reset (data and address flops need none: waived by name)
+#              no reset (data and address flops need none: waived by name);
+#              the designs, then eduBOS5 (1.hw/eduBOS5) alone with RV32M and
+#              the counters
 #   slang      read_slang -Wextra: strict IEEE parse, second opinion
 #   verible    Verible style rules (run-lint.verible) on our own RTL: our case
 #              rule -- signals and ports lower case, constants UPPER case --
@@ -80,6 +83,7 @@ SV="$(design_rtl 1.hw | tr '\n' ' ') $(serdes_synth)"
 SERWB=$(serwb_rtl 1.hw | tr '\n' ' ')
 REF="1.hw/iclink_pkg.sv $(ref_rtl 2.sim | tr '\n' ' ')"
 OWN="$(own_rtl 1.hw | tr '\n' ' ') $(ref_rtl 2.sim | tr '\n' ' ')"
+EDUBOS5_SV=$(for f in pkg rf alu; do echo 1.hw/eduBOS5/edubos5_$f.sv; done; echo 1.hw/eduBOS5/edubos5.sv)
 # the designs the verilator, yosys and slang phases lint: top, sources
 DESIGNS=("top:$SV" "iclink_serwb_pump:$SERWB" "iclink_serwb_line:$SERWB"
          "iclink_8b10b_enc:$REF" "iclink_8b10b_dec:$REF")
@@ -105,7 +109,7 @@ waivers() {
 } > lint_ok.txt
 
 found() {  # $1 phase; one finding per line on stdin (not a pipe: RESULT must stay in this shell)
-  cat > $1.all
+  awk '!seen[$0]++' > $1.all  # a finding that several tops or runs share, once
   # drop findings about a pin waived inline: file:line plus the 'PIN' the tools
   # quote (Windows tools print \ in paths)
   awk 'NR == FNR { ok[$0] = 1; next }
@@ -179,6 +183,32 @@ for f in files:
             d = dirs.get(typ, {}).get(m.group(1))
             if d != 'output':
                 print(f'{f}:{n}: LINT:OK on {d or "unknown"} port {typ}.{m.group(1)}')
+# our RTL rule: every unique and priority case has a default, also a full one
+# (no tool checks it: Verible's case-missing-default skips unique, Verilator
+# and slang only flag values no item covers); unique0 has none
+tok = re.compile(r'\b(?:(unique0|unique|priority)\s+)?(case[zx]?|endcase|default)\b|([{}])')
+blank = re.compile(r'"(?:\\.|[^"\\\n])*"|//[^\n]*|/\*.*?\*/', re.S)
+for f in files:
+    if f.endswith('.v'):  # the stubs
+        continue
+    # strings and comments blanked, newlines kept, so line numbers stay
+    t = blank.sub(lambda m: re.sub(r'[^\n]', ' ', m.group(0)), text[f])
+    stack, braces = [], 0  # one [qualifier, line, brace depth, has default] per open case
+    for m in tok.finditer(t):
+        if m.group(3):
+            braces += 1 if m.group(3) == '{' else -1
+        elif m.group(2).startswith('case'):
+            stack.append([m.group(1), t.count('\n', 0, m.start()) + 1, braces, False])
+        elif m.group(2) == 'default':
+            # a case label, not '{default: ...} in an assignment pattern
+            if stack and stack[-1][2] == braces:
+                stack[-1][3] = True
+        elif stack:
+            q, n, _, has = stack.pop()
+            if q in ('unique', 'priority') and not has:
+                print(f'{f}:{n}: {q} case without default')
+    for q, n, _, _ in stack:
+        print(f'{f}:{n}: case without endcase (an `ifdef around case or endcase?)')
 EOF
   local rc=$?
   [ $rc -eq 0 ] || { failed tags "exit $rc"; return; }
@@ -238,6 +268,15 @@ run_reset() {
     "$PYTHON" "$HERE/run-lint-reset.py" reset.$n.json >> reset.out 2>> reset.log ||
       { failed reset "top ${d%%:*}: netlist check failed"; return; }
   done
+  # eduBOS5 alone with the options no SoC build sets: RV32M (in RTL) and the
+  # counters
+  "$YOSYS" $YOSYS_ARGS -q -l reset.cpu.log -p "read_slang --top edubos5 -G USE_HW_MUL=1 -G EN_COUNTERS=1 \
+      $(echo $EDUBOS5_SV); hierarchy -check -top edubos5; proc; flatten; opt_expr; opt_clean; opt_dff; opt_clean; \
+      write_json reset.cpu.json" >/dev/null 2>&1 || rc=$?
+  cat reset.cpu.log >> reset.log
+  [ $rc -eq 0 ] && [ -s reset.cpu.json ] || { failed reset "eduBOS5 RV32M: exit $rc, no netlist"; return; }
+  "$PYTHON" "$HERE/run-lint-reset.py" reset.cpu.json >> reset.out 2>> reset.log ||
+    { failed reset "eduBOS5 RV32M: netlist check failed"; return; }
   found reset < <(sort -u reset.out)
 }
 

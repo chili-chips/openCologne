@@ -85,6 +85,9 @@ module iclink_prbs_tx
       PRBS_31: begin
         prbs = prbs31;
       end
+      default: begin  // all four values listed: never
+        prbs = '0;
+      end
     endcase
 
     for (int b = 0; b < WIDTH; b++) begin

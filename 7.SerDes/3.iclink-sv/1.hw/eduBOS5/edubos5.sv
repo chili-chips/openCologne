@@ -25,7 +25,12 @@ module edubos5
     parameter bit USE_HW_MUL      = 1'b0,
     // USE_HW_MUL: 1 multiplies in a DSP48E1 primitive (Xilinx 7-series), 0 in
     // plain RTL with the same registers and timing
-    parameter bit USE_DSP48E1     = 1'b0
+    parameter bit USE_DSP48E1     = 1'b0,
+    // 1: the register file reads on a clock (edubos5_rf SYNC_READ), in
+    // WAIT4REGS, so it maps to block RAM: for an FPGA with no LUT RAM
+    // (GateMate). Needs EN_WAIT4REGS = 1. Reset enters WAIT4REGS, 1 clock
+    // later than EXECUTE, so the first instruction reads its registers too
+    parameter bit RF_SYNC_READ    = 1'b0
 ) (
     input  logic             clk,
     input  logic             arst_n,          // reset button
@@ -95,6 +100,7 @@ module edubos5
   state_t       state;
 
   logic         go2exec;  // pipeline register load enable
+  logic         rf_re;  // RF_SYNC_READ: the register file reads (WAIT4REGS)
 
   // A STORE is on the bus in the cycle after its FETCH_INSTR, the next
   // instruction's EXECUTE (2-stage) or WAIT4REGS (3-stage). Without ready, the
@@ -309,11 +315,13 @@ module edubos5
   // RF writeback, reset in a software handler
   //------------------------------------------
   edubos5_rf #(
-      .TARGET_IS_ASIC (TARGET_IS_ASIC)
+      .TARGET_IS_ASIC (TARGET_IS_ASIC),
+      .SYNC_READ      (RF_SYNC_READ)
   ) u_rf (
       .clk      (clk),                    //i
       .rs1_addr (instr.grp.reg2reg.rs1),  //i
       .rs2_addr (instr.grp.reg2reg.rs2),  //i
+      .rf_re    (rf_re),                  //i
       .rd_addr  (instr.grp.reg2reg.rd),   //i
       .rf_we    (rf_we),                  //i
 
@@ -502,7 +510,7 @@ module edubos5
   always_ff @(negedge arst_n or posedge clk) begin : _fsm
     if (arst_n == LO) begin
       pc       <= '0;
-      state    <= EXECUTE;
+      state    <= RF_SYNC_READ ? WAIT4REGS : EXECUTE;
       imem_vld <= '1;
     end
     else if (!store_stall) begin
@@ -585,7 +593,7 @@ module edubos5
       // with go2exec low: its sources are frozen, so nothing needs to reload.
       always_ff @(negedge arst_n or posedge clk) begin
         if (arst_n == LO) begin
-          go2exec <= 1'b1;
+          go2exec <= ~RF_SYNC_READ;  // reset enters EXECUTE, or WAIT4REGS
         end
         else begin
           go2exec <= (state == WAIT4REGS) & ~store_stall;
@@ -594,6 +602,14 @@ module edubos5
     end
     else begin : g_ce_2stg
       assign go2exec = 1'b1;  // no flop: load every clock
+    end
+  endgenerate
+
+  assign rf_re = (state == WAIT4REGS);
+
+  generate
+    if (RF_SYNC_READ && EN_WAIT4REGS != 1) begin : g_rf_sync_needs_3stg
+      $error("edubos5: RF_SYNC_READ needs EN_WAIT4REGS = 1 (the 3-stage core)");
     end
   endgenerate
 
@@ -658,10 +674,71 @@ module edubos5
       logic [5:0] md_cnt;
       cpu_data_t mul_res, div_res;
 
-      assign md_op   = instr_decode.ALUREG & (instr.grp.reg2reg.func7 == SEL_MULDIV);
-      assign md_f3   = funct3_imm;
+      //--- product reuse (mul/mulh fusion) --------------------------------
+      // A multiply leaves its 64-bit product in the multiplier registers. The
+      // next one with the same rs1 and rs2 register numbers, while neither
+      // register was written since, reuses it: it retires after 2 EXECUTE
+      // clocks (MUL_HIT_END), not 7. So "mul lo, a, b; mulh hi, a, b", as gcc
+      // emits a 32x32->64 multiply, costs 7 + 2 clocks, not 7 + 7. The match is
+      // on register numbers and the instruction stream, never on values: the
+      // clock count depends on the code, not on the data, and constant-time
+      // code stays constant time. MUL and MULH both form the signed x signed
+      // product (the low word is the same for any signedness), MULHSU and
+      // MULHU their own; a high word reuses only a product of its own kind, a
+      // MUL (the low word) any.
+      localparam int MUL_HIT_END = 1;
+
+      logic [4:0] md_rs1, md_rs2;  // the instruction's rs1, rs2 numbers, registered
+      logic md_same;  // registered at md_cnt 0: rs1, rs2 match the kept product
+      logic md_hit;  // a multiply that reuses the kept product
+      logic pr_vld;  // the multiplier holds the product of pr_rs1 x pr_rs2
+      logic [4:0] pr_rs1, pr_rs2;
+      logic [1:0] pr_kind, md_kind;  // 0: signed x signed, 2: signed x unsigned, 3: unsigned
+      logic pr_wr;  // a register write to pr_rs1 or pr_rs2
+
+      assign md_kind = (md_f3[1:0] == 2'b01) ? 2'd0 : md_f3[1:0];
+      assign md_hit = md_same & ~md_f3[2] & ((md_f3[1:0] == 2'b00) | (md_kind == pr_kind));
+      assign pr_wr = rf_we & ((instr.grp.reg2reg.rd == pr_rs1) | (instr.grp.reg2reg.rd == pr_rs2));
+
+      // loaded with the operands (rs1_reg, rs2_reg): md_cnt 0
+      always_ff @(negedge arst_n or posedge clk) begin : _md_same
+        if (arst_n == LO) begin
+          md_same <= 1'b0;
+          md_rs1  <= '0;
+          md_rs2  <= '0;
+        end
+        else if (go2exec) begin
+          md_same <= pr_vld & (instr.grp.reg2reg.rs1 == pr_rs1) & (instr.grp.reg2reg.rs2 == pr_rs2);
+          md_rs1 <= instr.grp.reg2reg.rs1;
+          md_rs2 <= instr.grp.reg2reg.rs2;
+        end
+      end : _md_same
+
+      // the kept product: set by a full multiply, cleared by a write to its
+      // rs1 or rs2 (rf_we, in FETCH_INSTR: never with md_end, in EXECUTE)
+      always_ff @(negedge arst_n or posedge clk) begin : _pr
+        if (arst_n == LO) begin
+          pr_vld  <= 1'b0;
+          pr_rs1  <= '0;
+          pr_rs2  <= '0;
+          pr_kind <= '0;
+        end
+        else if (md_step & md_end & ~md_f3[2] & ~md_hit) begin
+          pr_vld  <= 1'b1;
+          pr_rs1  <= md_rs1;
+          pr_rs2  <= md_rs2;
+          pr_kind <= md_kind;
+        end
+        else if (pr_wr) begin
+          pr_vld <= 1'b0;
+        end
+      end : _pr
+
+      assign md_op = instr_decode.ALUREG & (instr.grp.reg2reg.func7 == SEL_MULDIV);
+      assign md_f3 = funct3_imm;
       assign md_step = (state == EXECUTE) & md_op & ~store_stall;
-      assign md_end  = (md_cnt == (md_f3[2] ? 6'(DIV_END) : 6'(MUL_END)));
+      assign md_end  = (md_cnt           == (md_f3[2] ? 6'(DIV_END) : 6'(MUL_END)))
+                     | (md_hit & (md_cnt == 6'(MUL_HIT_END)));
       assign md_hold = (state == EXECUTE) & md_op & ~md_end;
 
       always_ff @(negedge arst_n or posedge clk) begin : _md_cnt
@@ -693,7 +770,9 @@ module edubos5
       // low bits are kept as they shift out: product {p4[29:0], p3[16:0],
       // p1[16:0]}. The DSP registers its operands (AREG, BREG), product (MREG),
       // OPMODE and sum (PREG). md_cnt: 1-4 operands in, 2-5 products, 3-6 sums.
-      // p1 clears the old sum, so nothing from before counts.
+      // p1 clears the old sum, so nothing from before counts. The registers
+      // load from md_cnt 1 on (mul_ce), so a product stays for reuse; a reuse
+      // (md_hit) loads nothing.
       typedef enum logic [2:0] {
         Z_ZERO = 3'b000,
         Z_P    = 3'b010,
@@ -710,9 +789,9 @@ module edubos5
       logic [17:0] NC_mul_p;  // above bit 63 of the product
       assign       NC_mul_p = mul_p[47:30];
 
-      assign mul_ce   = md_step & ~md_f3[2];
-      assign a_sx     = rs1_reg[31] & (md_f3[1:0] != 2'b11);  // MULH, MULHSU (MUL: any)
-      assign b_sx     = rs2_reg[31] & (md_f3[1:0] == 2'b01);  // MULH
+      assign mul_ce   = md_step & ~md_f3[2] & (md_cnt != '0) & ~md_hit;
+      assign a_sx     = rs1_reg[31] & (md_f3[1:0] != 2'b11);  // MUL, MULH, MULHSU
+      assign b_sx     = rs2_reg[31] & ~md_f3[1];  // MUL, MULH: the same product
       assign mul_a    = (md_cnt >= 6'd3) ? {{10{a_sx}}, rs1_reg[31:17]} : {8'd0, rs1_reg[16:0]};
       assign mul_b    = md_cnt[0]
                       ? {1'b0, rs2_reg[16:0]}
@@ -998,6 +1077,14 @@ module edubos5
 
   // MCP capture side: the registers the sources feed (pc and the FSM load
   // nothing from them at the 1st edge either)
+  // MCP sources: the instruction port, and the register file reads when they
+  // are asynchronous. RF_SYNC_READ: the register file is a 1-cycle path,
+  // read at the edge that ends WAIT4REGS (rf_re), so not a source; its reads
+  // must change only there. And the read registers load from the instruction
+  // port at the 1st edge after launch: edubos5.3STG-ONLY.mcp.tcl keeps that
+  // path 1 cycle
+  `define EDUBOS5_MCP_SOURCE (RF_SYNC_READ ? {imem_rdat, 64'b0} : {imem_rdat, rs1, rs2})
+
   `define EDUBOS5_MCP_CAPTURE {instr_decode_reg, funct3_brnch, funct7_alu, funct3_imm, \
       pc_imm_reg, imm_uload_reg, rs1_reg, rs2_reg, ls_offset_reg, pc, dmem_rdat_reg, \
       u_alu.shifter, u_alu.aluin_1_31_reg, u_alu.aluin_2_31_reg, \
@@ -1025,7 +1112,7 @@ module edubos5
   // verilog_format: off
   a_mcp_launch_only_at_fetch :
   assert property (@(posedge clk) disable iff (!arst_n || !mcp_started)
-      $changed({imem_rdat, rs1, rs2}) |-> $past(state) inside {FETCH_INSTR, FETCH_TARGET})
+      $changed(`EDUBOS5_MCP_SOURCE) |-> $past(state) inside {FETCH_INSTR, FETCH_TARGET})
   else begin
     $error("EDUBOS5_MCP_CHECK: source changed outside the launch edge, pc %h", {pc, 2'b00});
   end
@@ -1033,7 +1120,7 @@ module edubos5
   a_mcp_held_2_clocks :
   assert property (@(posedge clk) disable iff (!arst_n || !mcp_started)
       $past(state) inside {FETCH_INSTR, FETCH_TARGET} && state != FETCH_TARGET
-      |=> $stable({imem_rdat, rs1, rs2}))
+      |=> $stable(`EDUBOS5_MCP_SOURCE))
   else begin
     $error("EDUBOS5_MCP_CHECK: source not held 2 clocks after launch, pc %h", {pc, 2'b00});
   end
@@ -1045,6 +1132,15 @@ module edubos5
       |=> $stable(`EDUBOS5_MCP_CAPTURE))
   else begin
     $error("EDUBOS5_MCP_CHECK: a register loaded at the 1st edge after launch, pc %h", {pc, 2'b00});
+  end
+
+  // RF_SYNC_READ: the register file reads change only at the edge that ends
+  // WAIT4REGS, the 1st after launch
+  a_rf_sync_read_at_wait4regs :
+  assert property (@(posedge clk) disable iff (!arst_n || !mcp_started)
+      RF_SYNC_READ && $changed({rs1, rs2}) |-> $past(state) == WAIT4REGS)
+  else begin
+    $error("EDUBOS5_MCP_CHECK: register file read outside WAIT4REGS, pc %h", {pc, 2'b00});
   end
   // verilog_format: on
 
@@ -1066,8 +1162,11 @@ module edubos5
 
   always_ff @(posedge clk) begin
     if ($past(fv_on)) begin
-      assert ({imem_rdat, rs1, rs2} == $past({imem_rdat, rs1, rs2}) ||
-              $past(state) == FETCH_INSTR || $past(state) == FETCH_TARGET);
+      assert (`EDUBOS5_MCP_SOURCE == $past(`EDUBOS5_MCP_SOURCE) || $past(state) == FETCH_INSTR ||
+              $past(state) == FETCH_TARGET);
+    end
+    if ($past(fv_on) && RF_SYNC_READ) begin
+      assert ({rs1, rs2} == $past({rs1, rs2}) || $past(state) == WAIT4REGS);
     end
     // the load enable: 2-stage always; 3-stage only in EXECUTE, and always
     // on entering it from WAIT4REGS
@@ -1088,12 +1187,13 @@ module edubos5
         ) == FETCH_TARGET) && $past(
             state
         ) != FETCH_TARGET) begin
-      assert ({imem_rdat, rs1, rs2} == $past({imem_rdat, rs1, rs2}));
+      assert (`EDUBOS5_MCP_SOURCE == $past(`EDUBOS5_MCP_SOURCE));
       assert (`EDUBOS5_MCP_CAPTURE == $past(`EDUBOS5_MCP_CAPTURE));
     end
   end
 `endif
   `undef EDUBOS5_MCP_CAPTURE
+  `undef EDUBOS5_MCP_SOURCE
 
 `ifdef RISCV_FORMAL
   // An instruction retires in FETCH_INSTR: the register file is written there,

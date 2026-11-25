@@ -188,6 +188,9 @@ package iclink_serwb_pkg;
       2'd3: begin
         return mul32(SERWB_M[3], w);
       end
+      default: begin  // all four values listed: never
+        return '0;
+      end
     endcase
   endfunction
 

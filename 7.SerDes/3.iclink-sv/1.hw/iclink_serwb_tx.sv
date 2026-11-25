@@ -162,6 +162,8 @@ module iclink_serwb_tx
         f_next.crcslot[0] = 1'b1;
         state_next        = S_IDLE;
       end
+      default: begin  // the fourth value is no state: never
+      end
     endcase
   end
 

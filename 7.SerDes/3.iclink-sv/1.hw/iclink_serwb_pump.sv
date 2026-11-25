@@ -228,6 +228,8 @@ module iclink_serwb_pump
             tx_state <= T_WAIT;
           end
         end
+        default: begin  // both values listed: never
+        end
       endcase
     end
   end

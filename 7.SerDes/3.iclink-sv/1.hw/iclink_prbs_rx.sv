@@ -99,6 +99,8 @@ module iclink_prbs_rx
         PRBS_31: begin
           error <= err31 != '0;
         end
+        default: begin  // all four values listed: never
+        end
       endcase
 
       if (config_sync == PRBS_OFF) begin
