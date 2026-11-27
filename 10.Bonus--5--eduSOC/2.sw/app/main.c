@@ -77,8 +77,6 @@
  **********************************************************************/
                                   // global variables for:
 
-register  uart_rx_t uart_rx asm("t5");
-
 char      crx_asc[CRX_ASC_SIZE];  // buffer that stores ASCII of a received command element
 uint8_t   crx_asc_idx;            // index into next free spot in that buffer
 uint32_t  crx_bin;                // corresponding binary value for that ASCII string
@@ -89,6 +87,7 @@ cmd_flag_t crx_flag = {0, 0, 0};
 static inline void cmd_recv() __attribute__((always_inline));
 static inline void cmd_recv() {
 //void cmd_recv() {
+   uart_rx_t uart_rx;  // the UART_RX word of this poll
 
    // poll UART_RX:
    //  Due to Clear-on-Read nature of VALID and OFLOW flags, this MUST
